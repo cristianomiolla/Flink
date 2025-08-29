@@ -18,7 +18,7 @@ interface Chat {
   id: string
   participant: {
     name: string
-    avatar?: string
+    avatar?: string | null
   }
   lastMessage: string
   timestamp: string

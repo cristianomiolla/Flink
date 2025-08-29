@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import './ChatConversation.css'
 import { Avatar } from './Avatar'
-import { ActionButton } from './ActionButton'
 import { useMessages } from '../hooks/useMessages'
 import { useAuth } from '../hooks/useAuth'
 
@@ -17,7 +16,7 @@ interface ChatConversationProps {
     id: string
     participant: {
       name: string
-      avatar?: string
+      avatar?: string | null
     }
     lastMessage: string
     timestamp: string

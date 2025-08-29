@@ -95,7 +95,7 @@ export function useMessages() {
         throw messagesError
       }
 
-      const typedMessages = messagesData as MessageWithProfiles[]
+      const typedMessages = messagesData as unknown as MessageWithProfiles[]
 
       // Group messages into conversation threads
       const conversationMap = new Map<string, ConversationThread>()
@@ -179,7 +179,7 @@ export function useMessages() {
         throw messagesError
       }
 
-      return messagesData as MessageWithProfiles[]
+      return messagesData as unknown as MessageWithProfiles[]
     } catch (err) {
       console.error('Error fetching conversation messages:', err)
       return []
@@ -191,7 +191,7 @@ export function useMessages() {
     if (!user || !content.trim()) return false
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('messages')
         .insert([{
           sender_id: user.id,
