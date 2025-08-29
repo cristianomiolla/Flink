@@ -1,0 +1,244 @@
+/* Professional Design Tokens */
+
+:root {
+  /* === COLORS BASE === */
+  --background: hsl(0, 0%, 100%);
+  --foreground: #171717;
+  
+  --primary: #171717;
+  --primary-foreground: hsl(0, 0%, 98%);
+  
+  /* === UNIFIED GREY PALETTE === */
+  --grey-light: #f5f5f5;    /* Sfondi chiari, cards secondarie */
+  --grey-medium: #d4d4d4;   /* Bordi, separatori, input backgrounds */
+  --grey-dark: #737373;     /* Testi secondari, placeholder, icone */
+  
+  --secondary: var(--grey-light);
+  --secondary-foreground: var(--grey-dark);
+  
+  --muted: var(--grey-light);
+  --muted-foreground: var(--grey-dark);
+  
+  --accent: #EF4343;
+  --accent-foreground: hsl(0, 0%, 98%);
+  
+  --border: var(--grey-medium);
+  --border-red: #EF4343;
+  --input: var(--grey-medium);
+  --ring: #EF4343;
+  
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: #171717;
+
+  /* === SHADOWS === */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  
+  /* === RADIUS === */
+  --radius: 0px;
+  --radius-sm: 6px;  /* Only for chips/badges */
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  
+  /* === TYPOGRAPHY === */
+  --font-sans: 'Chakra Petch', system-ui, -apple-system, sans-serif;
+  --font-body: 'Chakra Petch', system-ui, -apple-system, sans-serif;
+}
+
+/* === DARK MODE === */
+.dark {
+  --background: #171717;
+  --foreground: hsl(0, 0%, 100%);
+  
+  --primary: hsl(0, 0%, 100%);
+  --primary-foreground: #171717;
+  
+  /* === UNIFIED GREY PALETTE DARK === */
+  --grey-light: #262626;    /* Sfondi chiari, cards secondarie */
+  --grey-medium: #404040;   /* Bordi, separatori, input backgrounds */
+  --grey-dark: #a3a3a3;     /* Testi secondari, placeholder, icone */
+  
+  --secondary: var(--grey-light);
+  --secondary-foreground: var(--grey-dark);
+  
+  --muted: var(--grey-light);
+  --muted-foreground: var(--grey-dark);
+  
+  --accent: hsl(0, 0%, 4%);
+  --accent-foreground: hsl(0, 0%, 90%);
+  
+  --card: #171717;
+  --card-foreground: hsl(0, 0%, 100%);
+  
+  --border: var(--grey-medium);
+  --border-red: #EF4343;
+  --input: var(--grey-medium);
+  
+  --shadow-brutal: 8px 8px 0px hsl(0, 0%, 100%);
+  --shadow-brutal-hover: 12px 12px 0px hsl(0, 0%, 100%);
+}
+
+/* === BASE STYLES === */
+* {
+  font-family: var(--font-body);
+}
+
+html {
+  font-family: var(--font-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-size: 15px;
+  font-family: var(--font-body);
+}
+
+/* === TYPOGRAPHY === */
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+/* === LAYOUT === */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 2rem;
+  }
+}
+
+/* === BUTTONS === */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  padding: 0.625rem 1rem;
+  text-transform: uppercase;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.btn-primary:hover {
+  background: var(--grey-dark);
+}
+
+.btn-secondary {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--grey-medium);
+}
+
+.btn-accent {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.btn-accent:hover {
+  background: hsl(0, 84%, 55%);
+}
+
+/* === CARDS === */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border-red);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* === FOCUS STYLES === */
+*:focus {
+  outline: none;
+}
+
+/* === ANIMATIONS === */
+@keyframes accordion-down {
+  from { height: 0 }
+  to { height: var(--radix-accordion-content-height) }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height) }
+  to { height: 0 }
+}
+
+.accordion-down {
+  animation: accordion-down 0.2s ease-out;
+}
+
+.accordion-up {
+  animation: accordion-up 0.2s ease-out;
+}
+
+/* === UTILITY CLASSES === */
+.text-primary { color: var(--primary); }
+.text-secondary { color: var(--secondary-foreground); }
+.text-muted { color: var(--muted-foreground); }
+
+.bg-background { background-color: var(--background); }
+.bg-primary { background-color: var(--primary); }
+.bg-card { background-color: var(--card); }
+.bg-secondary { background-color: var(--secondary); }
+
+.border-border { border-color: var(--border); }
+.border-red { border-color: var(--border-red); }
+
+/* === RESPONSIVE === */
+/* Mobile Design - Under 768px */
+@media (max-width: 767px) {
+  .container { 
+    padding: 0 1rem;
+  }
+  
+  .btn {
+    padding: 0.625rem 1rem;
+    font-size: 13px;
+  }
+  
+  .card {
+    border: 1px solid var(--border-red);
+  }
+}
+
+@media (min-width: 640px) {
+  .container { padding: 0 2rem; }
+}
+
+@media (min-width: 1536px) {
+  .container { padding: 0 2rem; }
+}

@@ -1,0 +1,376 @@
+/* Professional PortfolioGrid Styles */
+
+.grid-container {
+  padding: 0 0 2rem 0;
+}
+
+.grid-header {
+  margin-bottom: 2rem;
+}
+
+.header-card {
+  background: var(--background);
+  border: none;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.header-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.filter-dropdown {
+  position: absolute;
+  right: 0;
+}
+
+.grid-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.grid-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.stat-count {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+}
+
+.search-info {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  padding-top: 1rem;
+  border-top: 1px solid #EF4343;
+  flex-wrap: wrap;
+}
+
+.search-term,
+.location-term {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  padding: 0.25rem 0.5rem;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  border-radius: 50px;
+}
+
+/* Filter Dropdown Styles */
+.filter-dropdown {
+  display: inline-block;
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 0.5rem 0.75rem;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.filter-btn:hover {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  border-color: var(--accent);
+}
+
+.filter-btn:focus {
+  outline: none;
+}
+
+.filter-icon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+}
+
+.filter-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.chevron-icon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+  transition: transform 0.2s;
+}
+
+.chevron-icon.open {
+  transform: rotate(180deg);
+}
+
+.filter-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: var(--shadow-md);
+  z-index: 1000;
+  min-width: 120px;
+  margin-top: 2px;
+}
+
+.filter-option {
+  display: block;
+  width: 100%;
+  background: none;
+  color: var(--foreground);
+  border: none;
+  padding: 0.625rem 0.875rem;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.filter-option:hover {
+  background: var(--grey-light);
+}
+
+.filter-option.active {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.filter-option:focus {
+  outline: none;
+  background: var(--grey-light);
+}
+
+.filter-option.active:focus,
+.filter-option.active:hover {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.artist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 1.5rem;
+}
+
+/* State Styles */
+.loading-state,
+.error-state,
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  padding: 2rem;
+}
+
+.loading-card,
+.error-card,
+.empty-card {
+  background: var(--background);
+  border: none;
+  border-radius: var(--radius);
+  padding: 2rem;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.loading-title,
+.error-title,
+.empty-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-message {
+  color: var(--accent);
+  font-weight: 500;
+  margin: 0 0 1rem 0;
+  font-size: 14px;
+}
+
+.empty-message {
+  font-size: 14px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.retry-btn {
+  margin-top: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) and (min-width: 768px) {
+  .portfolio-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .artist-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Mobile Design - Under 768px */
+@media (max-width: 767px) {
+  .grid-container {
+    padding: 1.25rem 0;
+  }
+  
+  .grid-header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .header-card {
+    padding: 1.25rem;
+    border: none;
+  }
+  
+  .header-top {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    position: static;
+  }
+  
+  .filter-dropdown {
+    position: relative;
+    right: auto;
+  }
+  
+  .grid-title {
+    font-size: 20px;
+    margin-bottom: 1rem;
+  }
+  
+  .stat-count {
+    font-size: 26px;
+  }
+  
+  .stat-label {
+    font-size: 13px;
+  }
+  
+  .portfolio-grid,
+  .artist-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  
+  .loading-card,
+  .error-card,
+  .empty-card {
+    padding: 1.5rem;
+    border: none;
+  }
+  
+  .loading-title,
+  .error-title,
+  .empty-title {
+    font-size: 17px;
+  }
+  
+  .spinner {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .search-info {
+    gap: 0.5rem;
+    padding-top: 1rem;
+    flex-direction: column;
+  }
+  
+  .search-term,
+  .location-term {
+    font-size: 12px;
+    padding: 0.3rem 0.6rem;
+  }
+  
+  .filter-btn {
+    padding: 0.4rem 0.625rem;
+    font-size: 12px;
+    border: 2px solid var(--border);
+  }
+  
+  .filter-btn:hover {
+    background: var(--accent);
+    color: var(--accent-foreground);
+    border: 2px solid var(--accent);
+  }
+  
+  .filter-dropdown-menu {
+    right: 0;
+    left: auto;
+    min-width: 110px;
+  }
+  
+  .filter-option {
+    padding: 0.5rem 0.75rem;
+    font-size: 12px;
+  }
+}

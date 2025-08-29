@@ -1,0 +1,41 @@
+/* Brutalist Square Spinner */
+.brutalist-spinner {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.brutalist-block {
+  width: 16px;
+  height: 16px;
+  background-color: #000000;
+  border: none;
+  animation: brutalist-bounce 1.2s infinite ease-in-out;
+}
+
+.brutalist-block:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.brutalist-block:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+.brutalist-block:nth-child(3) {
+  animation-delay: 0s;
+}
+
+.brutalist-block:nth-child(4) {
+  animation-delay: 0.16s;
+}
+
+@keyframes brutalist-bounce {
+  0%, 80%, 100% {
+    transform: scaleY(0.4);
+    background-color: #000000;
+  }
+  40% {
+    transform: scaleY(1.0);
+    background-color: #ef4444;
+  }
+}

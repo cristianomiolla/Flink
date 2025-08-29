@@ -1,0 +1,173 @@
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useEffect, useState } from 'react'
+import type { User, AuthError, Session } from '@supabase/supabase-js'
+import { supabase } from '../lib/supabase'
+
+interface UserProfile {
+  id: string
+  user_id: string
+  email: string
+  full_name: string | null
+  username: string | null
+  profile_type: 'client' | 'artist'
+  bio: string | null
+  avatar_url: string | null
+  phone: string | null
+  location: string | null
+}
+
+interface AuthContextType {
+  user: User | null
+  profile: UserProfile | null
+  loading: boolean
+  signUp: (email: string, password: string, fullName: string) => Promise<{ error: AuthError | null }>
+  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
+  signOut: () => Promise<void>
+}
+
+export const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+interface AuthProviderProps {
+  children: React.ReactNode
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(null)
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle()
+      
+      // data can be null if no profile found, which is valid
+      return data as UserProfile | null
+    } catch {
+      console.error('Error fetching profile')
+      return null
+    }
+  }
+
+  useEffect(() => {
+    let isMounted = true
+
+    const handleAuthState = async (session: Session | null) => {
+      if (!isMounted) return
+
+      setUser(session?.user ?? null)
+      
+      if (session?.user) {
+        try {
+          const userProfile = await fetchUserProfile(session.user.id)
+          if (isMounted) {
+            setProfile(userProfile)
+          }
+        } catch {
+          console.error('Error fetching user profile')
+          if (isMounted) {
+            setProfile(null)
+          }
+        }
+      } else {
+        setProfile(null)
+      }
+      
+      if (isMounted) {
+        setLoading(false)
+      }
+    }
+
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      handleAuthState(session)
+    })
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === 'TOKEN_REFRESHED') {
+          console.log('Token refreshed successfully')
+        } else if (event === 'SIGNED_OUT') {
+          console.log('User signed out')
+        }
+        handleAuthState(session)
+      }
+    )
+
+    return () => {
+      isMounted = false
+      subscription.unsubscribe()
+    }
+  }, [])
+
+  const signUp = async (email: string, password: string, fullName: string) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+          }
+        }
+      })
+
+      if (error) return { error }
+
+      // If user was created, also create profile record
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              user_id: data.user.id,
+              email: data.user.email!,
+              full_name: fullName,
+              profile_type: 'client'
+            }
+          ])
+
+        if (profileError) {
+          console.error('Error creating profile')
+        }
+      }
+
+      return { error: null }
+    } catch (error) {
+      return { error: error as AuthError }
+    }
+  }
+
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+    return { error }
+  }
+
+  const signOut = async () => {
+    await supabase.auth.signOut()
+    // Clear any stale local storage
+    localStorage.removeItem('supabase.auth.token')
+  }
+
+  const value = {
+    user,
+    profile,
+    loading,
+    signUp,
+    signIn,
+    signOut,
+  }
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  )
+}

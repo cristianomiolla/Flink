@@ -1,0 +1,206 @@
+/* Professional ArtistCard Styles */
+
+.artist-card {
+  padding: 1rem 1.5rem;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  min-height: 250px; /* Ensures consistent minimum height for all cards */
+}
+
+.artist-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.artist-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.avatar-section {
+  flex-shrink: 0;
+}
+
+/* Avatar styles now handled by Avatar component */
+
+.artist-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.artist-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.artist-location {
+  font-size: 14px;
+  color: var(--muted-foreground);
+  font-weight: 500;
+  margin: 0;
+}
+
+.artist-bio {
+  font-size: 14px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+  margin: 0 0 1rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 2.3rem; /* Fixed height for exactly 2 lines (14px * 1.5 * 2 = 42px ≈ 2.3rem) */
+  min-height: 2.3rem;
+}
+
+.artist-meta {
+  padding: 1rem 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.join-date {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.join-icon {
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.artist-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto; /* Push actions to bottom of card for uniform spacing */
+}
+
+.artist-actions .btn {
+  flex: 1;
+  justify-content: center;
+}
+
+.artist-actions .btn.btn-accent {
+  background: #171717;
+  color: #ffffff;
+}
+
+.artist-actions .btn.btn-accent:hover {
+  background: hsl(0, 0%, 20%);
+  color: #ffffff;
+}
+
+.artist-actions .btn.btn-secondary {
+  background: #ffffff;
+  color: #171717;
+}
+
+.artist-actions .btn.btn-secondary:hover {
+  background: #EF4343;
+  color: #ffffff;
+}
+
+.artist-actions .btn.btn-secondary:focus {
+  outline: none;
+}
+
+.artist-actions .btn.btn-secondary:active {
+  outline: none;
+}
+
+.artist-actions .btn.btn-accent:focus {
+  outline: none;
+}
+
+.artist-actions .btn.btn-accent:active {
+  outline: none;
+}
+
+/* Mobile Design - Under 768px */
+@media (max-width: 767px) {
+  .artist-card {
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border-red);
+    min-height: 320px;
+  }
+  
+  .artist-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .avatar-image,
+  .avatar-placeholder {
+    width: 3.5rem;
+    height: 3.5rem;
+    align-self: center;
+  }
+  
+  .avatar-placeholder {
+    font-size: 1.3rem;
+  }
+  
+  .artist-info {
+    align-items: center;
+    text-align: left;
+    gap: 0.5rem;
+  }
+  
+  .artist-name {
+    font-size: 16px;
+  }
+  
+  .artist-location {
+    font-size: 13px;
+  }
+  
+  .artist-bio {
+    font-size: 13px;
+    text-align: left;
+    height: 2.1rem;
+    min-height: 2.1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .artist-meta {
+    padding: 0.875rem 0;
+    margin-bottom: 1rem;
+    border-top: 2px solid var(--border);
+    border-bottom: 2px solid var(--border);
+  }
+  
+  .join-date {
+    font-size: 12px;
+  }
+  
+  .join-icon {
+    font-size: 10px;
+  }
+  
+  .artist-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .artist-actions .btn {
+    padding: 0.5rem 0.875rem;
+    font-size: 13px;
+  }
+}

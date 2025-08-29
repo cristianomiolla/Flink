@@ -1,0 +1,47 @@
+/* Messages Page Styles */
+
+.messages-page {
+  min-height: 100vh;
+  background: var(--background);
+}
+
+.messages-container {
+  padding-top: 1rem;
+}
+
+.messages-content {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  height: calc(100vh - 140px);
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 0;
+  border: 2px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--shadow-heavy);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .messages-content {
+    grid-template-columns: 1fr;
+    height: calc(100vh - 120px);
+    margin: 0 1rem;
+  }
+  
+  .chat-list {
+    display: none;
+  }
+  
+  .chat-list.mobile-visible {
+    display: flex;
+  }
+  
+  .chat-conversation {
+    display: none;
+  }
+  
+  .chat-conversation.mobile-visible {
+    display: flex;
+  }
+}

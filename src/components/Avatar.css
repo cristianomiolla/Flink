@@ -1,0 +1,133 @@
+/* Avatar Component Styles */
+
+.avatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.avatar-clickable {
+  cursor: pointer;
+}
+
+.avatar-clickable:hover {
+  opacity: 0.8;
+}
+
+.avatar-clickable:focus {
+  outline: none;
+}
+
+/* Avatar Image */
+.avatar .avatar-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Avatar Placeholder */
+.avatar .avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--secondary-foreground);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* === SIZE VARIANTS === */
+
+/* Small - 36px (Portfolio cards, header dropdown) */
+.avatar-sm {
+  width: 36px;
+  height: 36px;
+}
+
+.avatar-sm .avatar-placeholder {
+  font-size: 14px;
+}
+
+/* Medium - 60px (Artist cards) */
+.avatar-md {
+  width: 60px;
+  height: 60px;
+}
+
+.avatar-md .avatar-placeholder {
+  font-size: 24px;
+}
+
+/* Large - 120px (Artist profile header, modals) */
+.avatar-lg {
+  width: 120px;
+  height: 120px;
+}
+
+.avatar-lg .avatar-placeholder {
+  font-size: 48px;
+}
+
+/* === VARIANT STYLES === */
+
+/* Default variant */
+.avatar-default .avatar-image {
+  /* No additional styles */
+}
+
+/* Bordered variant (Artist profile pages) */
+.avatar-bordered .avatar-image {
+  border: 3px solid var(--border-red);
+}
+
+/* Card variant (for use in cards with specific styling) */
+.avatar-card .avatar-placeholder {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+/* === CONTEXT-SPECIFIC OVERRIDES === */
+
+/* Portfolio modal now uses standard lg size, no overrides needed */
+
+/* === RESPONSIVE DESIGN === */
+
+/* Mobile adjustments */
+@media (max-width: 767px) {
+  /* Small - slightly smaller on mobile */
+  .avatar-sm {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .avatar-sm .avatar-placeholder {
+    font-size: 12px;
+  }
+  
+  /* Medium - slightly smaller on mobile */
+  .avatar-md {
+    width: 56px;
+    height: 56px;
+  }
+  
+  .avatar-md .avatar-placeholder {
+    font-size: 22px;
+  }
+  
+  /* Large - smaller but still prominent on mobile */
+  .avatar-lg {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .avatar-lg .avatar-placeholder {
+    font-size: 40px;
+  }
+}

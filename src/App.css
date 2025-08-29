@@ -1,0 +1,108 @@
+@import './styles/tokens.css';
+
+/* INKMATCH Brutalist App Styles */
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: var(--background);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+.app {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.main-content {
+  width: 100%;
+  margin: 0;
+  padding: 2rem 0;
+  overflow-x: hidden;
+}
+
+.hero-section {
+  background: var(--gradient-hero);
+  color: var(--primary-foreground);
+  padding: 6rem 0;
+  text-align: center;
+  border-bottom: 4px solid var(--border);
+  position: relative;
+}
+
+.hero-title {
+  font-size: clamp(3rem, 8vw, 6rem);
+  margin-bottom: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 0.9;
+}
+
+.hero-subtitle {
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  margin-bottom: 3rem;
+  letter-spacing: 0.1em;
+  opacity: 0.9;
+  font-weight: 600;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+
+.read-the-docs {
+  color: var(--grey-dark);
+}
+
+/* Mobile Design - Under 768px */
+@media (max-width: 767px) {
+  .main-content {
+    padding: 1rem 0;
+  }
+  
+  .hero-section {
+    padding: 3rem 0;
+    border-bottom: 2px solid var(--border);
+  }
+  
+  .hero-title {
+    font-size: clamp(2rem, 8vw, 4rem);
+    margin-bottom: 1rem;
+  }
+  
+  .hero-subtitle {
+    font-size: clamp(1rem, 3vw, 1.3rem);
+    margin-bottom: 2rem;
+  }
+  
+  .hero-actions {
+    gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+  }
+}
