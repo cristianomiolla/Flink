@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import './Header.css'
 import { useAuth } from '../hooks/useAuth'
 import { HeaderIcons } from './HeaderIcons'
