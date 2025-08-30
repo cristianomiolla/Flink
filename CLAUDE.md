@@ -31,6 +31,9 @@ npm run lint
 
 # Preview production build
 npm run preview
+
+# Deploy to GitHub Pages
+npm run deploy
 ```
 
 ## Supabase Integration
@@ -223,10 +226,11 @@ The app follows a modular React architecture with authentication and state manag
 - **Authentication Flow**: Action buttons require authentication - redirect to AuthOverlay when not logged in
 
 ### Authentication System
-- **AuthContext**: Provides user state, profile data, and auth functions (signIn, signUp, signOut)
+- **AuthContext**: Located in `src/contexts/AuthContext.tsx` - provides user state, profile data, and auth functions (signIn, signUp, signOut)
 - **AuthOverlay**: Modal component for login/registration, managed at page level
 - **Protected Actions**: All action buttons (follow, contact, like, save) require authentication
 - **Authentication Check**: Components check `user` state and trigger `onAuthRequired` callback when needed
+- **Profile Creation**: SignUp automatically creates a profile record with default 'client' type
 
 ### Key Data Flow & Components
 
@@ -268,3 +272,5 @@ The app uses TypeScript interfaces defined in `src/types/portfolio.ts`:
 - **TypeScript**: Use strict typing - all interfaces are defined in `src/types/portfolio.ts`
 - **Data Queries**: Use optimized Supabase JOIN queries, transform nested results to flat component interfaces
 - **Saved Items**: Order by `saved_tattoos.created_at` (not `portfolio_items.created_at`) for chronological user experience
+- **Deployment**: Configured for GitHub Pages deployment via `npm run deploy`
+- **Environment**: Supabase configuration stored in `.env.local`

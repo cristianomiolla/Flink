@@ -115,18 +115,12 @@
   flex-wrap: wrap;
 }
 
-/* Styles for ActionButton components in profile-actions */
-.profile-actions .action-btn,
-.profile-actions .btn.btn-secondary {
-  flex: 1;
-  min-width: 140px;
-  padding: 0.75rem 1rem;
-  font-size: 13px;
-  font-weight: 600;
-  text-transform: uppercase;
-  white-space: nowrap;
-  cursor: pointer;
+/* Artist Actions - Joined buttons with dividing border */
+.artist-actions {
+  display: flex;
+  gap: 0;
 }
+
 
 
 /* Sezione Bassa - Tabs Interattive */

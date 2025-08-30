@@ -11,14 +11,27 @@
 
 .messages-content {
   display: grid;
-  grid-template-columns: 350px 1fr;
+  grid-template-columns: 350px minmax(400px, 1fr);
   height: calc(100vh - 140px);
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
   gap: 0;
-  border: 2px solid var(--border);
+  border: 1px solid var(--border);
   background: var(--card);
   box-shadow: var(--shadow-heavy);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Loading State */
+.messages-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* Mobile responsive */

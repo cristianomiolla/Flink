@@ -131,7 +131,7 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: var(--radius);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   transition: all 0.2s;
   cursor: pointer;
@@ -160,14 +160,7 @@ body {
   background: var(--grey-medium);
 }
 
-.btn-accent {
-  background: var(--accent);
-  color: var(--accent-foreground);
-}
 
-.btn-accent:hover {
-  background: hsl(0, 84%, 55%);
-}
 
 /* === CARDS === */
 .card {
@@ -225,10 +218,6 @@ body {
     padding: 0 1rem;
   }
   
-  .btn {
-    padding: 0.625rem 1rem;
-    font-size: 13px;
-  }
   
   .card {
     border: 1px solid var(--border-red);

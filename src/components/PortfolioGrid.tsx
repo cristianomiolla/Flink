@@ -104,17 +104,21 @@ export function PortfolioGrid({
               <h2 className="grid-title">Portfolio opere</h2>
               <div className="filter-dropdown" ref={dropdownRef}>
                 <button 
-                  className="filter-btn"
+                  className="action-btn"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   aria-expanded={isDropdownOpen}
                 >
-                  <svg className="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
-                  </svg>
-                  <span className="filter-label">{getFilterLabel(flashFilter)}</span>
-                  <svg className={`chevron-icon ${isDropdownOpen ? 'open' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <polyline points="6,9 12,15 18,9"/>
-                  </svg>
+                  <span className="action-icon">
+                    <svg className="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
+                    </svg>
+                  </span>
+                  <span className="action-text">{getFilterLabel(flashFilter)}</span>
+                  <span className="action-icon">
+                    <svg className={`chevron-icon ${isDropdownOpen ? 'open' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <polyline points="6,9 12,15 18,9"/>
+                    </svg>
+                  </span>
                 </button>
                 {isDropdownOpen && (
                   <div className="filter-dropdown-menu">

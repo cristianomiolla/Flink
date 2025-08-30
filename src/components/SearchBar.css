@@ -101,11 +101,18 @@
   color: var(--muted-foreground);
 }
 
-.search-btn {
+/* Search button - consolidated styles */
+.search-btn.btn.btn-accent {
+  background: var(--accent);
+  color: var(--accent-foreground);
   white-space: nowrap;
   border-left: 1px solid var(--border);
   border-radius: 0;
   flex-shrink: 0;
+}
+
+.search-btn.btn.btn-accent:hover {
+  background: hsl(0, 84%, 55%);
 }
 
 .user-section {

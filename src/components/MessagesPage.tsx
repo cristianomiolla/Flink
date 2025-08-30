@@ -9,6 +9,7 @@ import { useAuth } from '../hooks/useAuth'
 import { generateConversationId } from '../lib/messageUtils'
 import { supabase } from '../lib/supabase'
 import LoadingSpinner from './LoadingSpinner'
+import { ConfirmationOverlay } from './ConfirmationOverlay'
 
 interface MessagesPageProps {
   onLogoClick?: () => void
@@ -28,9 +29,10 @@ interface Chat {
 export function MessagesPage({ onLogoClick }: MessagesPageProps) {
   const { artistId } = useParams()
   const { user } = useAuth()
-  const { conversations, loading, error, deleteConversation, markConversationAsRead } = useMessages()
+  const { conversations, loading, error, deleteConversation, markConversationAsRead, sendMessage, fetchConversationMessages } = useMessages()
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
   const [newChatArtist, setNewChatArtist] = useState<{id: string, name: string, avatar?: string} | null>(null)
+  const [chatToDelete, setChatToDelete] = useState<{id: string, participantName: string} | null>(null)
   
   // Convert Supabase conversations to Chat format for existing components
   const chats: Chat[] = conversations.map(conv => ({
@@ -63,6 +65,18 @@ export function MessagesPage({ onLogoClick }: MessagesPageProps) {
       }
     }
   }, [artistId, user, conversations])
+
+  // Update newChatArtist state when conversations change
+  useEffect(() => {
+    if (selectedChatId && newChatArtist) {
+      // Check if the virtual chat now exists in the real conversations
+      const existingConversation = conversations.find(conv => conv.id === selectedChatId)
+      if (existingConversation) {
+        // The virtual chat became real, clear newChatArtist
+        setNewChatArtist(null)
+      }
+    }
+  }, [conversations, selectedChatId, newChatArtist])
   
   // Function to fetch artist profile data
   const fetchArtistProfile = async (artistUserId: string) => {
@@ -95,7 +109,13 @@ export function MessagesPage({ onLogoClick }: MessagesPageProps) {
   }
 
   // Determine the selected chat - existing or new
-  let selectedChat = chats.find(chat => chat.id === selectedChatId)
+  let selectedChat = selectedChatId ? chats.find(chat => chat.id === selectedChatId) : null
+  
+  // If selectedChatId exists but no chat found AND no new chat artist, the chat was probably deleted
+  if (selectedChatId && !selectedChat && !newChatArtist) {
+    setSelectedChatId(null)
+    return // Re-render with null selectedChatId
+  }
   
   // If no existing chat found but we have a new chat artist, create a virtual chat
   if (!selectedChat && newChatArtist && selectedChatId) {
@@ -121,21 +141,39 @@ export function MessagesPage({ onLogoClick }: MessagesPageProps) {
     }
   }
 
-  const handleChatDelete = async (chatId: string) => {
-    try {
-      // Find the conversation to get participant ID
-      const conversation = conversations.find(conv => conv.id === chatId)
-      if (conversation) {
-        await deleteConversation(conversation.participant.user_id)
-        
-        // If the deleted chat was selected, clear selection
-        if (selectedChatId === chatId) {
-          setSelectedChatId(null)
+  const handleRequestDeleteChat = (chat: { id: string; participant: { name: string } }) => {
+    // Prevent event propagation to avoid immediate cancellation
+    setTimeout(() => {
+      setChatToDelete({
+        id: chat.id,
+        participantName: chat.participant.name
+      })
+    }, 0)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (chatToDelete) {
+      try {
+        // Find the conversation to get participant ID
+        const conversation = conversations.find(conv => conv.id === chatToDelete.id)
+        if (conversation) {
+          // If the deleted chat was selected, clear selection FIRST
+          if (selectedChatId === chatToDelete.id) {
+            setSelectedChatId(null)
+            setNewChatArtist(null)
+          }
+          
+          await deleteConversation(conversation.participant.user_id)
         }
+      } catch (err) {
+        console.error('Failed to delete conversation:', err)
       }
-    } catch (err) {
-      console.error('Failed to delete conversation:', err)
     }
+    setChatToDelete(null)
+  }
+
+  const handleCancelDelete = () => {
+    setChatToDelete(null)
   }
 
   // Show loading state
@@ -144,7 +182,7 @@ export function MessagesPage({ onLogoClick }: MessagesPageProps) {
       <div className="messages-page">
         <SearchBar onLogoClick={onLogoClick} />
         <div className="messages-container">
-          <div className="messages-content">
+          <div className="messages-loading">
             <LoadingSpinner />
           </div>
         </div>
@@ -180,16 +218,30 @@ export function MessagesPage({ onLogoClick }: MessagesPageProps) {
             chats={chats}
             selectedChatId={selectedChatId}
             onChatSelect={handleChatSelect}
-            onChatDelete={handleChatDelete}
+            onRequestDeleteChat={handleRequestDeleteChat}
           />
           
           {/* Chat Conversation Area */}
           <ChatConversation 
             chat={selectedChat}
             isVisible={selectedChatId !== null}
+            onRequestDeleteChat={handleRequestDeleteChat}
+            sendMessage={sendMessage}
+            fetchConversationMessages={fetchConversationMessages}
           />
         </div>
       </div>
+
+      {/* Delete Confirmation Overlay */}
+      <ConfirmationOverlay
+        isOpen={chatToDelete !== null}
+        title="Elimina Conversazione"
+        message={chatToDelete ? `Vuoi davvero eliminare la conversazione con ${chatToDelete.participantName}? Questa azione non può essere annullata.` : ''}
+        confirmText="Elimina"
+        cancelText="Annulla"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </div>
   )
 }

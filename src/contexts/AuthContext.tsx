@@ -20,8 +20,9 @@ interface AuthContextType {
   user: User | null
   profile: UserProfile | null
   loading: boolean
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: AuthError | null }>
+  signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
+  signInWithGoogle: () => Promise<{ error: AuthError | null }>
   signOut: () => Promise<void>
 }
 
@@ -52,6 +53,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
+
   useEffect(() => {
     let isMounted = true
 
@@ -63,6 +65,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (session?.user) {
         try {
           const userProfile = await fetchUserProfile(session.user.id)
+          
           if (isMounted) {
             setProfile(userProfile)
           }
@@ -104,48 +107,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [])
 
-  const signUp = async (email: string, password: string, fullName: string) => {
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-          }
-        }
-      })
-
-      if (error) return { error }
-
-      // If user was created, also create profile record
-      if (data.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              user_id: data.user.id,
-              email: data.user.email!,
-              full_name: fullName,
-              profile_type: 'client'
-            }
-          ])
-
-        if (profileError) {
-          console.error('Error creating profile')
-        }
-      }
-
-      return { error: null }
-    } catch (error) {
-      return { error: error as AuthError }
-    }
+  const signUp = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    })
+    return { error }
   }
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
+    })
+    return { error }
+  }
+
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin
+      }
     })
     return { error }
   }
@@ -162,6 +145,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     loading,
     signUp,
     signIn,
+    signInWithGoogle,
     signOut,
   }
 

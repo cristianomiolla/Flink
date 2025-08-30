@@ -14,10 +14,10 @@ interface ChatListProps {
   }>
   selectedChatId: string | null
   onChatSelect: (chatId: string) => void
-  onChatDelete: (chatId: string) => void
+  onRequestDeleteChat: (chat: { id: string; participant: { name: string } }) => void
 }
 
-export function ChatList({ chats, selectedChatId, onChatSelect, onChatDelete }: ChatListProps) {
+export function ChatList({ chats, selectedChatId, onChatSelect, onRequestDeleteChat }: ChatListProps) {
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp)
     const now = new Date()
@@ -38,11 +38,9 @@ export function ChatList({ chats, selectedChatId, onChatSelect, onChatDelete }: 
     }
   }
 
-  const handleDeleteClick = (e: React.MouseEvent, chatId: string) => {
+  const handleDeleteClick = (e: React.MouseEvent, chat: { id: string; participant: { name: string } }) => {
     e.stopPropagation()
-    if (window.confirm('Sei sicuro di voler eliminare questa conversazione?')) {
-      onChatDelete(chatId)
-    }
+    onRequestDeleteChat(chat)
   }
 
   return (
@@ -86,7 +84,7 @@ export function ChatList({ chats, selectedChatId, onChatSelect, onChatDelete }: 
                     </span>
                     <button
                       className="chat-delete-btn"
-                      onClick={(e) => handleDeleteClick(e, chat.id)}
+                      onClick={(e) => handleDeleteClick(e, { id: chat.id, participant: { name: chat.participant.name } })}
                       title="Elimina conversazione"
                       aria-label="Elimina conversazione"
                     >

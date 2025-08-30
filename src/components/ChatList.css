@@ -3,7 +3,7 @@
 .chat-list {
   display: flex;
   flex-direction: column;
-  border-right: 2px solid var(--border);
+  border-right: 1px solid var(--border);
   background: var(--card);
   height: 100%;
   overflow: hidden;
@@ -11,7 +11,7 @@
 
 .chat-list-header {
   padding: 1.5rem;
-  border-bottom: 2px solid var(--border);
+  border-bottom: 1px solid var(--border);
   background: var(--grey-light);
 }
 

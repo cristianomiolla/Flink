@@ -11,7 +11,6 @@ const DEFAULT_PLACEHOLDER = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZ
 export const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
   const img = event.currentTarget
   if (img.src !== DEFAULT_PLACEHOLDER) {
-    console.warn(`Image failed to load: ${img.src}`)
     img.src = DEFAULT_PLACEHOLDER
   }
 }

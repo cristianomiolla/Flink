@@ -75,10 +75,22 @@ export function ArtistCard({ profile, onArtistClick, onAuthRequired, onContactAr
 
       <div className="artist-actions">
         <button className="action-btn" onClick={handleFollowClick}>
-          Segui
+          <span className="action-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+            </svg>
+          </span>
+          <span className="action-text">Segui</span>
         </button>
         <button className="action-btn" onClick={handleContactClick}>
-          Contatta
+          <span className="action-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+            </svg>
+          </span>
+          <span className="action-text">Contatta</span>
         </button>
       </div>
     </article>
