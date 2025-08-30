@@ -20,14 +20,7 @@
   position: relative;
 }
 
-.grid-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--foreground);
-  text-transform: uppercase;
-  margin: 0;
-  letter-spacing: 0.02em;
-}
+/* .grid-title - using global class from tokens.css */
 
 .grid-subtitle {
   font-size: 1rem;

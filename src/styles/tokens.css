@@ -198,6 +198,32 @@ body {
   animation: accordion-up 0.2s ease-out;
 }
 
+/* === STATE CLASSES === */
+.loading-state,
+.error-state,
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 300px;
+  padding: 2rem;
+  text-align: center;
+  background: var(--background);
+  border: none;
+  border-radius: 0;
+}
+
+/* === GRID TITLE CLASSES === */
+.grid-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--foreground);
+  text-transform: uppercase;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
 /* === UTILITY CLASSES === */
 .text-primary { color: var(--primary); }
 .text-secondary { color: var(--secondary-foreground); }
@@ -216,11 +242,6 @@ body {
 @media (max-width: 767px) {
   .container { 
     padding: 0 1rem;
-  }
-  
-  
-  .card {
-    border: 1px solid var(--border-red);
   }
 }
 

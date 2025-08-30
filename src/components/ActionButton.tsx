@@ -7,6 +7,7 @@ export interface ActionButtonProps {
   text: string
   variant?: 'portfolio' | 'modal' | 'secondary'
   active?: boolean
+  disabled?: boolean
   onClick?: (e: React.MouseEvent) => void
   className?: string
   requiresAuth?: boolean
@@ -18,6 +19,7 @@ export function ActionButton({
   text,
   variant = 'portfolio',
   active = false,
+  disabled = false,
   onClick,
   className = '',
   requiresAuth = false,
@@ -29,8 +31,11 @@ export function ActionButton({
     : 'action-btn'
   
   const activeClass = active ? 'active' : ''
+  const disabledClass = disabled ? 'disabled' : ''
   
   const handleClick = (e: React.MouseEvent) => {
+    if (disabled) return
+    
     if (requiresAuth && !user && onAuthRequired) {
       onAuthRequired()
       return
@@ -42,8 +47,9 @@ export function ActionButton({
   
   return (
     <button
-      className={`${baseClass} ${activeClass} ${className}`.trim()}
+      className={`${baseClass} ${activeClass} ${disabledClass} ${className}`.trim()}
       onClick={handleClick}
+      disabled={disabled}
     >
       <span className={variant === 'modal' ? 'modal-action-icon' : 'action-icon'}>
         {icon}

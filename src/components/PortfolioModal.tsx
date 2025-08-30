@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import './PortfolioModal.css'
 import { Avatar } from './Avatar'
 import { useSavedTattoos } from '../hooks/useSavedTattoos'
+import { usePortfolioLikes } from '../hooks/usePortfolioLikes'
 import { ActionButton, BookmarkIcon, HeartIcon, MessageIcon } from './ActionButton'
 import { handleImageError, getSafeImageUrl } from '../lib/imageUtils'
 import type { PortfolioItem } from '../types/portfolio'
@@ -17,6 +18,7 @@ interface PortfolioModalProps {
 
 export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthRequired, onContactArtist }: PortfolioModalProps) {
   const { toggleSave, isTattooSaved } = useSavedTattoos()
+  const { isLiked, likeCount, toggleLike, loading, tableExists } = usePortfolioLikes(item.id)
   // Block scroll when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -61,6 +63,14 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
     }
   }
 
+  const handleLike = async () => {
+    try {
+      await toggleLike()
+    } catch (error) {
+      console.error('Error toggling like:', error)
+    }
+  }
+
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose()
@@ -86,6 +96,11 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
             />
           ) : (
             <div className="modal-image-placeholder">
+              <svg className="modal-placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21,15 16,10 5,21"/>
+              </svg>
               <span className="modal-placeholder-text">Immagine non disponibile</span>
             </div>
           )}
@@ -171,13 +186,18 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
 
           {/* Action Buttons */}
           <div className="modal-portfolio-actions">
-            <ActionButton
-              icon={<HeartIcon />}
-              text="Mi piace"
-              variant="modal"
-              requiresAuth={true}
-              onAuthRequired={onAuthRequired}
-            />
+            {tableExists && (
+              <ActionButton
+                icon={<HeartIcon />}
+                text={likeCount > 0 ? `Mi piace (${likeCount})` : "Mi piace"}
+                variant="modal"
+                active={isLiked}
+                disabled={loading}
+                requiresAuth={true}
+                onAuthRequired={onAuthRequired}
+                onClick={handleLike}
+              />
+            )}
             <ActionButton
               icon={<BookmarkIcon />}
               text={isTattooSaved(item.id) ? 'Salvato' : 'Salva'}

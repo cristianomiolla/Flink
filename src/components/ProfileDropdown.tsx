@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { Avatar } from './Avatar'
+import { useNavigate } from 'react-router-dom'
 import './ProfileDropdown.css'
 
 export function ProfileDropdown() {
   const { user, profile, loading, signOut } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -57,7 +59,19 @@ export function ProfileDropdown() {
 
   // Fallback rendering if profile is not loaded yet
   if (!profile) {
-    const fallbackName = user?.email ? user.email.split('@')[0] : 'U'
+    const getFallbackName = (): string => {
+      if (!user?.email) return 'U'
+      const emailPart = user.email.split('@')[0]
+      // Se contiene punti, trasformali in spazi e metti maiuscole
+      if (emailPart.includes('.')) {
+        return emailPart
+          .split('.')
+          .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+          .join(' ')
+      }
+      return emailPart
+    }
+    const fallbackName = getFallbackName()
     return (
       <div className="profile-dropdown">
         <Avatar
@@ -81,13 +95,15 @@ export function ProfileDropdown() {
             </div>
             <div className="dropdown-divider"></div>
             <button className="dropdown-item become-artist-btn" onClick={() => {
-              // TODO: Navigate to become artist page
+              navigate('/become-artist')
+              setIsOpen(false)
             }}>
               Diventi un'artista
             </button>
             <div className="dropdown-divider"></div>
             <button className="dropdown-item" onClick={() => {
-              // TODO: Navigate to profile page
+              navigate('/profile')
+              setIsOpen(false)
             }}>
               Il mio profilo
             </button>
@@ -131,21 +147,23 @@ export function ProfileDropdown() {
               variant="default"
             />
             <div className="user-info">
-              <div className="user-name">{profile.full_name || getDisplayName()}</div>
+              <div className="user-name">{profile.full_name && profile.full_name.trim() ? profile.full_name : getDisplayName()}</div>
               <div className="user-type">{getProfileTypeDisplayName(profile.profile_type)}</div>
             </div>
           </div>
           <div className="dropdown-divider"></div>
           {profile.profile_type !== 'artist' && (
             <button className="dropdown-item become-artist-btn" onClick={() => {
-              // TODO: Navigate to become artist page
+              navigate('/become-artist')
+              setIsOpen(false)
             }}>
               Diventi un'artista
             </button>
           )}
           <div className="dropdown-divider"></div>
           <button className="dropdown-item" onClick={() => {
-            // TODO: Navigate to profile page
+            navigate('/profile')
+            setIsOpen(false)
           }}>
             Il mio profilo
           </button>

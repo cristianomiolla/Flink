@@ -68,6 +68,10 @@
   color: var(--foreground);
   margin-bottom: 0.25rem;
   text-transform: uppercase;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .user-type {

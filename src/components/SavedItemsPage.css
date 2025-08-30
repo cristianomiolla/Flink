@@ -17,13 +17,9 @@
   min-height: 50vh;
 }
 
-/* Empty State */
-.empty-state {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* Empty State - specific to saved items page */
+.saved-items-page .empty-state {
   min-height: 50vh;
-  padding: 2rem;
 }
 
 .empty-content {
@@ -52,13 +48,9 @@
   line-height: 1.6;
 }
 
-/* Error State */
+/* Error State - extends global state styles */
 .error-state {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 40vh;
-  padding: 2rem;
 }
 
 .error-content {

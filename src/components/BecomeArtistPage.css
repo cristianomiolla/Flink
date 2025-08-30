@@ -1,0 +1,427 @@
+@import '../styles/tokens.css';
+
+.become-artist-page {
+  background: var(--background);
+  min-height: 100vh;
+}
+
+.become-artist-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Hero Section */
+.hero-section {
+  text-align: center;
+  margin-bottom: 4rem;
+  padding: 4rem 2rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: 1px solid var(--border-red);
+  position: relative;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: -8px;
+  bottom: -8px;
+  background: var(--border-red);
+  z-index: -1;
+}
+
+.hero-title {
+  font-family: var(--font-sans);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 1rem;
+  line-height: 0.9;
+}
+
+.hero-subtitle {
+  font-family: var(--font-sans);
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.4;
+}
+
+.hero-cta {
+  margin-top: 2rem;
+}
+
+.hero-cta-button {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  border: 1px solid var(--accent);
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: normal;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.hero-cta-button:hover {
+  background: hsl(0, 84%, 55%);
+}
+
+.hero-cta-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.hero-cta-button.loading {
+  background: var(--grey-medium);
+  color: var(--grey-dark);
+  border-color: var(--grey-medium);
+}
+
+/* Confirmation Modal Styles */
+.confirmation-modal {
+  max-width: 500px;
+  width: 90%;
+}
+
+.confirmation-content {
+  padding: 0 2rem 2rem 2rem;
+  text-align: center;
+}
+
+.confirmation-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--foreground);
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.05em;
+}
+
+.confirmation-text {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--foreground);
+  margin-bottom: 1rem;
+}
+
+.confirmation-note {
+  font-size: 0.875rem;
+  color: var(--grey-dark);
+  margin-bottom: 2rem;
+  background: var(--grey-light);
+  padding: 1rem;
+  border: 1px solid var(--border);
+}
+
+.confirmation-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Benefits Section */
+.benefits-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 4rem;
+}
+
+.benefit-card {
+  background: var(--card);
+  border: 1px solid var(--border-red);
+  padding: 2rem;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.benefit-card::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  right: -6px;
+  bottom: -6px;
+  background: var(--border-red);
+  z-index: -1;
+  transition: all 0.2s ease;
+}
+
+.benefit-card:hover::before {
+  top: 8px;
+  left: 8px;
+  right: -8px;
+  bottom: -8px;
+}
+
+.benefit-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  display: block;
+  text-align: center;
+  filter: grayscale(1);
+}
+
+.benefit-title {
+  font-family: var(--font-sans);
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--foreground);
+  margin-bottom: 1rem;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.benefit-description {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+  text-align: center;
+  font-weight: 500;
+}
+
+/* CTA Section */
+.cta-section {
+  text-align: center;
+  background: var(--card);
+  padding: 3rem 2rem;
+  border: 1px solid var(--border-red);
+  position: relative;
+  margin: 2rem 0;
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: -12px;
+  bottom: -12px;
+  background: var(--primary);
+  z-index: -1;
+}
+
+.cta-title {
+  font-family: var(--font-sans);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 1rem;
+  line-height: 0.9;
+  color: var(--foreground);
+}
+
+.cta-description {
+  font-family: var(--font-sans);
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 2.5rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+
+.cta-button {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: 1px solid var(--border-red);
+  padding: 1rem 2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.cta-button::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: -4px;
+  bottom: -4px;
+  background: var(--border-red);
+  z-index: -1;
+  transition: all 0.2s ease;
+}
+
+.cta-button:hover:not(:disabled)::before {
+  top: 6px;
+  left: 6px;
+  right: -6px;
+  bottom: -6px;
+}
+
+.cta-button:active:not(:disabled)::before {
+  top: 2px;
+  left: 2px;
+  right: -2px;
+  bottom: -2px;
+}
+
+.cta-button.loading {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.cta-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cta-button:disabled::before {
+  background: var(--muted);
+}
+
+/* Success Message */
+.success-message h2 {
+  font-family: var(--font-sans);
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 1rem;
+  line-height: 0.9;
+  color: var(--foreground);
+}
+
+.success-message p {
+  font-family: var(--font-sans);
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+
+/* Error Message */
+.error-message {
+  background: var(--card);
+  color: var(--border-red);
+  border: 1px solid var(--border-red);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 0.9rem;
+  position: relative;
+}
+
+.error-message::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: -4px;
+  bottom: -4px;
+  background: var(--border-red);
+  z-index: -1;
+}
+
+/* Auth Notice */
+.auth-notice {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--muted-foreground);
+  margin-top: 1.5rem;
+  font-weight: 500;
+}
+
+.auth-link {
+  background: none;
+  border: none;
+  color: var(--border-red);
+  text-decoration: underline;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-left: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.auth-link:hover {
+  opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .become-artist-container {
+    padding: 1rem;
+  }
+
+  .hero-section {
+    padding: 3rem 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .hero-section::before {
+    top: 6px;
+    left: 6px;
+    right: -6px;
+    bottom: -6px;
+  }
+
+  .benefits-section {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    margin-bottom: 3rem;
+  }
+
+  .benefit-card {
+    padding: 1.5rem;
+  }
+
+  .benefit-card::before {
+    top: 4px;
+    left: 4px;
+    right: -4px;
+    bottom: -4px;
+  }
+
+  .cta-section {
+    padding: 2.5rem 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .cta-section::before {
+    top: 8px;
+    left: 8px;
+    right: -8px;
+    bottom: -8px;
+  }
+
+  .cta-button {
+    width: 100%;
+    padding: 1rem 1.5rem;
+  }
+
+  .cta-description {
+    margin-bottom: 2rem;
+  }
+}

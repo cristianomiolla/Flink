@@ -24,6 +24,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
   signInWithGoogle: () => Promise<{ error: AuthError | null }>
   signOut: () => Promise<void>
+  refreshProfile: () => Promise<void>
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -139,6 +140,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
     localStorage.removeItem('supabase.auth.token')
   }
 
+  const refreshProfile = async () => {
+    if (!user?.id) return
+    
+    try {
+      const userProfile = await fetchUserProfile(user.id)
+      setProfile(userProfile)
+    } catch {
+      console.error('Error refreshing user profile')
+    }
+  }
+
   const value = {
     user,
     profile,
@@ -147,6 +159,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signIn,
     signInWithGoogle,
     signOut,
+    refreshProfile,
   }
 
   return (

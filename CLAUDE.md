@@ -31,9 +31,6 @@ npm run lint
 
 # Preview production build
 npm run preview
-
-# Deploy to GitHub Pages
-npm run deploy
 ```
 
 ## Supabase Integration
@@ -96,14 +93,6 @@ CREATE INDEX idx_portfolio_tags ON portfolio_items USING GIN(tags);
 CREATE INDEX idx_profiles_user_id ON profiles(user_id);
 CREATE INDEX idx_profiles_profile_type ON profiles(profile_type);
 CREATE INDEX idx_profiles_full_name ON profiles(full_name);
-
--- Messages indexes
-CREATE INDEX idx_messages_sender_id ON messages(sender_id);
-CREATE INDEX idx_messages_receiver_id ON messages(receiver_id);
-CREATE INDEX idx_messages_created_at ON messages(created_at DESC);
-CREATE INDEX idx_messages_conversation ON messages(sender_id, receiver_id);
-CREATE INDEX idx_messages_unread ON messages(receiver_id, is_read) WHERE is_read = false;
-CREATE INDEX idx_messages_active ON messages(deleted_at) WHERE deleted_at IS NULL;
 ```
 
 #### RLS Policies
@@ -115,11 +104,6 @@ CREATE POLICY "Authenticated users can insert profiles" ON profiles FOR INSERT T
 -- Portfolio items
 CREATE POLICY "Public can view portfolio items" ON portfolio_items FOR SELECT TO public USING (true);
 CREATE POLICY "Authenticated users can insert portfolio items" ON portfolio_items FOR INSERT TO authenticated WITH CHECK (true);
-
--- Messages
-CREATE POLICY "Users can read own messages" ON messages FOR SELECT USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
-CREATE POLICY "Users can send messages" ON messages FOR INSERT WITH CHECK (auth.uid() = sender_id);
-CREATE POLICY "Users can update own messages" ON messages FOR UPDATE USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
 ```
 
 #### Table: `saved_tattoos`
@@ -133,31 +117,13 @@ CREATE TABLE saved_tattoos (
 );
 ```
 
-#### Table: `messages`
-```sql
-CREATE TABLE messages (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    sender_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    receiver_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    content TEXT NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    is_read BOOLEAN NOT NULL DEFAULT false,
-    deleted_at TIMESTAMPTZ NULL
-);
-```
-
 #### Relationships
 - `portfolio_items.user_id` → `profiles.user_id` (Foreign Key)
 - `saved_tattoos.user_id` → `auth.users.id` (Foreign Key)
 - `saved_tattoos.portfolio_item_id` → `portfolio_items.id` (Foreign Key)
-- `messages.sender_id` → `auth.users.id` (Foreign Key)
-- `messages.receiver_id` → `auth.users.id` (Foreign Key)
 - Both portfolio and profile tables have RLS enabled with public read access
-- Messages table has RLS enabled with user-specific read/write access
 - Artists are identified by `profiles.profile_type = 'artist'`
 - Saved items are ordered by `saved_tattoos.created_at` for chronological display
-- Messages are ordered by `messages.created_at` for chronological conversations
 
 ### Supabase Client Usage
 ```typescript
@@ -226,11 +192,10 @@ The app follows a modular React architecture with authentication and state manag
 - **Authentication Flow**: Action buttons require authentication - redirect to AuthOverlay when not logged in
 
 ### Authentication System
-- **AuthContext**: Located in `src/contexts/AuthContext.tsx` - provides user state, profile data, and auth functions (signIn, signUp, signOut)
+- **AuthContext**: Provides user state, profile data, and auth functions (signIn, signUp, signOut)
 - **AuthOverlay**: Modal component for login/registration, managed at page level
 - **Protected Actions**: All action buttons (follow, contact, like, save) require authentication
 - **Authentication Check**: Components check `user` state and trigger `onAuthRequired` callback when needed
-- **Profile Creation**: SignUp automatically creates a profile record with default 'client' type
 
 ### Key Data Flow & Components
 
@@ -272,5 +237,5 @@ The app uses TypeScript interfaces defined in `src/types/portfolio.ts`:
 - **TypeScript**: Use strict typing - all interfaces are defined in `src/types/portfolio.ts`
 - **Data Queries**: Use optimized Supabase JOIN queries, transform nested results to flat component interfaces
 - **Saved Items**: Order by `saved_tattoos.created_at` (not `portfolio_items.created_at`) for chronological user experience
-- **Deployment**: Configured for GitHub Pages deployment via `npm run deploy`
-- **Environment**: Supabase configuration stored in `.env.local`
+
+

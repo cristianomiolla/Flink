@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import './ChatConversation.css'
 import './HeaderIcons.css'
 import { Avatar } from './Avatar'
-import { useMessages } from '../hooks/useMessages'
 import { useAuth } from '../hooks/useAuth'
 
 interface Message {
@@ -64,7 +63,7 @@ export function ChatConversation({ chat, isVisible, onRequestDeleteChat, sendMes
           id: msg.id,
           content: msg.content,
           timestamp: msg.created_at,
-          isFromCurrentUser: msg.sender_id === user.id
+          isFromCurrentUser: msg.sender_id === user?.id
         }))
         
         setMessages(formattedMessages)

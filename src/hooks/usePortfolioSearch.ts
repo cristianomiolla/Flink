@@ -125,18 +125,30 @@ export function usePortfolioSearch() {
     const locationLower = locationFilter.toLowerCase().trim()
 
     return items.filter(item => {
-      // Search in title, description, and tags
-      const matchesSearch = !searchLower || 
-        item.title?.toLowerCase().includes(searchLower) ||
-        item.description?.toLowerCase().includes(searchLower) ||
-        (Array.isArray(item.tags) && item.tags.some(tag => 
-          tag?.toLowerCase().includes(searchLower)
-        )) ||
-        (item.artist_name && item.artist_name.toLowerCase().includes(searchLower))
-
       // Location filter matches location field from profile or item
       const matchesLocation = !locationLower ||
         (item.location && item.location.toLowerCase().includes(locationLower))
+
+      // If no search term, only apply location filter
+      if (!searchLower) {
+        return matchesLocation
+      }
+
+      // Split search term into individual keywords for distributed matching
+      const searchKeywords = searchLower.split(/\s+/).filter(keyword => keyword.length > 0)
+      
+      // Collect all searchable text from the item
+      const searchableFields = [
+        item.title?.toLowerCase() || '',
+        item.description?.toLowerCase() || '',
+        ...(Array.isArray(item.tags) ? item.tags.map(tag => tag?.toLowerCase() || '') : []),
+        item.artist_name?.toLowerCase() || ''
+      ].join(' ')
+
+      // Check if ALL keywords are found somewhere in the searchable fields
+      const matchesSearch = searchKeywords.every(keyword => 
+        searchableFields.includes(keyword)
+      )
 
       return matchesSearch && matchesLocation
     })

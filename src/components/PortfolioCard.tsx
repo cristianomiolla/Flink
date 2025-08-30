@@ -3,6 +3,7 @@ import './PortfolioCard.css'
 import { PortfolioModal } from './PortfolioModal'
 import { Avatar } from './Avatar'
 import { useSavedTattoos } from '../hooks/useSavedTattoos'
+import { usePortfolioLikes } from '../hooks/usePortfolioLikes'
 import { ActionButton, BookmarkIcon, HeartIcon } from './ActionButton'
 import { handleImageError, getSafeImageUrl } from '../lib/imageUtils'
 import type { PortfolioItem } from '../types/portfolio'
@@ -17,6 +18,7 @@ interface PortfolioCardProps {
 export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactArtist }: PortfolioCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { toggleSave, isTattooSaved } = useSavedTattoos()
+  const { isLiked, likeCount, toggleLike, loading, tableExists } = usePortfolioLikes(item.id)
   
   // Badge basato sui dati del database
   const badge = item.is_flash ? 'FLASH' : 'REALIZZATO';
@@ -46,6 +48,15 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
     setIsModalOpen(false)
   }
 
+  const handleLike = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    try {
+      await toggleLike()
+    } catch (error) {
+      console.error('Error toggling like:', error)
+    }
+  }
+
   return (
     <>
       <article className="card portfolio-card" onClick={handleCardClick}>
@@ -60,6 +71,11 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
           />
         ) : (
           <div className="image-placeholder">
+            <svg className="placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21,15 16,10 5,21"/>
+            </svg>
             <span className="placeholder-text">Immagine non disponibile</span>
           </div>
         )}
@@ -138,13 +154,18 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
 
         {/* Action Buttons */}
         <div className="portfolio-actions">
-          <ActionButton
-            icon={<HeartIcon />}
-            text="Mi piace"
-            variant="portfolio"
-            requiresAuth={true}
-            onAuthRequired={onAuthRequired}
-          />
+          {tableExists && (
+            <ActionButton
+              icon={<HeartIcon />}
+              text={likeCount > 0 ? `Mi piace (${likeCount})` : "Mi piace"}
+              variant="portfolio"
+              active={isLiked}
+              disabled={loading}
+              requiresAuth={true}
+              onAuthRequired={onAuthRequired}
+              onClick={handleLike}
+            />
+          )}
           <ActionButton
             icon={<BookmarkIcon />}
             text={isTattooSaved(item.id) ? 'Salvato' : 'Salva'}
