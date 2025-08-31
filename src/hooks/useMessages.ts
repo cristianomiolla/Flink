@@ -97,7 +97,7 @@ export function useMessages() {
         throw messagesError
       }
 
-      const typedMessages = messagesData as any[]
+      const typedMessages = messagesData as Message[]
 
       if (typedMessages.length === 0) {
         setConversations([])
@@ -126,7 +126,7 @@ export function useMessages() {
       })
 
       // Fetch profile data for all participants
-      let profilesMap = new Map<string, any>()
+      const profilesMap = new Map<string, { user_id: string; full_name: string; username: string; avatar_url: string | null }>()
       if (participantIds.size > 0) {
         try {
           const { data: profilesData, error: profilesError } = await supabase
@@ -264,7 +264,7 @@ export function useMessages() {
         throw messagesError
       }
 
-      const typedMessages = messagesData as any[]
+      const typedMessages = messagesData as Message[]
 
       if (typedMessages.length === 0) {
         return []
@@ -272,7 +272,7 @@ export function useMessages() {
 
       // Fetch profile data for participants in this conversation
       const participantIds = [user.id, participantId]
-      let profilesMap = new Map<string, any>()
+      const profilesMap = new Map<string, { user_id: string; full_name: string; username: string; avatar_url: string | null }>()
       
       try {
         const { data: profilesData, error: profilesError } = await supabase
@@ -322,10 +322,10 @@ export function useMessages() {
       console.error('Error fetching conversation messages:', err)
       return []
     }
-  }, [user?.id])
+  }, [user])
 
   // Update conversation locally after sending a message (avoid full refresh)
-  const updateConversationAfterSend = async (receiverId: string, content: string) => {
+  const updateConversationAfterSend = useCallback(async (receiverId: string, content: string) => {
     if (!user) return
 
     try {
@@ -385,7 +385,7 @@ export function useMessages() {
     } catch (err) {
       console.error('Error updating conversation locally:', err)
     }
-  }
+  }, [user, conversations])
 
   // Send a new message
   const sendMessage = useCallback(async (receiverId: string, content: string): Promise<boolean> => {
@@ -413,7 +413,7 @@ export function useMessages() {
       setError(err instanceof Error ? err.message : 'Failed to send message')
       return false
     }
-  }, [user, fetchConversations])
+  }, [user, updateConversationAfterSend])
 
   // Mark messages as read
   const markConversationAsRead = async (senderId: string): Promise<void> => {

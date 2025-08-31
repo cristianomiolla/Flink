@@ -2,17 +2,12 @@
  * Image utilities for handling image loading and fallbacks
  */
 
-// Default placeholder image (you can replace with your own)
-const DEFAULT_PLACEHOLDER = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDMwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0xMjUgNzVMMTc1IDEyNUgxMjVIMTAwSDc1TDEyNSA3NVoiIGZpbGw9IiNEREREREQiLz4KPC9zdmc+'
-
 /**
- * Handle image loading errors by providing fallbacks
+ * Handle image loading errors by hiding the image
  */
 export const handleImageError = (event: React.SyntheticEvent<HTMLImageElement>) => {
   const img = event.currentTarget
-  if (img.src !== DEFAULT_PLACEHOLDER) {
-    img.src = DEFAULT_PLACEHOLDER
-  }
+  img.style.display = 'none'
 }
 
 /**
@@ -35,8 +30,8 @@ export const isThirdPartyImage = (url: string): boolean => {
  * Get a safe image URL with fallback handling
  */
 export const getSafeImageUrl = (url: string | null): string => {
-  if (!url || isThirdPartyImage(url)) {
-    return DEFAULT_PLACEHOLDER
+  if (!url) {
+    return ''
   }
   return url
 }

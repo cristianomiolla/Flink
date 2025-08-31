@@ -1,15 +1,20 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { SearchBar } from './SearchBar'
 import { CategoryBar } from './CategoryBar'
 import { PortfolioGrid } from './PortfolioGrid'
 import { ArtistGrid } from './ArtistGrid'
-import { AuthOverlay } from './AuthOverlay'
 import { usePortfolioSearch } from '../hooks/usePortfolioSearch'
+import { useAuth } from '../hooks/useAuth'
+import LoadingSpinner from './LoadingSpinner'
+
+// Lazy load heavy modal component
+const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
 
 export function MainPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const { profile } = useAuth()
   const [searchSource, setSearchSource] = useState<'search-bar' | 'category' | null>(null)
   const [showAuthOverlay, setShowAuthOverlay] = useState(false)
   
@@ -61,8 +66,13 @@ export function MainPage() {
   }, [toggleViewMode])
 
   const handleArtistProfileOpen = useCallback((artistId: string) => {
-    navigate(`/artist/${artistId}`)
-  }, [navigate])
+    // Se l'artista cliccato è l'utente corrente, vai al profilo personale
+    if (profile && profile.user_id === artistId) {
+      navigate('/profile')
+    } else {
+      navigate(`/artist/${artistId}`)
+    }
+  }, [navigate, profile])
 
   const handleLogoClick = useCallback(() => {
     window.location.reload()
@@ -118,10 +128,14 @@ export function MainPage() {
         )}
       </main>
       
-      <AuthOverlay 
-        isOpen={showAuthOverlay} 
-        onClose={() => setShowAuthOverlay(false)} 
-      />
+      {showAuthOverlay && (
+        <Suspense fallback={<div className="loading-state"><LoadingSpinner /></div>}>
+          <AuthOverlay 
+            isOpen={showAuthOverlay} 
+            onClose={() => setShowAuthOverlay(false)} 
+          />
+        </Suspense>
+      )}
     </div>
   )
 }

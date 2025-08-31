@@ -15,7 +15,7 @@
   left: 0;
   right: 0;
   background: #171717;
-  border: 2px solid #EF4343;
+  border: 1px solid #EF4343;
   border-top: none;
   max-height: 200px;
   overflow-y: auto;
@@ -57,7 +57,7 @@
 /* Mobile Design - Under 768px */
 @media (max-width: 767px) {
   .location-dropdown {
-    border: 2px solid #EF4343;
+    border: 1px solid #EF4343;
     max-height: 160px;
   }
   

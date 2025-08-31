@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import './ArtistGrid.css'
 import { ArtistCard } from './ArtistCard'
+import { useFollowers } from '../hooks/useFollowers'
 import LoadingSpinner from './LoadingSpinner'
 import type { ArtistProfile } from '../types/portfolio'
 
@@ -28,6 +30,15 @@ export function ArtistGrid({
   onAuthRequired,
   onContactArtist
 }: ArtistGridProps) {
+  const { fetchFollowerStats } = useFollowers()
+  
+  // Fetch follower stats for all displayed artists
+  useEffect(() => {
+    if (profiles.length > 0) {
+      const artistUserIds = profiles.map(p => p.user_id)
+      fetchFollowerStats(artistUserIds)
+    }
+  }, [profiles, fetchFollowerStats])
   if (loading) {
     return (
       <section className="grid-container">

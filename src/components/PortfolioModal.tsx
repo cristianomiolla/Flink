@@ -3,6 +3,7 @@ import './PortfolioModal.css'
 import { Avatar } from './Avatar'
 import { useSavedTattoos } from '../hooks/useSavedTattoos'
 import { usePortfolioLikes } from '../hooks/usePortfolioLikes'
+import { useAuth } from '../hooks/useAuth'
 import { ActionButton, BookmarkIcon, HeartIcon, MessageIcon } from './ActionButton'
 import { handleImageError, getSafeImageUrl } from '../lib/imageUtils'
 import type { PortfolioItem } from '../types/portfolio'
@@ -17,6 +18,7 @@ interface PortfolioModalProps {
 }
 
 export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthRequired, onContactArtist }: PortfolioModalProps) {
+  const { profile } = useAuth()
   const { toggleSave, isTattooSaved } = useSavedTattoos()
   const { isLiked, likeCount, toggleLike, loading, tableExists } = usePortfolioLikes(item.id)
   // Block scroll when modal is open
@@ -80,29 +82,22 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
   return (
     <div className="portfolio-modal-overlay" onClick={handleBackdropClick}>
       <div className="portfolio-modal-content">
-        {/* Close Button */}
-        <button className="modal-close-btn" onClick={onClose}>
-          ×
-        </button>
+        {/* Sticky Header with Close Button */}
+        <div className="modal-header">
+          <button className="modal-close-btn" onClick={onClose}>
+            ×
+          </button>
+        </div>
 
         {/* Image Section */}
         <div className="modal-image-section">
-          {item.image_url ? (
+          {item.image_url && (
             <img 
               src={getSafeImageUrl(item.image_url)} 
               alt={item.title || 'Portfolio Item'} 
               className="modal-portfolio-image"
               onError={handleImageError}
             />
-          ) : (
-            <div className="modal-image-placeholder">
-              <svg className="modal-placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                <circle cx="8.5" cy="8.5" r="1.5"/>
-                <polyline points="21,15 16,10 5,21"/>
-              </svg>
-              <span className="modal-placeholder-text">Immagine non disponibile</span>
-            </div>
           )}
           
           {/* Badge and Price Overlays */}
@@ -207,14 +202,17 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
               onAuthRequired={onAuthRequired}
               onClick={() => toggleSave(item.id)}
             />
-            <ActionButton
-              icon={<MessageIcon />}
-              text="Contatta artista"
-              variant="modal"
-              requiresAuth={true}
-              onAuthRequired={onAuthRequired}
-              onClick={() => onContactArtist && onContactArtist(item.user_id)}
-            />
+            {/* Non mostrare "Contatta artista" se l'elemento appartiene all'utente corrente */}
+            {profile?.user_id !== item.user_id && (
+              <ActionButton
+                icon={<MessageIcon />}
+                text="Contatta artista"
+                variant="modal"
+                requiresAuth={true}
+                onAuthRequired={onAuthRequired}
+                onClick={() => onContactArtist && onContactArtist(item.user_id)}
+              />
+            )}
           </div>
         </div>
       </div>

@@ -339,13 +339,13 @@
   .filter-btn {
     padding: 0.4rem 0.625rem;
     font-size: 12px;
-    border: 2px solid var(--border);
+    border: 1px solid var(--border);
   }
   
   .filter-btn:hover {
     background: var(--accent);
     color: var(--accent-foreground);
-    border: 2px solid var(--accent);
+    border: 1px solid var(--accent);
   }
   
   .filter-dropdown-menu {

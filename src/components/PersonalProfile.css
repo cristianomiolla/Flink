@@ -13,7 +13,7 @@
   justify-content: flex-start;
 }
 
-.profile-edit-actions .modal-action-btn {
+.profile-edit-actions .action-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -80,7 +80,7 @@
 
 .form-input, .form-textarea {
   padding: 0.75rem;
-  border: 2px solid var(--border);
+  border: 1px solid var(--border);
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-body);
@@ -151,24 +151,10 @@
   border-top: 1px solid var(--border);
 }
 
-/* Form actions with action-btn styling */
+/* Form actions specific overrides */
 .form-actions .action-btn {
-  padding: 0.75rem 1.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  border: 2px solid var(--border);
-  border-radius: 0;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: var(--font-body);
-  background: var(--background);
-  color: var(--foreground);
-}
-
-.form-actions .action-btn:hover:not(:disabled) {
-  background: var(--grey-light);
-  border-color: var(--border-red);
+  flex: 1;
+  min-width: 120px;
 }
 
 .form-actions .action-btn:disabled {
@@ -176,25 +162,9 @@
   color: var(--grey-dark);
   border-color: var(--grey-medium);
   cursor: not-allowed;
+  opacity: 0.6;
 }
 
-/* Primary action button (last button) */
-.form-actions .action-btn:last-child {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
-}
-
-.form-actions .action-btn:last-child:hover:not(:disabled) {
-  background: #d63838;
-  border-color: #d63838;
-}
-
-.form-actions .action-btn:last-child:disabled {
-  background: var(--grey-medium);
-  color: var(--grey-dark);
-  border-color: var(--grey-medium);
-}
 
 /* Portfolio Header */
 .portfolio-header {
@@ -276,6 +246,47 @@
   margin-top: 0.25rem;
 }
 
+/* File input and image preview */
+.file-input {
+  cursor: pointer;
+}
+
+.image-preview {
+  position: relative;
+  margin-top: 1rem;
+  display: inline-block;
+}
+
+.preview-image {
+  max-width: 200px;
+  max-height: 200px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  border-radius: 0;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.remove-image-btn:hover {
+  background: #d63838;
+}
+
 /* Checkbox Styles */
 .checkbox-label {
   display: flex;
@@ -289,7 +300,7 @@
 .checkbox-label input[type="checkbox"] {
   width: 18px;
   height: 18px;
-  border: 2px solid var(--border);
+  border: 1px solid var(--border);
   background: var(--background);
   cursor: pointer;
 }
@@ -304,6 +315,12 @@
   text-transform: uppercase;
   font-size: 0.8rem;
   letter-spacing: 0.02em;
+}
+
+/* Add work button spacing in empty state */
+.empty-state .action-btn {
+  margin-top: 1.5rem;
+  flex: none;
 }
 
 /* Loading container */
@@ -340,8 +357,8 @@
   }
   
   .form-actions .action-btn {
-    padding: 0.875rem 1rem;
     width: 100%;
+    min-width: auto;
   }
   
   .bio-suggestions {

@@ -182,7 +182,7 @@
   .category-tag {
     padding: 0.4rem 0.75rem;
     font-size: 12px;
-    border: 2px solid var(--border);
+    border: 1px solid var(--border);
     white-space: nowrap;
     flex-shrink: 0;
   }
@@ -190,24 +190,24 @@
   .category-tag:hover {
     background: var(--grey-light);
     color: #171717;
-    border: 2px solid var(--border);
+    border: 1px solid var(--border);
   }
   
   .category-tag.active {
     background: #171717;
     color: #ffffff;
-    border: 2px solid var(--border);
+    border: 1px solid var(--border);
   }
   
   .view-toggle {
     width: 100%;
-    border: 2px solid var(--border);
+    border: 1px solid var(--border);
   }
   
   .toggle-btn {
     padding: 0.5rem 0.75rem;
     font-size: 11px;
-    border-right: 2px solid var(--border);
+    border-right: 1px solid var(--border);
     flex: 1;
   }
   
@@ -234,18 +234,18 @@
   .flash-btn {
     padding: 0.4rem 0.75rem;
     font-size: 12px;
-    border: 2px solid var(--border);
+    border: 1px solid var(--border);
   }
   
   .flash-btn:hover {
     background: #EF4343;
     color: #ffffff;
-    border: 2px solid #EF4343;
+    border: 1px solid #EF4343;
   }
   
   .flash-btn.active {
     background: #EF4343;
     color: #ffffff;
-    border: 2px solid #EF4343;
+    border: 1px solid #EF4343;
   }
 }

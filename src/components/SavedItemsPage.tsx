@@ -120,17 +120,17 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
       
       <div className="container">
         <div className="saved-items-content">
-          {/* Header */}
-          <PageHeader 
-            title="ELEMENTI SALVATI"
-            subtitle={savedItems.length === 0 ? (
-              'Nessun elemento salvato'
-            ) : savedItems.length === 1 ? (
-              '1 elemento salvato'
-            ) : (
-              `${savedItems.length} elementi salvati`
-            )}
-          />
+          {/* Header - solo se ci sono elementi salvati */}
+          {savedItems.length > 0 && (
+            <PageHeader 
+              title="ELEMENTI SALVATI"
+              subtitle={savedItems.length === 1 ? (
+                '1 elemento salvato'
+              ) : (
+                `${savedItems.length} elementi salvati`
+              )}
+            />
+          )}
 
           {error && (
             <div className="error-state">
@@ -139,6 +139,7 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
                 <button 
                   className="btn btn-accent retry-btn" 
                   onClick={() => refreshSavedTattoos()}
+                  style={{ marginTop: '1.5rem' }}
                 >
                   Riprova
                 </button>
@@ -157,6 +158,7 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
                 <button 
                   className="btn btn-accent" 
                   onClick={onLogoClick}
+                  style={{ marginTop: '1.5rem' }}
                 >
                   Esplora Portfolio
                 </button>

@@ -1,6 +1,7 @@
 /* Professional PortfolioCard Styles */
 
 .portfolio-card {
+  position: relative;
   overflow: hidden;
   transition: all 0.2s;
   margin: 0;
@@ -43,6 +44,7 @@
   gap: 0.75rem;
   background: var(--muted);
   color: var(--muted-foreground);
+  border-bottom: 1px solid var(--accent);
 }
 
 .placeholder-icon {
@@ -97,6 +99,7 @@
   font-size: 16px;
   font-weight: 700;
   border-radius: 50px;
+  border: 1px solid var(--border);
   backdrop-filter: blur(4px);
 }
 
@@ -290,8 +293,9 @@
   }
 
   .portfolio-actions {
-    flex-direction: column;
-    gap: 0.75rem;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0;
     margin-top: 1rem;
     padding-top: 1rem;
   }
@@ -304,4 +308,50 @@
   .action-icon {
     font-size: 15px;
   }
+  
+  .portfolio-card .modal-close-btn.delete-portfolio-btn {
+    top: 0.625rem;
+    right: 0.625rem;
+    width: 28px;
+    height: 28px;
+  }
+  
+  .portfolio-card .modal-close-btn.delete-portfolio-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Delete Button for Portfolio Card - styled like modal-close-btn */
+.portfolio-card .modal-close-btn.delete-portfolio-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--foreground);
+  cursor: pointer;
+  z-index: 10;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-sizing: border-box;
+  pointer-events: all;
+}
+
+.portfolio-card .modal-close-btn.delete-portfolio-btn:hover {
+  background: #EF4343;
+  color: #ffffff;
+}
+
+.portfolio-card .modal-close-btn.delete-portfolio-btn svg {
+  width: 20px;
+  height: 20px;
 }

@@ -6,16 +6,23 @@ import { SavedItemsPage } from './SavedItemsPage'
 import { MessagesPage } from './MessagesPage'
 import { BecomeArtistPage } from './BecomeArtistPage'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 
 export function AppRoutes() {
   const navigate = useNavigate()
+  const { profile } = useAuth()
 
   const handleLogoClick = () => {
     navigate('/')
   }
 
   const handleArtistClick = (artistId: string) => {
-    navigate(`/artist/${artistId}`)
+    // Se l'artista cliccato è l'utente corrente, vai al profilo personale
+    if (profile && profile.user_id === artistId) {
+      navigate('/profile')
+    } else {
+      navigate(`/artist/${artistId}`)
+    }
   }
 
   return (

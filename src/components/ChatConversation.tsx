@@ -25,7 +25,7 @@ interface ChatConversationProps {
   isVisible: boolean
   onRequestDeleteChat?: (chat: { id: string; participant: { name: string } }) => void
   sendMessage?: (receiverId: string, content: string) => Promise<boolean>
-  fetchConversationMessages?: (participantId: string) => Promise<any[]>
+  fetchConversationMessages?: (participantId: string) => Promise<Message[]>
 }
 
 export function ChatConversation({ chat, isVisible, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages }: ChatConversationProps) {

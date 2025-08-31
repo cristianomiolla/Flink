@@ -32,6 +32,16 @@
   position: relative;
 }
 
+/* Auth Sticky Header */
+.auth-header-sticky {
+  position: sticky;
+  top: 0;
+  right: 0;
+  height: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
 .auth-close-btn {
   position: absolute;
   top: 1rem;
@@ -39,7 +49,7 @@
   width: 40px;
   height: 40px;
   background: rgba(255, 255, 255, 0.95);
-  border: 2px solid var(--border);
+  border: 1px solid var(--border);
   border-radius: 0;
   display: flex;
   align-items: center;
@@ -51,6 +61,8 @@
   z-index: 10;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
+  box-sizing: border-box;
+  pointer-events: all;
 }
 
 .auth-close-btn:hover {
@@ -313,13 +325,13 @@
   }
   
   .auth-tabs {
-    border: 2px solid var(--border);
+    border: 1px solid var(--border);
   }
   
   .auth-tab {
     padding: 0.5rem 0.75rem;
     font-size: 13px;
-    border-right: 2px solid var(--border);
+    border-right: 1px solid var(--border);
   }
   
   .auth-tab:last-child {

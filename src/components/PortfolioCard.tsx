@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import './PortfolioCard.css'
 import { PortfolioModal } from './PortfolioModal'
 import { Avatar } from './Avatar'
@@ -13,9 +13,11 @@ interface PortfolioCardProps {
   onArtistClick?: (artistId: string) => void
   onAuthRequired?: () => void
   onContactArtist?: (artistId: string) => void
+  showDeleteButton?: boolean
+  onDelete?: (itemId: string) => void
 }
 
-export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactArtist }: PortfolioCardProps) {
+export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactArtist, showDeleteButton, onDelete }: PortfolioCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { toggleSave, isTattooSaved } = useSavedTattoos()
   const { isLiked, likeCount, toggleLike, loading, tableExists } = usePortfolioLikes(item.id)
@@ -57,10 +59,32 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
     }
   }
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation() // Previene l'apertura del modal
+    if (onDelete) {
+      onDelete(item.id)
+    }
+  }
+
   return (
     <>
       <article className="card portfolio-card" onClick={handleCardClick}>
-      {/* Image Section */}
+        {/* Delete Button - solo nel profilo personale */}
+        {showDeleteButton && (
+          <button 
+            className="modal-close-btn delete-portfolio-btn" 
+            onClick={handleDelete}
+            title="Elimina elemento"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polyline points="3,6 5,6 21,6"></polyline>
+              <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </button>
+        )}
+        {/* Image Section */}
       <div className="image-section">
         {item.image_url ? (
           <img 
@@ -194,3 +218,5 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
     </>
   )
 }
+
+export default memo(PortfolioCard)

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { SearchBar } from './SearchBar'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
@@ -57,6 +57,20 @@ export function BecomeArtistPage({ onLogoClick }: BecomeArtistPageProps) {
       setLoading(false)
     }
   }
+
+  // Block body scroll when confirmation overlay is open
+  useEffect(() => {
+    if (showConfirmation) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+
+    // Clean up on unmount
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [showConfirmation])
 
   return (
     <div className="become-artist-page">
@@ -141,10 +155,14 @@ export function BecomeArtistPage({ onLogoClick }: BecomeArtistPageProps) {
       {showConfirmation && (
         <div className="auth-overlay" onClick={(e) => e.target === e.currentTarget && setShowConfirmation(false)}>
           <div className="auth-modal confirmation-modal">
-            <div className="auth-modal-header">
+            {/* Sticky Header with Close Button */}
+            <div className="auth-header-sticky">
               <button className="auth-close-btn" onClick={() => setShowConfirmation(false)}>
                 ×
               </button>
+            </div>
+            
+            <div className="auth-modal-header">
             </div>
             
             <div className="confirmation-content">
@@ -159,13 +177,13 @@ export function BecomeArtistPage({ onLogoClick }: BecomeArtistPageProps) {
               
               <div className="confirmation-buttons">
                 <button 
-                  className="modal-action-btn"
+                  className="action-btn"
                   onClick={() => setShowConfirmation(false)}
                 >
                   Annulla
                 </button>
                 <button 
-                  className={`modal-action-btn ${loading ? 'disabled' : ''}`}
+                  className={`action-btn ${loading ? 'disabled' : ''}`}
                   onClick={() => {
                     setShowConfirmation(false)
                     handleUpgradeToArtist()

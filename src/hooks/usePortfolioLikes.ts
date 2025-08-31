@@ -16,11 +16,8 @@ export function usePortfolioLikes(portfolioItemId: string) {
   const [loading, setLoading] = useState(false)
   const [tableExists, setTableExists] = useState(false)
 
-  // Likes functionality enabled
-  const LIKES_FEATURE_ENABLED = true
-
   useEffect(() => {
-    if (portfolioItemId && LIKES_FEATURE_ENABLED) {
+    if (portfolioItemId) {
       checkTableAndFetchData()
     }
   }, [portfolioItemId, user]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -106,10 +103,6 @@ export function usePortfolioLikes(portfolioItemId: string) {
   }
 
   const toggleLike = async () => {
-    if (!LIKES_FEATURE_ENABLED) {
-      throw new Error('Likes feature temporarily disabled')
-    }
-
     if (!user) {
       throw new Error('Authentication required')
     }
@@ -169,6 +162,6 @@ export function usePortfolioLikes(portfolioItemId: string) {
     likeCount,
     toggleLike,
     loading,
-    tableExists: LIKES_FEATURE_ENABLED && tableExists
+    tableExists
   }
 }

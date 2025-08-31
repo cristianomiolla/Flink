@@ -53,6 +53,20 @@ export function AuthOverlay({ isOpen, onClose }: AuthOverlayProps) {
     }
   }, [isOpen])
 
+  // Block body scroll when overlay is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+
+    // Clean up on unmount
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen])
+
   // Close on escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -206,10 +220,14 @@ export function AuthOverlay({ isOpen, onClose }: AuthOverlayProps) {
   return (
     <div className="auth-overlay" onClick={handleOverlayClick}>
       <div className="auth-modal">
-        <div className="auth-modal-header">
+        {/* Sticky Header with Close Button */}
+        <div className="auth-header-sticky">
           <button className="auth-close-btn" onClick={onClose}>
             ×
           </button>
+        </div>
+        
+        <div className="auth-modal-header">
           
           <div className="view-toggle">
             <button

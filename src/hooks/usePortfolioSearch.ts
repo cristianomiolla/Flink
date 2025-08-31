@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { supabase } from '../lib/supabase'
+import { APP_CONSTANTS } from '../constants/app'
 import type { PortfolioItem, ArtistProfile, ViewMode, DatabasePortfolioItem, DatabaseProfile } from '../types/portfolio'
 
 interface PortfolioItemWithProfile extends DatabasePortfolioItem {
-  profiles: DatabaseProfile
+  profiles: DatabaseProfile | null
 }
 
 export function usePortfolioSearch() {
@@ -37,7 +38,7 @@ export function usePortfolioSearch() {
         `)
         .eq('profiles.profile_type', 'artist')
         .order('created_at', { ascending: false })
-        .limit(50)
+        .limit(APP_CONSTANTS.PORTFOLIO_ITEMS_LIMIT)
 
       if (portfolioError) {
         throw portfolioError
@@ -90,7 +91,7 @@ export function usePortfolioSearch() {
         `)
         .eq('profile_type', 'artist')
         .order('created_at', { ascending: false })
-        .limit(100) // Add reasonable limit
+        .limit(APP_CONSTANTS.ARTIST_PROFILES_LIMIT)
 
       if (profilesError) {
         throw profilesError
@@ -209,6 +210,40 @@ export function usePortfolioSearch() {
         .catch(() => setDataFetched(true)) // Still mark as fetched to prevent infinite retries
     }
   }, [fetchPortfolioItems, fetchArtistProfiles, dataFetched])
+
+  // Listen for portfolio items updates from other components
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'portfolioItemsUpdated') {
+        // Refetch data when portfolio items are updated elsewhere
+        setDataFetched(false)
+      }
+    }
+
+    // Listen for localStorage changes
+    window.addEventListener('storage', handleStorageChange)
+
+    // Also check for changes when the window gets focus (for same-tab changes)
+    const handleFocus = () => {
+      const lastUpdate = localStorage.getItem('portfolioItemsUpdated')
+      if (lastUpdate) {
+        const lastUpdateTime = parseInt(lastUpdate)
+        const currentTime = Date.now()
+        // Refetch if data was updated in the last 5 seconds
+        if (currentTime - lastUpdateTime < 5000) {
+          setDataFetched(false)
+          localStorage.removeItem('portfolioItemsUpdated') // Clean up
+        }
+      }
+    }
+
+    window.addEventListener('focus', handleFocus)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('focus', handleFocus)
+    }
+  }, [])
 
   // No longer need useEffect for filtering since we're using useMemo
 

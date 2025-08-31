@@ -186,7 +186,7 @@
   color: var(--foreground);
   margin: 0 0 2rem 0;
   text-transform: uppercase;
-  border-bottom: 2px solid var(--border-red);
+  border-bottom: 1px solid var(--border-red);
   padding-bottom: 0.5rem;
 }
 
@@ -265,7 +265,7 @@
   align-items: flex-start;
   padding: 1.5rem;
   background: var(--background);
-  border: 2px solid var(--border);
+  border: 1px solid var(--border);
   gap: 1rem;
 }
 
@@ -394,7 +394,7 @@
 .review-item {
   padding: 1.5rem;
   background: var(--background);
-  border: 2px solid var(--border);
+  border: 1px solid var(--border);
 }
 
 .review-item:hover {

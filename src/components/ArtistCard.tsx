@@ -1,6 +1,8 @@
+import { memo } from 'react'
 import './ArtistCard.css'
 import { Avatar } from './Avatar'
 import { useAuth } from '../hooks/useAuth'
+import { useFollowers } from '../hooks/useFollowers'
 import type { ArtistProfile } from '../types/portfolio'
 
 interface ArtistCardProps {
@@ -8,11 +10,16 @@ interface ArtistCardProps {
   onArtistClick?: (artistId: string) => void
   onAuthRequired?: () => void
   onContactArtist?: (artistId: string) => void
+  onFollowUpdate?: (artistId: string, isFollowing: boolean) => void
 }
 
-export function ArtistCard({ profile, onArtistClick, onAuthRequired, onContactArtist }: ArtistCardProps) {
+export function ArtistCard({ profile, onArtistClick, onAuthRequired, onContactArtist, onFollowUpdate }: ArtistCardProps) {
   const { user } = useAuth()
+  const { getFollowerStats, toggleFollow } = useFollowers()
   const displayName = profile.full_name || profile.username || 'Unknown Artist'
+  
+  const followerStats = getFollowerStats(profile.user_id)
+  const isFollowing = followerStats.is_following
 
   const handleCardClick = (e: React.MouseEvent) => {
     // Don't open profile if clicking on artist-actions
@@ -26,12 +33,19 @@ export function ArtistCard({ profile, onArtistClick, onAuthRequired, onContactAr
     }
   }
 
-  const handleFollowClick = (e: React.MouseEvent) => {
+  const handleFollowClick = async (e: React.MouseEvent) => {
     e.stopPropagation()
     if (!user && onAuthRequired) {
       onAuthRequired()
+      return
     }
-    // TODO: Add actual functionality for follow when authenticated
+    
+    if (user) {
+      const result = await toggleFollow(profile.user_id)
+      if (result.success && onFollowUpdate) {
+        onFollowUpdate(profile.user_id, !isFollowing)
+      }
+    }
   }
 
   const handleContactClick = (e: React.MouseEvent) => {
@@ -74,20 +88,20 @@ export function ArtistCard({ profile, onArtistClick, onAuthRequired, onContactAr
       </div>
 
       <div className="artist-actions">
-        <button className="action-btn" onClick={handleFollowClick}>
+        <button className={`action-btn ${isFollowing ? 'active' : ''}`} onClick={handleFollowClick}>
           <span className="action-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" />
               <circle cx="9" cy="7" r="4" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
             </svg>
           </span>
-          <span className="action-text">Segui</span>
+          <span className="action-text">{isFollowing ? 'Seguito' : 'Segui'}</span>
         </button>
         <button className="action-btn" onClick={handleContactClick}>
           <span className="action-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
             </svg>
           </span>
           <span className="action-text">Contatta</span>
@@ -96,3 +110,5 @@ export function ArtistCard({ profile, onArtistClick, onAuthRequired, onContactAr
     </article>
   )
 }
+
+export default memo(ArtistCard)

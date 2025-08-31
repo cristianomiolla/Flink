@@ -47,38 +47,6 @@
   --font-body: 'Chakra Petch', system-ui, -apple-system, sans-serif;
 }
 
-/* === DARK MODE === */
-.dark {
-  --background: #171717;
-  --foreground: hsl(0, 0%, 100%);
-  
-  --primary: hsl(0, 0%, 100%);
-  --primary-foreground: #171717;
-  
-  /* === UNIFIED GREY PALETTE DARK === */
-  --grey-light: #262626;    /* Sfondi chiari, cards secondarie */
-  --grey-medium: #404040;   /* Bordi, separatori, input backgrounds */
-  --grey-dark: #a3a3a3;     /* Testi secondari, placeholder, icone */
-  
-  --secondary: var(--grey-light);
-  --secondary-foreground: var(--grey-dark);
-  
-  --muted: var(--grey-light);
-  --muted-foreground: var(--grey-dark);
-  
-  --accent: hsl(0, 0%, 4%);
-  --accent-foreground: hsl(0, 0%, 90%);
-  
-  --card: #171717;
-  --card-foreground: hsl(0, 0%, 100%);
-  
-  --border: var(--grey-medium);
-  --border-red: #EF4343;
-  --input: var(--grey-medium);
-  
-  --shadow-brutal: 8px 8px 0px hsl(0, 0%, 100%);
-  --shadow-brutal-hover: 12px 12px 0px hsl(0, 0%, 100%);
-}
 
 /* === BASE STYLES === */
 * {

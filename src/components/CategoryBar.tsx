@@ -5,8 +5,6 @@ interface CategoryBarProps {
   onCategoryChange?: (category: string) => void
   onViewModeChange?: (mode: 'portfolio' | 'artists') => void
   viewMode?: 'portfolio' | 'artists'
-  searchTerm?: string
-  locationFilter?: string
   searchSource?: 'search-bar' | 'category' | null
 }
 
