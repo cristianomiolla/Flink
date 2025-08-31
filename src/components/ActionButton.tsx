@@ -28,6 +28,9 @@ export function ActionButton({
   const { user } = useAuth()
   const baseClass = 'action-btn'
   
+  // Use variant for potential future styling variations
+  void variant
+  
   const activeClass = active ? 'active' : ''
   const disabledClass = disabled ? 'disabled' : ''
   

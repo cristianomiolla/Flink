@@ -3,6 +3,7 @@ import './ChatConversation.css'
 import './HeaderIcons.css'
 import { Avatar } from './Avatar'
 import { useAuth } from '../hooks/useAuth'
+import { type Message as DatabaseMessage } from '../hooks/useMessages'
 
 interface Message {
   id: string
@@ -25,7 +26,7 @@ interface ChatConversationProps {
   isVisible: boolean
   onRequestDeleteChat?: (chat: { id: string; participant: { name: string } }) => void
   sendMessage?: (receiverId: string, content: string) => Promise<boolean>
-  fetchConversationMessages?: (participantId: string) => Promise<Message[]>
+  fetchConversationMessages?: (participantId: string) => Promise<DatabaseMessage[]>
 }
 
 export function ChatConversation({ chat, isVisible, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages }: ChatConversationProps) {
@@ -59,7 +60,7 @@ export function ChatConversation({ chat, isVisible, onRequestDeleteChat, sendMes
         const conversationMessages = await propFetchConversationMessages(participantId)
         
         // Convert to local Message format
-        const formattedMessages: Message[] = conversationMessages.map(msg => ({
+        const formattedMessages: Message[] = conversationMessages.map((msg: DatabaseMessage) => ({
           id: msg.id,
           content: msg.content,
           timestamp: msg.created_at,
