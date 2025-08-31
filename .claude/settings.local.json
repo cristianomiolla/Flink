@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create:*)",
+      "Bash(cp:*)",
+      "Bash(rm:*)",
+      "mcp__supabase__list_tables",
+      "Read(/c:\\Users\\crist\\OneDrive\\Documenti\\progetti\\Skunk/**)",
+      "Bash(node:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run build:*)",
+      "Bash(git add:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "supabase"
+  ]
+}
