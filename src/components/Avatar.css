@@ -27,6 +27,7 @@
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
+  border: 1px solid var(--border-red);
 }
 
 /* Avatar Placeholder */
@@ -55,14 +56,14 @@
   font-size: 14px;
 }
 
-/* Medium - 60px (Artist cards) */
+/* Medium - 80px (Artist cards) */
 .avatar-md {
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
 }
 
 .avatar-md .avatar-placeholder {
-  font-size: 24px;
+  font-size: 32px;
 }
 
 /* Large - 120px (Artist profile header, modals) */
@@ -77,25 +78,9 @@
 
 /* === VARIANT STYLES === */
 
-/* Default variant */
-.avatar-default .avatar-image {
-  /* No additional styles */
-}
+/* Default variant - no additional styles needed */
 
-/* Bordered variant (Artist profile pages) */
-.avatar-bordered .avatar-image {
-  border: 3px solid var(--border-red);
-}
-
-/* Card variant (for use in cards with specific styling) */
-.avatar-card .avatar-placeholder {
-  background: var(--secondary);
-  color: var(--secondary-foreground);
-}
-
-/* === CONTEXT-SPECIFIC OVERRIDES === */
-
-/* Portfolio modal now uses standard lg size, no overrides needed */
+/* Bordered variant - now redundant as all avatars have borders */
 
 /* === RESPONSIVE DESIGN === */
 
@@ -113,12 +98,12 @@
   
   /* Medium - slightly smaller on mobile */
   .avatar-md {
-    width: 56px;
-    height: 56px;
+    width: 72px;
+    height: 72px;
   }
   
   .avatar-md .avatar-placeholder {
-    font-size: 22px;
+    font-size: 28px;
   }
   
   /* Large - smaller but still prominent on mobile */

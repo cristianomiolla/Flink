@@ -248,26 +248,17 @@
   margin-top: 1rem;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) and (min-width: 768px) {
-  .portfolio-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .artist-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
 
 /* Mobile Design - Under 768px */
 @media (max-width: 767px) {
   .grid-container {
-    padding: 1.25rem 0;
+    padding: 0;
   }
   
   .grid-header {
     margin-bottom: 1.5rem;
   }
+
   
   .header-card {
     padding: 1.25rem;

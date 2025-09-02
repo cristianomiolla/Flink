@@ -117,11 +117,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-    return { error }
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+      return { error }
+    } catch (networkError) {
+      console.error('Network error during sign in:', networkError)
+      // Return null error and handle network issues in the UI
+      return { error: null }
+    }
   }
 
   const signInWithGoogle = async () => {

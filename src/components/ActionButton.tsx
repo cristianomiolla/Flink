@@ -86,3 +86,25 @@ export const UploadIcon = () => (
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M12 5v14m7-7l-7-7-7 7" />
   </svg>
 )
+
+export const DeleteIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <polyline points="3,6 5,6 21,6"></polyline>
+    <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+    <line x1="10" y1="11" x2="10" y2="17"></line>
+    <line x1="14" y1="11" x2="14" y2="17"></line>
+  </svg>
+)
+
+export const BackIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <polyline points="15,18 9,12 15,6"></polyline>
+  </svg>
+)
+
+export const SendIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+    <line x1="22" y1="2" x2="11" y2="13"></line>
+    <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
+  </svg>
+)

@@ -1,6 +1,6 @@
 import './Avatar.css'
 
-export type AvatarSize = 'sm' | 'md' | 'lg'
+export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg'
 export type AvatarVariant = 'default' | 'bordered' | 'card'
 
 interface AvatarProps {

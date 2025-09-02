@@ -48,55 +48,54 @@ export function usePortfolioLikes(portfolioItemId: string) {
 
   const fetchLikeData = async () => {
     try {
-      // Get total like count - try with minimal query first
-      const { count, error: countError } = await supabase
-        .from('portfolio_likes')
-        .select('*', { count: 'exact', head: true })
-        .eq('portfolio_item_id', portfolioItemId)
+      // Combine count and user like check into a single optimized query
+      if (user) {
+        // For authenticated users, get both count and user's like status in one query
+        const [{ count }, { data: userLike, error: userLikeError }] = await Promise.all([
+          supabase
+            .from('portfolio_likes')
+            .select('*', { count: 'exact', head: true })
+            .eq('portfolio_item_id', portfolioItemId),
+          supabase
+            .from('portfolio_likes')
+            .select('id')
+            .eq('portfolio_item_id', portfolioItemId)
+            .eq('user_id', user.id)
+            .maybeSingle()
+        ])
 
-      if (countError) {
-        // If we get 406, the policies aren't working correctly - fail silently
-        if (countError.code === 'PGRST116' || countError.message?.includes('406') || countError.code === '42501') {
+        // Handle any policy errors
+        if (userLikeError && (userLikeError.code === 'PGRST116' || userLikeError.message?.includes('406') || userLikeError.code === '42501')) {
           console.warn('Portfolio likes: RLS policies not configured correctly, using fallback')
           setLikeCount(0)
           setIsLiked(false)
           return
         }
-        throw countError
-      }
 
-      setLikeCount(count || 0)
+        setLikeCount(count || 0)
+        setIsLiked(!!userLike)
+      } else {
+        // For anonymous users, only get the count
+        const { count, error: countError } = await supabase
+          .from('portfolio_likes')
+          .select('*', { count: 'exact', head: true })
+          .eq('portfolio_item_id', portfolioItemId)
 
-      // Check if user has liked this item - skip if we're getting policy errors
-      if (user) {
-        try {
-          const { data, error: likeError } = await supabase
-            .from('portfolio_likes')
-            .select('id')
-            .eq('portfolio_item_id', portfolioItemId)
-            .eq('user_id', user.id)
-            .maybeSingle() // Use maybeSingle instead of single to avoid "No rows" error
-
-          if (likeError) {
-            // If policy error, assume not liked and continue silently
-            if (likeError.code === 'PGRST116' || likeError.message?.includes('406') || likeError.code === '42501') {
-              console.warn('Portfolio likes: Cannot check user like status due to RLS policies')
-              setIsLiked(false)
-              return
-            }
-            throw likeError
+        if (countError) {
+          if (countError.code === 'PGRST116' || countError.message?.includes('406') || countError.code === '42501') {
+            console.warn('Portfolio likes: RLS policies not configured correctly, using fallback')
+            setLikeCount(0)
+            setIsLiked(false)
+            return
           }
-
-          setIsLiked(!!data)
-        } catch (userLikeError) {
-          // Fallback: assume user hasn't liked if we can't check
-          console.warn('Cannot verify user like status, assuming not liked:', userLikeError)
-          setIsLiked(false)
+          throw countError
         }
+
+        setLikeCount(count || 0)
+        setIsLiked(false)
       }
     } catch (error) {
       console.error('Error fetching like data:', error)
-      // Set reasonable defaults if everything fails
       setLikeCount(0)
       setIsLiked(false)
     }

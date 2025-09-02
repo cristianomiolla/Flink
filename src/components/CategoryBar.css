@@ -141,8 +141,8 @@
 /* Mobile Design - Under 768px */
 @media (max-width: 767px) {
   .category-bar {
-    padding: 0.875rem 0;
-    border-bottom: 1px solid #EF4343;
+    padding: 0;
+    border-bottom: none;
   }
   
   .category-content {
@@ -151,12 +151,15 @@
     gap: 1rem;
   }
   
+  /* Change order: view-toggle first, then category-tags */
   .category-filters {
     gap: 0.75rem;
+    display: flex;
+    flex-direction: column-reverse;
   }
   
   .category-tags {
-    gap: 0.375rem;
+    gap: 0.25rem;
     justify-content: flex-start;
     overflow-x: auto;
     overflow-y: hidden;
@@ -180,8 +183,8 @@
   }
   
   .category-tag {
-    padding: 0.4rem 0.75rem;
-    font-size: 12px;
+    padding: 0.25rem 0.5rem;
+    font-size: 10px;
     border: 1px solid var(--border);
     white-space: nowrap;
     flex-shrink: 0;

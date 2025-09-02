@@ -83,11 +83,11 @@ export function ProfileDropdown() {
         {isOpen && (
           <div className="dropdown-menu">
             <div className="dropdown-header">
-              <Avatar
-                name={fallbackName}
-                size="md"
-                variant="default"
-              />
+              <div className="avatar avatar-sm avatar-default">
+                <div className="avatar-placeholder">
+                  {fallbackName.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase()}
+                </div>
+              </div>
               <div className="user-info">
                 <div className="user-name">{fallbackName}</div>
                 <div className="user-type">Cliente</div>
@@ -101,12 +101,6 @@ export function ProfileDropdown() {
               Diventi un'artista
             </button>
             <div className="dropdown-divider"></div>
-            <button className="dropdown-item" onClick={() => {
-              navigate('/profile')
-              setIsOpen(false)
-            }}>
-              Il mio profilo
-            </button>
             <button className="dropdown-item" onClick={() => {
               // TODO: Navigate to settings page
             }}>
@@ -139,13 +133,19 @@ export function ProfileDropdown() {
       {isOpen && (
         <div className="dropdown-menu">
           <div className="dropdown-header">
-            <Avatar
-              src={profile.avatar_url}
-              name={profile.full_name}
-              alt={`Avatar di ${getDisplayName()}`}
-              size="md"
-              variant="default"
-            />
+            <div className="avatar avatar-sm avatar-default" aria-label={`Avatar di ${getDisplayName()}`}>
+              {profile.avatar_url ? (
+                <img 
+                  src={profile.avatar_url} 
+                  alt={`Avatar di ${getDisplayName()}`}
+                  className="avatar-image"
+                />
+              ) : (
+                <div className="avatar-placeholder">
+                  {(profile.full_name || getDisplayName()).split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase()}
+                </div>
+              )}
+            </div>
             <div className="user-info">
               <div className="user-name">{profile.full_name && profile.full_name.trim() ? profile.full_name : getDisplayName()}</div>
               <div className="user-type">{getProfileTypeDisplayName(profile.profile_type)}</div>
@@ -161,12 +161,14 @@ export function ProfileDropdown() {
             </button>
           )}
           <div className="dropdown-divider"></div>
-          <button className="dropdown-item" onClick={() => {
-            navigate('/profile')
-            setIsOpen(false)
-          }}>
-            Il mio profilo
-          </button>
+          {profile.profile_type === 'artist' && (
+            <button className="dropdown-item" onClick={() => {
+              navigate('/profile')
+              setIsOpen(false)
+            }}>
+              Il mio profilo
+            </button>
+          )}
           <button className="dropdown-item" onClick={() => {
             // TODO: Navigate to settings page
           }}>

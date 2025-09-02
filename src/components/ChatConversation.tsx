@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import './ChatConversation.css'
-import './HeaderIcons.css'
 import { Avatar } from './Avatar'
 import { useAuth } from '../hooks/useAuth'
 import { type Message as DatabaseMessage } from '../hooks/useMessages'
+import { ActionButton, DeleteIcon, BackIcon, SendIcon } from './ActionButton'
 
 interface Message {
   id: string
@@ -27,9 +27,11 @@ interface ChatConversationProps {
   onRequestDeleteChat?: (chat: { id: string; participant: { name: string } }) => void
   sendMessage?: (receiverId: string, content: string) => Promise<boolean>
   fetchConversationMessages?: (participantId: string) => Promise<DatabaseMessage[]>
+  showOnMobile?: boolean
+  onBackToList?: () => void
 }
 
-export function ChatConversation({ chat, isVisible, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages }: ChatConversationProps) {
+export function ChatConversation({ chat, isVisible, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages, showOnMobile = true, onBackToList }: ChatConversationProps) {
   const { user } = useAuth()
   const [newMessage, setNewMessage] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
@@ -136,7 +138,7 @@ export function ChatConversation({ chat, isVisible, onRequestDeleteChat, sendMes
 
   if (!isVisible || !chat) {
     return (
-      <div className="chat-conversation empty">
+      <div className={`chat-conversation empty ${showOnMobile ? 'mobile-visible' : ''}`}>
         <div className="empty-conversation">
           <div className="empty-conversation-icon">💬</div>
           <h3 className="empty-conversation-title">Seleziona una conversazione</h3>
@@ -149,10 +151,18 @@ export function ChatConversation({ chat, isVisible, onRequestDeleteChat, sendMes
   }
 
   return (
-    <div className="chat-conversation">
+    <div className={`chat-conversation ${showOnMobile ? 'mobile-visible' : ''}`}>
       {/* Chat Header */}
       <div className="conversation-header">
         <div className="conversation-participant">
+          {/* Back button for mobile */}
+          <ActionButton
+            icon={<BackIcon />}
+            text="Indietro"
+            variant="secondary"
+            onClick={onBackToList}
+            className="mobile-back-action"
+          />
           <Avatar
             src={chat.participant.avatar}
             name={chat.participant.name}
@@ -160,25 +170,20 @@ export function ChatConversation({ chat, isVisible, onRequestDeleteChat, sendMes
             size="sm"
             variant="default"
           />
-          <h2 className="participant-name">{chat.participant.name}</h2>
+          <h2 className="participant-name">{chat.participant.name || 'Nome non disponibile'}</h2>
         </div>
         <div className="conversation-actions">
-          <button 
-            className="header-icon-btn delete-chat-btn" 
-            title="Elimina conversazione"
+          <ActionButton
+            icon={<DeleteIcon />}
+            text="Elimina"
+            variant="secondary"
             onClick={(e) => {
               e.stopPropagation()
               e.preventDefault()
               handleDeleteChat()
             }}
-          >
-            <svg className="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <polyline points="3,6 5,6 21,6"></polyline>
-              <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
-              <line x1="10" y1="11" x2="10" y2="17"></line>
-              <line x1="14" y1="11" x2="14" y2="17"></line>
-            </svg>
-          </button>
+            className="delete-chat-action"
+          />
         </div>
       </div>
 
@@ -222,17 +227,14 @@ export function ChatConversation({ chat, isVisible, onRequestDeleteChat, sendMes
             onKeyPress={handleKeyPress}
             rows={1}
           />
-          <button
-            className={`header-icon-btn send-button ${!newMessage.trim() ? 'disabled' : ''}`}
+          <ActionButton
+            icon={<SendIcon />}
+            text="Invia"
+            variant="secondary"
             onClick={handleSendMessage}
             disabled={!newMessage.trim()}
-            title="Invia messaggio"
-          >
-            <svg className="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <line x1="22" y1="2" x2="11" y2="13"></line>
-              <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
-            </svg>
-          </button>
+            className="send-message-action"
+          />
         </div>
       </div>
     </div>

@@ -131,6 +131,13 @@
   outline: none;
 }
 
+/* Disabled state for own profile */
+.action-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+
 /* Mobile Design - Under 768px */
 @media (max-width: 767px) {
   .artist-card {
@@ -195,12 +202,14 @@
   }
   
   .artist-actions {
-    flex-direction: column;
-    gap: 0.75rem;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.5rem;
   }
   
   .artist-actions .btn {
-    padding: 0.5rem 0.875rem;
+    flex: 1;
+    padding: 0.5rem 0.75rem;
     font-size: 13px;
   }
 }

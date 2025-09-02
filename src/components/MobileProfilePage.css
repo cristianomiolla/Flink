@@ -1,0 +1,156 @@
+/* Mobile Profile Page */
+.mobile-profile-page {
+  background: var(--background);
+  min-height: 100vh;
+  padding-bottom: calc(70px + env(safe-area-inset-bottom));
+}
+
+.mobile-profile-header {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.mobile-profile-title {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--foreground);
+  text-transform: uppercase;
+  margin: 0;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.mobile-profile-content {
+  padding: 0;
+}
+
+/* User Info Section */
+.mobile-profile-user {
+  background: var(--card);
+  padding: 2rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.mobile-profile-avatar {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.mobile-profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mobile-profile-name {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.mobile-profile-type {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Menu Items */
+.mobile-profile-menu {
+  background: var(--card);
+  margin-top: 1rem;
+}
+
+.mobile-profile-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1rem;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mobile-profile-item:hover {
+  background: var(--muted);
+}
+
+.mobile-profile-item:last-child {
+  border-bottom: none;
+}
+
+.mobile-profile-item-text {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.mobile-profile-item-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--muted-foreground);
+  stroke-width: 1.5;
+  flex-shrink: 0;
+}
+
+/* Special styling for become artist button */
+.mobile-profile-item.become-artist-btn .mobile-profile-item-text {
+  color: var(--primary);
+}
+
+.mobile-profile-item.become-artist-btn .mobile-profile-item-icon {
+  color: var(--primary);
+}
+
+/* Logout item styling */
+.mobile-profile-item.logout-item .mobile-profile-item-text {
+  color: var(--destructive);
+}
+
+.mobile-profile-item.logout-item .mobile-profile-item-icon {
+  color: var(--destructive);
+}
+
+/* Loading state */
+.mobile-profile-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  color: var(--muted-foreground);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
+
+/* Mobile only */
+@media (max-width: 767px) {
+  .mobile-profile-page {
+    display: block;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-profile-page {
+    display: none;
+  }
+}

@@ -123,7 +123,7 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
         <div className="artist-info">
           <div onClick={handleArtistNameClick} style={{ cursor: 'pointer' }}>
             <Avatar
-              src={null}
+              src={item.artist_avatar_url}
               name={displayName}
               alt={`Avatar di ${displayName}`}
               size="sm"

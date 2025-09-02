@@ -5,6 +5,7 @@ import { PersonalProfile } from './PersonalProfile'
 import { SavedItemsPage } from './SavedItemsPage'
 import { MessagesPage } from './MessagesPage'
 import { BecomeArtistPage } from './BecomeArtistPage'
+import { MobileProfilePage } from './MobileProfilePage'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
@@ -30,6 +31,7 @@ export function AppRoutes() {
       <Route path="/" element={<MainPage />} />
       <Route path="/artist/:artistId" element={<ArtistProfile />} />
       <Route path="/profile" element={<PersonalProfile />} />
+      <Route path="/profile-menu" element={<MobileProfilePage />} />
       <Route path="/saved" element={<SavedItemsPage onLogoClick={handleLogoClick} onArtistClick={handleArtistClick} />} />
       <Route path="/messages" element={<MessagesPage onLogoClick={handleLogoClick} />} />
       <Route path="/messages/:artistId" element={<MessagesPage onLogoClick={handleLogoClick} />} />

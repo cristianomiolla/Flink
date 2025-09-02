@@ -71,13 +71,24 @@
   gap: 0.5rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .saved-items-content {
     padding: 1rem 0;
   }
+  
+  /* Hide header content on mobile when on saved items page */
+  .saved-items-page .header-content {
+    display: none;
+  }
+  
+  .saved-items-page .header {
+    height: 0;
+    padding: 0;
+    border: none;
+  }
 
   .empty-icon {
-    font-size: 3rem;
+    font-size: 2.5rem;
   }
 
   .empty-title {
@@ -86,11 +97,5 @@
 
   .empty-content, .error-content {
     padding: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .empty-icon {
-    font-size: 2.5rem;
   }
 }

@@ -119,7 +119,7 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
           <div className="modal-artist-info">
             <div onClick={handleArtistNameClick} style={{ cursor: 'pointer' }}>
               <Avatar
-                src={null}
+                src={item.artist_avatar_url}
                 name={displayName}
                 alt={`Avatar di ${displayName}`}
                 size="lg"

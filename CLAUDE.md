@@ -93,6 +93,11 @@ CREATE INDEX idx_portfolio_tags ON portfolio_items USING GIN(tags);
 CREATE INDEX idx_profiles_user_id ON profiles(user_id);
 CREATE INDEX idx_profiles_profile_type ON profiles(profile_type);
 CREATE INDEX idx_profiles_full_name ON profiles(full_name);
+
+-- Followers indexes
+CREATE INDEX idx_followers_follower_id ON followers(follower_id);
+CREATE INDEX idx_followers_following_id ON followers(following_id);
+CREATE INDEX idx_followers_created_at ON followers(created_at DESC);
 ```
 
 #### RLS Policies
@@ -104,6 +109,11 @@ CREATE POLICY "Authenticated users can insert profiles" ON profiles FOR INSERT T
 -- Portfolio items
 CREATE POLICY "Public can view portfolio items" ON portfolio_items FOR SELECT TO public USING (true);
 CREATE POLICY "Authenticated users can insert portfolio items" ON portfolio_items FOR INSERT TO authenticated WITH CHECK (true);
+
+-- Followers
+CREATE POLICY "Public can view all follower relationships" ON followers FOR SELECT TO public USING (true);
+CREATE POLICY "Users can create their own follows" ON followers FOR INSERT TO authenticated WITH CHECK (auth.uid() = follower_id);
+CREATE POLICY "Users can delete their own follows" ON followers FOR DELETE TO authenticated USING (auth.uid() = follower_id);
 ```
 
 #### Table: `saved_tattoos`
@@ -117,13 +127,27 @@ CREATE TABLE saved_tattoos (
 );
 ```
 
+#### Table: `followers`
+```sql
+CREATE TABLE followers (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    follower_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    following_id UUID NOT NULL REFERENCES profiles(user_id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE(follower_id, following_id)
+);
+```
+
 #### Relationships
 - `portfolio_items.user_id` → `profiles.user_id` (Foreign Key)
 - `saved_tattoos.user_id` → `auth.users.id` (Foreign Key)
 - `saved_tattoos.portfolio_item_id` → `portfolio_items.id` (Foreign Key)
+- `followers.follower_id` → `auth.users.id` (Foreign Key)
+- `followers.following_id` → `profiles.user_id` (Foreign Key)
 - Both portfolio and profile tables have RLS enabled with public read access
 - Artists are identified by `profiles.profile_type = 'artist'`
 - Saved items are ordered by `saved_tattoos.created_at` for chronological display
+- Follow relationships enable dynamic artist following functionality
 
 ### Supabase Client Usage
 ```typescript

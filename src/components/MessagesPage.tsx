@@ -28,11 +28,17 @@ interface Chat {
 
 export function MessagesPage({ onLogoClick }: MessagesPageProps) {
   const { artistId } = useParams()
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
   const { user } = useAuth()
   const { conversations, loading, error, deleteConversation, markConversationAsRead, sendMessage, fetchConversationMessages } = useMessages()
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
   const [newChatArtist, setNewChatArtist] = useState<{id: string, name: string, avatar?: string} | null>(null)
   const [chatToDelete, setChatToDelete] = useState<{id: string, participantName: string} | null>(null)
+  const [showConversation, setShowConversation] = useState(false) // Mobile view control
   
   // Convert Supabase conversations to Chat format for existing components
   const chats: Chat[] = conversations.map(conv => ({
@@ -133,12 +139,19 @@ export function MessagesPage({ onLogoClick }: MessagesPageProps) {
 
   const handleChatSelect = (chatId: string) => {
     setSelectedChatId(chatId)
+    setShowConversation(true) // Show conversation on mobile
     
     // Mark conversation as read when selected
     const conversation = conversations.find(conv => conv.id === chatId)
     if (conversation && conversation.unreadCount > 0) {
       markConversationAsRead(conversation.participant.user_id)
     }
+  }
+
+  const handleBackToList = () => {
+    setShowConversation(false)
+    setSelectedChatId(null) // Clear selected chat to fully return to list
+    setNewChatArtist(null) // Clear any new chat artist
   }
 
   const handleRequestDeleteChat = (chat: { id: string; participant: { name: string } }) => {
@@ -180,7 +193,7 @@ export function MessagesPage({ onLogoClick }: MessagesPageProps) {
   if (loading) {
     return (
       <div className="messages-page">
-        <SearchBar onLogoClick={onLogoClick} />
+        <SearchBar onLogoClick={onLogoClick} hideOnMobile={true} />
         <div className="messages-container">
           <div className="messages-loading">
             <LoadingSpinner />
@@ -194,7 +207,7 @@ export function MessagesPage({ onLogoClick }: MessagesPageProps) {
   if (error) {
     return (
       <div className="messages-page">
-        <SearchBar onLogoClick={onLogoClick} />
+        <SearchBar onLogoClick={onLogoClick} hideOnMobile={true} />
         <div className="messages-container">
           <div className="messages-content">
             <div className="error-message">
@@ -209,7 +222,7 @@ export function MessagesPage({ onLogoClick }: MessagesPageProps) {
 
   return (
     <div className="messages-page">
-      <SearchBar onLogoClick={onLogoClick} />
+      <SearchBar onLogoClick={onLogoClick} hideOnMobile={true} />
       
       <div className="messages-container">
         <div className="messages-content">
@@ -219,6 +232,7 @@ export function MessagesPage({ onLogoClick }: MessagesPageProps) {
             selectedChatId={selectedChatId}
             onChatSelect={handleChatSelect}
             onRequestDeleteChat={handleRequestDeleteChat}
+            showOnMobile={!showConversation}
           />
           
           {/* Chat Conversation Area */}
@@ -228,6 +242,8 @@ export function MessagesPage({ onLogoClick }: MessagesPageProps) {
             onRequestDeleteChat={handleRequestDeleteChat}
             sendMessage={sendMessage}
             fetchConversationMessages={fetchConversationMessages}
+            showOnMobile={showConversation && selectedChatId !== null}
+            onBackToList={handleBackToList}
           />
         </div>
       </div>

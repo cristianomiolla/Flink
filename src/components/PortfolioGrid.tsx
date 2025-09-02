@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, memo, useCallback } from 'react'
 import './PortfolioGrid.css'
 import { PortfolioCard } from './PortfolioCard'
 import LoadingSpinner from './LoadingSpinner'
@@ -19,7 +19,7 @@ interface PortfolioGridProps {
   onContactArtist?: (artistId: string) => void
 }
 
-export function PortfolioGrid({ 
+const PortfolioGrid = memo(function PortfolioGrid({ 
   items, 
   loading, 
   error, 
@@ -50,10 +50,10 @@ export function PortfolioGrid({
     }
   }, [])
 
-  const handleFilterClick = (filter: FlashFilter) => {
+  const handleFilterClick = useCallback((filter: FlashFilter) => {
     onFlashFilterChange?.(filter)
     setIsDropdownOpen(false)
-  }
+  }, [onFlashFilterChange])
 
   const getFilterLabel = (filter: FlashFilter) => {
     switch (filter) {
@@ -187,4 +187,6 @@ export function PortfolioGrid({
       </div>
     </section>
   )
-}
+})
+
+export { PortfolioGrid }

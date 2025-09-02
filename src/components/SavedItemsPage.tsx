@@ -20,6 +20,11 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   // Load full portfolio items for saved tattoos
   useEffect(() => {
     const loadSavedItems = async () => {
@@ -106,7 +111,7 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
   if (loading || savedLoading) {
     return (
       <div className="saved-items-page">
-        <SearchBar onLogoClick={onLogoClick} />
+        <SearchBar onLogoClick={onLogoClick} hideOnMobile={true} />
         <div className="saved-items-loading">
           <LoadingSpinner />
         </div>
@@ -116,7 +121,7 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
 
   return (
     <div className="saved-items-page">
-      <SearchBar onLogoClick={onLogoClick} />
+      <SearchBar onLogoClick={onLogoClick} hideOnMobile={true} />
       
       <div className="container">
         <div className="saved-items-content">
@@ -175,11 +180,6 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
                   item={item}
                   onArtistClick={onArtistClick}
                 />
-              ))}
-              
-              {/* Fill remaining spots to maintain grid structure */}
-              {Array.from({ length: Math.max(0, 12 - (savedItems.length % 12)) }, (_, index) => (
-                <div key={`placeholder-${index}`} className="grid-placeholder" />
               ))}
             </div>
           )}

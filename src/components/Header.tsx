@@ -8,6 +8,7 @@ interface HeaderProps {
   onLogoClick?: () => void
   children?: ReactNode
   onAuthRequired?: () => void
+  hideOnMobile?: boolean
 }
 
 export function Header({ onLogoClick, children, onAuthRequired }: HeaderProps) {

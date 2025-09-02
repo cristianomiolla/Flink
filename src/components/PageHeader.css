@@ -8,7 +8,7 @@
   background: var(--background);
   border: none;
   border-radius: var(--radius);
-  padding: 1.5rem 0;
+  padding: 0;
   text-align: center;
 }
 
@@ -37,21 +37,11 @@
 }
 
 /* Mobile responsive */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .header-card {
-    padding: 1rem;
+    padding: 0;
   }
 
-  .grid-title {
-    font-size: 1.5rem;
-  }
-
-  .grid-subtitle {
-    font-size: 0.875rem;
-  }
-}
-
-@media (max-width: 480px) {
   .header-top {
     flex-direction: column;
     align-items: center;
@@ -64,5 +54,9 @@
 
   .grid-title {
     font-size: 1.25rem;
+  }
+
+  .grid-subtitle {
+    font-size: 0.875rem;
   }
 }

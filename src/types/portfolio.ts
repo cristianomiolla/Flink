@@ -1,35 +1,36 @@
 export interface DatabasePortfolioItem {
-  id: string
-  user_id: string
+  readonly id: string
+  readonly user_id: string
   title: string
   description: string | null
   image_url: string | null
-  tags: string[] | null
+  tags: readonly string[] | null
   is_flash: boolean
   price: number | null
   location: string | null
-  created_at: string
-  updated_at: string
+  readonly created_at: string
+  readonly updated_at: string
 }
 
 export interface PortfolioItem extends DatabasePortfolioItem {
-  artist_name?: string
-  full_name?: string | null
+  readonly artist_name?: string
+  readonly full_name?: string | null
+  readonly artist_avatar_url?: string | null
 }
 
 export interface DatabaseProfile {
-  id: string
-  user_id: string
-  email: string
+  readonly id: string
+  readonly user_id: string
+  readonly email: string
   full_name: string | null
   username: string | null
-  profile_type: 'client' | 'artist'
+  readonly profile_type: 'client' | 'artist'
   bio: string | null
   avatar_url: string | null
   phone: string | null
   location: string | null
-  created_at: string
-  updated_at: string
+  readonly created_at: string
+  readonly updated_at: string
 }
 
 export interface ArtistProfile extends DatabaseProfile {
@@ -70,3 +71,22 @@ export interface ArtistService {
 export type ViewMode = 'portfolio' | 'artists'
 export type TabType = 'portfolio' | 'servizi' | 'flash' | 'recensioni'
 export type FlashFilter = 'all' | 'flash' | 'realizzati'
+
+// Optimized interfaces for performance
+export interface PortfolioSearchFilters {
+  readonly searchTerm: string
+  readonly locationFilter: string
+  readonly flashFilter: FlashFilter
+}
+
+export interface GridCallbacks {
+  readonly onArtistClick?: (artistId: string) => void
+  readonly onFlashFilterChange?: (filter: FlashFilter) => void
+  readonly onAuthRequired?: () => void
+  readonly onContactArtist?: (artistId: string) => void
+}
+
+export interface GridStats {
+  readonly totalCount: number
+  readonly filteredCount: number
+}

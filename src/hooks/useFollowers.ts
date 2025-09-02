@@ -65,6 +65,12 @@ export function useFollowers() {
   const followArtist = useCallback(async (artistUserId: string) => {
     if (!user) return { error: 'Authentication required' }
 
+    // Check if already following to prevent duplicate constraint error
+    const currentStats = followerStats.get(artistUserId)
+    if (currentStats?.is_following) {
+      return { success: true } // Already following, nothing to do
+    }
+
     try {
       const { error } = await supabase
         .from('followers')
@@ -73,7 +79,13 @@ export function useFollowers() {
           following_id: artistUserId 
         })
 
-      if (error) throw error
+      if (error) {
+        // Handle duplicate key constraint gracefully
+        if (error.code === '23505') {
+          return { success: true } // Already exists, treat as success
+        }
+        throw error
+      }
 
       // Update local state optimistically
       setFollowerStats(prev => {
@@ -94,10 +106,16 @@ export function useFollowers() {
       console.error('Error following artist:', error)
       return { error: 'Failed to follow artist' }
     }
-  }, [user])
+  }, [user, followerStats])
 
   const unfollowArtist = useCallback(async (artistUserId: string) => {
     if (!user) return { error: 'Authentication required' }
+
+    // Check if not following to avoid unnecessary deletion
+    const currentStats = followerStats.get(artistUserId)
+    if (!currentStats?.is_following) {
+      return { success: true } // Not following, nothing to do
+    }
 
     try {
       const { error } = await supabase
@@ -127,10 +145,11 @@ export function useFollowers() {
       console.error('Error unfollowing artist:', error)
       return { error: 'Failed to unfollow artist' }
     }
-  }, [user])
+  }, [user, followerStats])
 
   const toggleFollow = useCallback(async (artistUserId: string) => {
     const stats = followerStats.get(artistUserId)
+    
     if (stats?.is_following) {
       return await unfollowArtist(artistUserId)
     } else {

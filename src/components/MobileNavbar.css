@@ -1,0 +1,105 @@
+/* Mobile Navigation Bar */
+.mobile-navbar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border-top: 1px solid var(--border-red);
+  padding: 0.75rem 0 calc(0.75rem + env(safe-area-inset-bottom));
+  z-index: 1000;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  justify-content: space-around;
+  align-items: center;
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: all 0.2s ease;
+  font-family: var(--font-sans);
+  min-width: 60px;
+  position: relative;
+}
+
+.mobile-nav-item:hover,
+.mobile-nav-item.active {
+  color: var(--primary);
+}
+
+.mobile-nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: -0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  background: var(--primary);
+}
+
+.mobile-nav-icon {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.5;
+  flex-shrink: 0;
+}
+
+.mobile-nav-avatar {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.mobile-nav-avatar .avatar {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.mobile-nav-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+/* Hide mobile navbar on desktop */
+@media (min-width: 768px) {
+  .mobile-navbar {
+    display: none !important;
+  }
+}
+
+/* Show mobile navbar only on mobile */
+@media (max-width: 767px) {
+  .mobile-navbar {
+    display: flex !important;
+  }
+  
+  /* Add bottom padding to main content to prevent overlap */
+  .app-container {
+    padding-bottom: calc(70px + env(safe-area-inset-bottom));
+  }
+  
+  /* Hide regular header on mobile when navbar is present */
+  .header {
+    display: none;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .mobile-navbar {
+    background: var(--card);
+    border-top-color: var(--border);
+  }
+}

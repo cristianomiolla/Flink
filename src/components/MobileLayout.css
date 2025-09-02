@@ -1,0 +1,124 @@
+/* Mobile Layout Styles */
+
+/* Mobile header with logo */
+.mobile-header {
+  display: none;
+  background: var(--card);
+  border-bottom: 1px solid var(--border-red);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.mobile-logo {
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.mobile-logo-text {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  transition: all 0.2s ease;
+}
+
+.mobile-logo:hover .mobile-logo-text {
+  color: var(--accent);
+}
+
+/* Mobile search container */
+.mobile-search-container {
+  display: none;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem;
+}
+
+.mobile-search-container .search-form {
+  margin: 0;
+  max-width: none;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mobile-search-container .search-input,
+.mobile-search-container .location-input {
+  padding: 0.5rem 1rem 0.5rem 2rem;
+  font-size: 14px;
+}
+
+.mobile-search-container .search-input-container,
+.mobile-search-container .location-input-container {
+  min-height: 40px;
+}
+
+.mobile-search-container .btn {
+  padding: 0.5rem 1rem;
+  font-size: 14px;
+}
+
+/* Mobile search form styling - remove border when only search input is visible */
+.mobile-search-container .search-input-container {
+  border-bottom: none !important;
+}
+
+/* Only add border back when location input is shown */
+.mobile-search-container .search-form:has(.location-input-container) .search-input-container {
+  border-bottom: 1px solid var(--border-red) !important;
+}
+
+/* Mobile search form animations */
+.mobile-search-container .location-input-container,
+.mobile-search-container .search-btn {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* App container adjustments for mobile */
+@media (max-width: 767px) {
+  .mobile-header {
+    display: block;
+  }
+  
+  /* Hide regular header on mobile */
+  .header {
+    display: none !important;
+  }
+  
+  /* Hide desktop search bar completely */
+  .search-bar {
+    display: none !important;
+  }
+  
+  /* Show mobile search container */
+  .mobile-search-container {
+    display: block !important;
+    border-bottom: none;
+  }
+  
+  /* Ensure main content has proper spacing */
+  .main-content {
+    padding-bottom: calc(70px + env(safe-area-inset-bottom));
+  }
+  
+}
+
+/* Ensure mobile navbar appears above everything */
+.mobile-navbar {
+  z-index: 1001 !important;
+}

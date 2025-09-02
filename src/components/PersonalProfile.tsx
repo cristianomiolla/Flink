@@ -15,6 +15,18 @@ import type { TabType, PortfolioItem } from '../types/portfolio'
 export function PersonalProfile() {
   const navigate = useNavigate()
   const { user, profile, loading, refreshProfile } = useAuth()
+  
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+  
+  // Redirect clients to home page - only artists can access personal profile
+  useEffect(() => {
+    if (!loading && profile && profile.profile_type === 'client') {
+      navigate('/')
+    }
+  }, [profile, loading, navigate])
   const { fetchFollowerStats, getFollowerStats } = useFollowers()
   const [showEditOverlay, setShowEditOverlay] = useState(false)
   const [showUploadOverlay, setShowUploadOverlay] = useState(false)
@@ -26,7 +38,8 @@ export function PersonalProfile() {
   const [portfolioLoading, setPortfolioLoading] = useState(true)
   const [formData, setFormData] = useState({
     bio: profile?.bio || '',
-    location: profile?.location || ''
+    location: profile?.location || '',
+    avatar_url: profile?.avatar_url || ''
   })
   const [uploadData, setUploadData] = useState({
     title: '',
@@ -37,6 +50,8 @@ export function PersonalProfile() {
     price: ''
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarPreview, setAvatarPreview] = useState<string>('')
   const [filePreview, setFilePreview] = useState<string | null>(null)
 
   const handleSearch = (searchTerm: string, location: string) => {
@@ -75,7 +90,8 @@ export function PersonalProfile() {
         updated_at: item.updated_at,
         user_id: item.user_id,
         artist_name: profile.full_name || profile.username || 'Tu',
-        full_name: profile.full_name || profile.username || 'Tu'
+        full_name: profile.full_name || profile.username || 'Tu',
+        artist_avatar_url: profile.avatar_url
       }))
 
       setPortfolioItems(portfolioData)
@@ -178,11 +194,56 @@ export function PersonalProfile() {
     
     setIsSubmitting(true)
     try {
+      let avatarUrl = formData.avatar_url
+
+      // Carica avatar se selezionato
+      if (avatarFile) {
+        try {
+          const timestamp = Date.now()
+          const fileExt = avatarFile.name.split('.').pop()
+          const fileName = `${user.id}/avatar_${timestamp}.${fileExt}`
+          
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(fileName, avatarFile, {
+              cacheControl: '3600',
+              upsert: false
+            })
+
+          if (uploadError) {
+            console.error('Error uploading avatar:', uploadError)
+            
+            // Handle specific storage errors
+            if (uploadError.message?.includes('Bucket not found')) {
+              alert('Errore: Il bucket per gli avatar non è configurato. Esegui il file fix-avatars-policies.sql nel database.')
+            } else if (uploadError.message?.includes('The resource already exists')) {
+              alert('Avatar con questo nome già esistente. Riprova.')
+            } else if (uploadError.message?.includes('row-level security policy') || uploadError.message?.includes('RLS')) {
+              alert('Errore di permessi: Le politiche RLS per gli avatar non sono configurate correttamente. Esegui il file fix-avatars-policies.sql nel database.')
+            } else {
+              alert(`Errore durante il caricamento dell'avatar: ${uploadError.message}`)
+            }
+            return
+          }
+
+          const { data } = supabase.storage
+            .from('avatars')
+            .getPublicUrl(uploadData.path)
+            
+          avatarUrl = data.publicUrl
+        } catch (error) {
+          console.error('Network error uploading avatar:', error)
+          alert('Errore di rete. Verifica la connessione internet e riprova.')
+          return
+        }
+      }
+
       const { error } = await supabase
         .from('profiles')
         .update({
           bio: formData.bio.trim(),
           location: formData.location.trim(),
+          avatar_url: avatarUrl,
           updated_at: new Date().toISOString()
         })
         .eq('user_id', profile.user_id)
@@ -198,6 +259,9 @@ export function PersonalProfile() {
         await refreshProfile()
       }
       
+      // Reset avatar states
+      setAvatarFile(null)
+      setAvatarPreview('')
       setShowEditOverlay(false)
     } catch (error) {
       console.error('Error updating profile:', error)
@@ -244,6 +308,39 @@ export function PersonalProfile() {
     setFilePreview(null)
   }
 
+  const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        alert('Seleziona un file immagine valido (JPG, PNG, GIF, WebP)')
+        return
+      }
+      
+      // Verifica dimensione file (2MB max per avatar)
+      const maxSize = 2 * 1024 * 1024 // 2MB in bytes
+      if (file.size > maxSize) {
+        alert('Il file è troppo grande. Dimensione massima: 2MB')
+        return
+      }
+      
+      setAvatarFile(file)
+      const reader = new FileReader()
+      reader.onload = () => {
+        setAvatarPreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const removeAvatarPreview = () => {
+    setAvatarFile(null)
+    setAvatarPreview('')
+    // Se c'è un avatar esistente, lo rimuoviamo anche dal form data
+    if (formData.avatar_url) {
+      setFormData(prev => ({ ...prev, avatar_url: '' }))
+    }
+  }
+
   const bioSuggestions = [
     "Racconta la tua storia come tatuatore",
     "Descrivi il tuo stile artistico preferito", 
@@ -257,7 +354,8 @@ export function PersonalProfile() {
     if (profile) {
       setFormData({
         bio: profile.bio || '',
-        location: profile.location || ''
+        location: profile.location || '',
+        avatar_url: profile.avatar_url || ''
       })
       // Load portfolio items when profile loads
       fetchPortfolioItems()
@@ -288,6 +386,13 @@ export function PersonalProfile() {
       fetchFollowerStats([profile.user_id])
     }
   }, [profile?.user_id, fetchFollowerStats])
+
+  // Handle redirect for unauthenticated users
+  useEffect(() => {
+    if (!loading && (!user || !profile)) {
+      navigate('/')
+    }
+  }, [user, profile, loading, navigate])
 
   // Funzione per eliminare un portfolio item - mostra modal di conferma
   const handleDeletePortfolioItem = (itemId: string) => {
@@ -335,7 +440,7 @@ export function PersonalProfile() {
   if (loading) {
     return (
       <div className="artist-profile">
-        <SearchBar onSearch={handleSearch} onLogoClick={handleLogoClick} />
+        <SearchBar onSearch={handleSearch} onLogoClick={handleLogoClick} hideOnMobile={true} />
         <div className="loading-state">
           <LoadingSpinner size="large" />
         </div>
@@ -343,8 +448,8 @@ export function PersonalProfile() {
     )
   }
 
+  // Don't render anything if not authenticated
   if (!user || !profile) {
-    navigate('/')
     return null
   }
 
@@ -353,7 +458,7 @@ export function PersonalProfile() {
 
   return (
     <div className="artist-profile">
-      <SearchBar onSearch={handleSearch} onLogoClick={handleLogoClick} />
+      <SearchBar onSearch={handleSearch} onLogoClick={handleLogoClick} hideOnMobile={true} />
       
       <main className="artist-profile-content">
         <div className="container">
@@ -580,6 +685,70 @@ export function PersonalProfile() {
               </p>
 
               <form className="complete-profile-form" onSubmit={(e) => e.preventDefault()}>
+                {/* Avatar Field */}
+                <div className="form-group">
+                  <label htmlFor="avatar" className="form-label">
+                    FOTO PROFILO
+                  </label>
+                  <div className="avatar-upload-section">
+                    <div className="current-avatar">
+                      {avatarPreview ? (
+                        <div className="avatar avatar-md avatar-default">
+                          <img 
+                            src={avatarPreview} 
+                            alt="Anteprima avatar" 
+                            className="avatar-image"
+                          />
+                        </div>
+                      ) : formData.avatar_url ? (
+                        <div className="avatar avatar-md avatar-default">
+                          <img 
+                            src={formData.avatar_url} 
+                            alt="Avatar attuale" 
+                            className="avatar-image"
+                          />
+                        </div>
+                      ) : (
+                        <div className="avatar avatar-md avatar-default">
+                          <div className="avatar-placeholder">
+                            {(profile?.full_name || profile?.username || user?.email || 'U').split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase()}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="avatar-upload-controls">
+                      <input
+                        type="file"
+                        id="avatar"
+                        accept="image/*"
+                        onChange={handleAvatarSelect}
+                        className="file-input"
+                        style={{ display: 'none' }}
+                      />
+                      <ActionButton
+                        icon={<UploadIcon />}
+                        text={formData.avatar_url || avatarPreview ? 'Cambia foto' : 'Carica foto'}
+                        onClick={() => document.getElementById('avatar')?.click()}
+                      />
+                      {(avatarPreview || formData.avatar_url) && (
+                        <ActionButton
+                          icon={
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          }
+                          text="Rimuovi"
+                          onClick={removeAvatarPreview}
+                          variant="secondary"
+                        />
+                      )}
+                    </div>
+                  </div>
+                  <div className="form-help">
+                    Formati supportati: JPG, PNG, GIF, WebP. Dimensione massima: 2MB
+                  </div>
+                </div>
+
                 {/* Bio Field */}
                 <div className="form-group">
                   <label htmlFor="bio" className="form-label">

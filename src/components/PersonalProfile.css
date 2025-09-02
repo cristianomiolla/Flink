@@ -142,6 +142,26 @@
   margin-top: 0.25rem;
 }
 
+/* Avatar Upload Styles */
+.avatar-upload-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.current-avatar {
+  flex-shrink: 0;
+}
+
+
+
+.avatar-upload-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+
 /* Form Actions */
 .form-actions {
   display: flex;
@@ -332,7 +352,7 @@
 }
 
 /* Mobile responsive */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .profile-edit-actions {
     justify-content: center;
     margin-top: 1rem;
@@ -371,6 +391,22 @@
   
   .suggestion-item {
     font-size: 0.7rem;
+  }
+  
+  /* Avatar Upload Mobile */
+  .avatar-upload-section {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .avatar-upload-controls {
+    width: 100%;
+    align-items: center;
+  }
+  
+  .avatar-upload-controls .action-btn {
+    width: 100%;
   }
   
   /* Portfolio Header Mobile */

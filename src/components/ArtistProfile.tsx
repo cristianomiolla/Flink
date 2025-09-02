@@ -23,6 +23,11 @@ export function ArtistProfile() {
   const followerCount = followerStats?.follower_count || 0
   const isFollowing = followerStats?.is_following || false
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   // Fetch follower stats when profile loads
   useEffect(() => {
     if (profile?.user_id) {
@@ -70,7 +75,7 @@ export function ArtistProfile() {
 
   return (
     <div className="artist-profile">
-      <SearchBar onSearch={handleSearch} onLogoClick={handleLogoClick} />
+      <SearchBar onSearch={handleSearch} onLogoClick={handleLogoClick} hideOnMobile={true} />
       
       <main className="artist-profile-content">
         <div className="container">

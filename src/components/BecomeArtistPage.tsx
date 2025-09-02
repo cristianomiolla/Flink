@@ -154,43 +154,53 @@ export function BecomeArtistPage({ onLogoClick }: BecomeArtistPageProps) {
       {/* Confirmation Overlay */}
       {showConfirmation && (
         <div className="auth-overlay" onClick={(e) => e.target === e.currentTarget && setShowConfirmation(false)}>
-          <div className="auth-modal confirmation-modal">
-            {/* Sticky Header with Close Button */}
+          <div className="auth-modal">
             <div className="auth-header-sticky">
               <button className="auth-close-btn" onClick={() => setShowConfirmation(false)}>
                 ×
               </button>
             </div>
-            
             <div className="auth-modal-header">
+              <div className="confirmation-header-title">
+                <h2 className="confirmation-title">CONFERMA UPGRADE</h2>
+              </div>
             </div>
-            
-            <div className="confirmation-content">
-              <h2 className="confirmation-title">CONFERMA UPGRADE</h2>
-              <p className="confirmation-text">
-                Sei sicuro di voler diventare un artista? Questa azione cambierà il tuo profilo 
-                da cliente ad artista.
-              </p>
+            <div className="auth-content">
+              <div className="confirmation-message-section">
+                <p className="confirmation-text">
+                  Sei sicuro di voler diventare un artista? Questa azione cambierà il tuo profilo 
+                  da cliente ad artista.
+                </p>
+              </div>
               <p className="confirmation-note">
                 <strong>Nota:</strong> Potrai sempre tornare indietro dalle impostazioni del profilo.
               </p>
-              
-              <div className="confirmation-buttons">
+              <div className="confirmation-actions">
                 <button 
-                  className="action-btn"
+                  className="action-btn confirmation-cancel-action"
                   onClick={() => setShowConfirmation(false)}
                 >
-                  Annulla
+                  <span className="action-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                  </span>
+                  <span className="action-text">Annulla</span>
                 </button>
                 <button 
-                  className={`action-btn ${loading ? 'disabled' : ''}`}
+                  className={`action-btn confirmation-confirm-action ${loading ? 'disabled' : ''}`}
                   onClick={() => {
                     setShowConfirmation(false)
                     handleUpgradeToArtist()
                   }}
                   disabled={loading}
                 >
-                  {loading ? 'AGGIORNAMENTO...' : 'CONFERMA'}
+                  <span className="action-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M20 6L9 17l-5-5"/>
+                    </svg>
+                  </span>
+                  <span className="action-text">{loading ? 'AGGIORNAMENTO...' : 'CONFERMA'}</span>
                 </button>
               </div>
             </div>

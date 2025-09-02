@@ -33,6 +33,7 @@ export function usePortfolioSearch() {
             username,
             profile_type,
             bio,
+            avatar_url,
             location
           )
         `)
@@ -56,6 +57,7 @@ export function usePortfolioSearch() {
           image_url: item.image_url ?? '',
           artist_name: profile?.full_name ?? profile?.username ?? '',
           full_name: profile?.full_name ?? null,
+          artist_avatar_url: profile?.avatar_url ?? null,
           location: profile?.location ?? item.location ?? null
         }
       }) || []
@@ -106,52 +108,59 @@ export function usePortfolioSearch() {
     }
   }, [])
 
-  // Memoize filtered items for better performance
+  // Memoize filtered items for better performance with early exits
   const filteredItems = useMemo(() => {
+    // Early return for empty data
+    if (portfolioItems.length === 0) return []
+    
     let items = portfolioItems
 
-    // Apply flash filter first
+    // Apply flash filter first (most selective)
     if (flashFilter === 'flash') {
       items = items.filter(item => item.is_flash === true)
     } else if (flashFilter === 'realizzati') {
       items = items.filter(item => item.is_flash === false)
     }
 
-    // Always show all items if no search/location term
-    if (!searchTerm.trim() && !locationFilter.trim()) {
+    // Early return if no search filters
+    const hasSearchTerm = searchTerm.trim()
+    const hasLocationFilter = locationFilter.trim()
+    if (!hasSearchTerm && !hasLocationFilter) {
       return items
     }
 
-    const searchLower = searchTerm.toLowerCase().trim()
-    const locationLower = locationFilter.toLowerCase().trim()
+    const searchLower = hasSearchTerm ? searchTerm.toLowerCase().trim() : ''
+    const locationLower = hasLocationFilter ? locationFilter.toLowerCase().trim() : ''
+    const searchKeywords = hasSearchTerm ? searchLower.split(/\s+/).filter(keyword => keyword.length > 0) : []
 
     return items.filter(item => {
-      // Location filter matches location field from profile or item
-      const matchesLocation = !locationLower ||
-        (item.location && item.location.toLowerCase().includes(locationLower))
-
-      // If no search term, only apply location filter
-      if (!searchLower) {
-        return matchesLocation
+      // Location filter (most specific, check first)
+      if (hasLocationFilter) {
+        const itemLocation = item.location?.toLowerCase()
+        if (!itemLocation || !itemLocation.includes(locationLower)) {
+          return false
+        }
       }
 
-      // Split search term into individual keywords for distributed matching
-      const searchKeywords = searchLower.split(/\s+/).filter(keyword => keyword.length > 0)
-      
-      // Collect all searchable text from the item
-      const searchableFields = [
-        item.title?.toLowerCase() || '',
-        item.description?.toLowerCase() || '',
-        ...(Array.isArray(item.tags) ? item.tags.map(tag => tag?.toLowerCase() || '') : []),
-        item.artist_name?.toLowerCase() || ''
-      ].join(' ')
+      // Search filter
+      if (hasSearchTerm && searchKeywords.length > 0) {
+        // Build searchable text only when needed
+        const searchableFields = [
+          item.title?.toLowerCase() || '',
+          item.description?.toLowerCase() || '',
+          item.artist_name?.toLowerCase() || '',
+          ...(Array.isArray(item.tags) ? item.tags.map(tag => tag?.toLowerCase() || '') : [])
+        ].join(' ')
 
-      // Check if ALL keywords are found somewhere in the searchable fields
-      const matchesSearch = searchKeywords.every(keyword => 
-        searchableFields.includes(keyword)
-      )
+        // Early exit if any keyword is not found
+        for (const keyword of searchKeywords) {
+          if (!searchableFields.includes(keyword)) {
+            return false
+          }
+        }
+      }
 
-      return matchesSearch && matchesLocation
+      return true
     })
   }, [portfolioItems, searchTerm, locationFilter, flashFilter])
 
