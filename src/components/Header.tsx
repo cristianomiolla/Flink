@@ -11,7 +11,7 @@ interface HeaderProps {
   hideOnMobile?: boolean
 }
 
-export function Header({ onLogoClick, children, onAuthRequired, hideOnMobile = false }: HeaderProps) {
+export function Header({ onLogoClick, children, onAuthRequired }: HeaderProps) {
   const { user, loading } = useAuth()
 
   const handleAuthClick = () => {
@@ -19,7 +19,7 @@ export function Header({ onLogoClick, children, onAuthRequired, hideOnMobile = f
   }
 
   return (
-    <header className={`header ${hideOnMobile ? 'hide-on-mobile' : ''}`}>
+    <header className="header">
       <div className="container">
         <div className="header-content">
           <span className="logo" onClick={onLogoClick}>SKUNK</span>
