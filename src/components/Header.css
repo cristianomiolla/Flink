@@ -93,4 +93,9 @@
     font-size: 0.875rem;
     padding: 0.5rem 1rem;
   }
+  
+  /* Hide header on mobile when hideOnMobile prop is true */
+  .header.hide-on-mobile {
+    display: none;
+  }
 }

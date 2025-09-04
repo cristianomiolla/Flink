@@ -85,15 +85,13 @@
     display: flex !important;
   }
   
-  /* Add bottom padding to main content to prevent overlap */
+  /* Add padding to main content to prevent overlap */
   .app-container {
+    padding-top: 32px;
     padding-bottom: calc(70px + env(safe-area-inset-bottom));
   }
   
-  /* Hide regular header on mobile when navbar is present */
-  .header {
-    display: none;
-  }
+  /* Header visibility on mobile is now managed by the hideOnMobile prop */
 }
 
 /* Dark mode support */
