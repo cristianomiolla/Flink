@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense, useCallback } from 'react'
+import { useState, useEffect, lazy, Suspense, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import './MessagesPage.css'
 import { SearchBar } from './SearchBar'
@@ -96,6 +96,28 @@ export function MessagesPage() {
     isFromCurrentUser: boolean
   }>>([])
   const [loadingMessages, setLoadingMessages] = useState(false)
+  const mobileMessagesListRef = useRef<HTMLDivElement>(null)
+  
+  // Scroll to bottom of mobile messages list
+  const scrollToBottom = useCallback(() => {
+    if (mobileMessagesListRef.current) {
+      const element = mobileMessagesListRef.current
+      
+      // Try scrolling to the bottom anchor element
+      const bottomAnchor = element.querySelector('#messages-bottom')
+      if (bottomAnchor) {
+        bottomAnchor.scrollIntoView({ behavior: 'auto', block: 'start', inline: 'nearest' })
+        
+        // Add extra scroll to compensate for mobile padding
+        setTimeout(() => {
+          element.scrollTop = element.scrollTop + 80
+        }, 10)
+      } else {
+        // Force maximum scroll
+        element.scrollTop = element.scrollHeight
+      }
+    }
+  }, [])
   
   // Convert Supabase conversations to Chat format for existing components
   const chats: Chat[] = conversations.map(conv => ({
@@ -191,6 +213,10 @@ export function MessagesPage() {
         // Only update if messages have actually changed
         setConversationMessages(prevMessages => {
           if (JSON.stringify(prevMessages) !== JSON.stringify(formattedMessages)) {
+            // Schedule scroll to bottom after state update
+            requestAnimationFrame(() => {
+              setTimeout(() => scrollToBottom(), 50)
+            })
             return formattedMessages
           }
           return prevMessages
@@ -205,6 +231,11 @@ export function MessagesPage() {
 
     // Load initial messages
     loadConversationMessages(true)
+    
+    // Scroll to bottom when conversation first loads
+    requestAnimationFrame(() => {
+      setTimeout(() => scrollToBottom(), 100)
+    })
 
     // Set up polling for new messages every 3 seconds (without loading spinner)
     const interval = setInterval(() => {
@@ -214,7 +245,7 @@ export function MessagesPage() {
     return () => {
       clearInterval(interval)
     }
-  }, [isMobile, artistId, user?.id]) // Rimossa fetchConversationMessages dalle dipendenze
+  }, [isMobile, artistId, user?.id, scrollToBottom]) // Rimossa fetchConversationMessages dalle dipendenze
 
   // Format message timestamp
   const formatMessageTime = (timestamp: string) => {
@@ -253,9 +284,16 @@ export function MessagesPage() {
   }
 
   const handleChatSelect = (chatId: string) => {
+    // Find conversation first
+    const conversation = conversations.find(conv => conv.id === chatId)
+    
+    // Mark conversation as read when selected (both mobile and desktop)
+    if (conversation && conversation.unreadCount > 0) {
+      markConversationAsRead(conversation.participant.user_id)
+    }
+
     // On mobile, navigate to the conversation page instead of selecting locally
     if (isMobile) {
-      const conversation = conversations.find(conv => conv.id === chatId)
       if (conversation) {
         navigate(`/messages/${conversation.participant.user_id}`)
         return
@@ -263,12 +301,6 @@ export function MessagesPage() {
     }
 
     setSelectedChatId(chatId)
-    
-    // Mark conversation as read when selected
-    const conversation = conversations.find(conv => conv.id === chatId)
-    if (conversation && conversation.unreadCount > 0) {
-      markConversationAsRead(conversation.participant.user_id)
-    }
   }
 
   const handleRequestDeleteChat = (chat: { id: string; participant: { name: string } }) => {
@@ -341,10 +373,12 @@ export function MessagesPage() {
                 isFromCurrentUser: msg.sender_id === user.id
               }))
               
-              console.log('Reloaded messages after send:', formattedMessages.length)
-              
               // Always update after sending a message
               setConversationMessages(formattedMessages)
+              // Ensure scroll to bottom after sending message
+              requestAnimationFrame(() => {
+                setTimeout(() => scrollToBottom(), 50)
+              })
             } catch (error) {
               console.error('Error reloading messages:', error)
             }
@@ -441,7 +475,9 @@ export function MessagesPage() {
             {/* Fixed Conversation Header */}
             <div className="conversation-header">
               <button className="back-to-messages" onClick={() => navigate('/messages')}>
-                ←
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                  <polyline points="15,18 9,12 15,6"></polyline>
+                </svg>
               </button>
               <div className="conversation-participant">
                 <Avatar
@@ -453,46 +489,53 @@ export function MessagesPage() {
                 />
                 <span className="participant-name">{selectedChat.participant.name}</span>
               </div>
-              <button
-                className="conversation-delete-btn"
+              <button 
+                className="action-btn delete-chat-action"
                 onClick={() => handleRequestDeleteChat({ id: selectedChat.id, participant: { name: selectedChat.participant.name } })}
                 title="Elimina conversazione"
                 aria-label="Elimina conversazione"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <polyline points="3,6 5,6 21,6"></polyline>
-                  <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
-                </svg>
+                <span className="action-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <polyline points="3,6 5,6 21,6"></polyline>
+                    <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                  </svg>
+                </span>
+                <span className="action-text">Elimina</span>
               </button>
             </div>
 
             {/* Scrollable Messages List */}
-            <div className="messages-list">
-              <div className="messages-container">
-                {loadingMessages ? (
-                  <div className="loading-messages">
-                    <p>Caricamento messaggi...</p>
-                  </div>
-                ) : conversationMessages.length === 0 ? (
+            <div className="messages-list" ref={mobileMessagesListRef}>
+              {loadingMessages ? (
+                <div className="loading-messages">
+                  <p>Caricamento messaggi...</p>
+                </div>
+              ) : conversationMessages.length === 0 ? (
                   <div className="empty-messages">
                     <p>Nessun messaggio ancora. Inizia la conversazione!</p>
                   </div>
                 ) : (
-                  conversationMessages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`message ${message.isFromCurrentUser ? 'sent' : 'received'}`}
-                    >
-                      <div className="message-bubble">
-                        <p className="message-content">{message.content}</p>
-                        <span className="message-time">
-                          {formatMessageTime(message.timestamp)}
-                        </span>
+                  <>
+                    {conversationMessages.map((message) => (
+                      <div
+                        key={message.id}
+                        className={`message ${message.isFromCurrentUser ? 'sent' : 'received'}`}
+                      >
+                        <div className="message-bubble">
+                          <p className="message-content">{message.content}</p>
+                          <span className="message-time">
+                            {formatMessageTime(message.timestamp)}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    ))}
+                    {/* Invisible element at the bottom for scrolling */}
+                    <div id="messages-bottom" style={{ height: '1px', minHeight: '1px' }} />
+                  </>
                 )}
-              </div>
             </div>
 
             {/* Fixed Message Input */}
@@ -557,7 +600,7 @@ export function MessagesPage() {
           {/* Scrollable Chat List */}
           <div className="chat-list-items">
             {chats.length === 0 ? (
-              <div className="empty-state mobile">
+              <div className="empty-state">
                 <div className="empty-content">
                   <div className="empty-icon">💬</div>
                   <h3 className="empty-title">Nessun messaggio</h3>

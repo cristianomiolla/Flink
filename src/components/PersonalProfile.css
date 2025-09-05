@@ -31,26 +31,7 @@
   overflow-y: auto;
 }
 
-.complete-profile-content {
-  padding: 0 2rem 2rem 2rem;
-}
 
-.complete-profile-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--foreground);
-  margin-bottom: 0.5rem;
-  letter-spacing: 0.05em;
-  text-align: center;
-}
-
-.complete-profile-description {
-  font-size: 0.9rem;
-  color: var(--grey-dark);
-  text-align: center;
-  margin-bottom: 2rem;
-}
 
 /* Form Styles */
 .complete-profile-form {
@@ -59,44 +40,10 @@
   gap: 1.5rem;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--foreground);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
+/* Personal profile specific styles */
 .required-indicator {
   color: var(--accent);
   font-weight: 700;
-}
-
-.form-input, .form-textarea {
-  padding: 0.75rem;
-  border: 1px solid var(--border);
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-body);
-  font-size: 0.9rem;
-  border-radius: 0;
-  transition: border-color 0.2s;
-}
-
-.form-input:focus, .form-textarea:focus {
-  outline: none;
-  border-color: var(--border-red);
-}
-
-.form-textarea {
-  resize: vertical;
-  min-height: 100px;
 }
 
 /* Bio Suggestions */
@@ -363,13 +310,7 @@
     max-height: 95vh;
   }
   
-  .complete-profile-content {
-    padding: 0 1rem 1rem 1rem;
-  }
   
-  .complete-profile-title {
-    font-size: 1.25rem;
-  }
   
   .form-actions {
     flex-direction: column;

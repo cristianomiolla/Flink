@@ -3,6 +3,7 @@ import './ArtistGrid.css'
 import { ArtistCard } from './ArtistCard'
 import { useFollowers } from '../hooks/useFollowers'
 import { DataStateHandler } from './DataStateHandler'
+import { GridHeader, GridStats, GridSearchInfo } from './GridHeader'
 import type { ArtistProfile } from '../types/portfolio'
 
 interface ArtistGridProps {
@@ -54,21 +55,17 @@ export function ArtistGrid({
     >
       <section className="grid-container">
         <div className="container">
-          <div className="grid-header">
-            <div className="header-card">
-              <h2 className="grid-title">Artisti</h2>
-              <div className="grid-stats">
-                <span className="stat-count">{hasSearchTerms ? filteredCount : totalCount}</span>
-                <span className="stat-label">{hasSearchTerms ? 'risultati' : 'artisti totali'}</span>
-              </div>
-              {hasSearchTerms && (
-                <div className="search-info">
-                  {searchTerm && <span className="search-term">"{searchTerm}"</span>}
-                  {locationFilter && <span className="location-term">{locationFilter}</span>}
-                </div>
-              )}
-            </div>
-          </div>
+          <GridHeader title="Artisti">
+            <GridStats
+              count={hasSearchTerms ? filteredCount : totalCount}
+              label={hasSearchTerms ? 'risultati' : 'artisti totali'}
+            />
+            
+            <GridSearchInfo
+              searchTerm={searchTerm}
+              locationFilter={locationFilter}
+            />
+          </GridHeader>
 
           <div className="artist-grid">
             {profiles.map((profile) => (

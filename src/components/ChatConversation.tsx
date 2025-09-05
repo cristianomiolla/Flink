@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import './ChatConversation.css'
 import { Avatar } from './Avatar'
 import { useAuth } from '../hooks/useAuth'
@@ -35,6 +35,14 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(false)
   const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null)
+  const messagesListRef = useRef<HTMLDivElement>(null)
+
+  // Scroll to bottom of messages list
+  const scrollToBottom = useCallback(() => {
+    if (messagesListRef.current) {
+      messagesListRef.current.scrollTop = messagesListRef.current.scrollHeight
+    }
+  }, [])
 
   // Extract participant ID from chat ID (format: "userId1__userId2")
   const getParticipantId = useCallback((chatId: string): string | null => {
@@ -65,6 +73,8 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
       // Only update if messages have actually changed
       setMessages(prevMessages => {
         if (JSON.stringify(prevMessages) !== JSON.stringify(formattedMessages)) {
+          // Schedule scroll to bottom after state update
+          setTimeout(() => scrollToBottom(), 100)
           return formattedMessages
         }
         return prevMessages
@@ -75,7 +85,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
     } finally {
       if (showLoading) setLoading(false)
     }
-  }, [chat, propFetchConversationMessages, user?.id, getParticipantId])
+  }, [chat, propFetchConversationMessages, user?.id, getParticipantId, scrollToBottom])
 
   // Reset messages when chat becomes null or changes
   useEffect(() => {
@@ -88,6 +98,9 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
 
     // Load initial messages
     loadMessages(true)
+    
+    // Scroll to bottom when conversation first loads
+    setTimeout(() => scrollToBottom(), 200)
 
     // Set up polling for new messages every 3 seconds
     const interval = setInterval(() => {
@@ -133,8 +146,18 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
       const success = await propSendMessage(participantId, messageContent)
       
       if (success) {
-        // Immediately reload messages to show the sent message
-        await loadMessages(false)
+        // Add message to local state immediately for instant feedback
+        const newMessage: Message = {
+          id: `temp_${Date.now()}`, // Temporary ID
+          content: messageContent,
+          timestamp: new Date().toISOString(),
+          isFromCurrentUser: true
+        }
+        
+        setMessages(prev => [...prev, newMessage])
+        
+        // Ensure scroll to bottom after sending message
+        setTimeout(() => scrollToBottom(), 50)
       } else {
         // If send failed, restore the message to input
         setNewMessage(messageContent)
@@ -209,7 +232,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
 
       {/* Messages */}
       <div className="messages-container">
-        <div className="messages-list">
+        <div className="messages-list" ref={messagesListRef}>
           {loading ? (
             <div className="loading-messages">
               <p>Caricamento messaggi...</p>

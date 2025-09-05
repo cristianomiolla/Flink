@@ -20,7 +20,7 @@ interface AuthContextType {
   user: User | null
   profile: UserProfile | null
   loading: boolean
-  signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>
+  signUp: (email: string, password: string, fullName?: string) => Promise<{ error: AuthError | null }>
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
   signInWithGoogle: () => Promise<{ error: AuthError | null }>
   signOut: () => Promise<void>
@@ -90,6 +90,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
       handleAuthState(session)
     })
 
+    // Handle email confirmation errors from URL params
+    const handleEmailConfirmation = () => {
+      const urlParams = new URLSearchParams(window.location.hash.substring(1))
+      const error = urlParams.get('error')
+      const errorDescription = urlParams.get('error_description')
+      
+      if (error && errorDescription) {
+        console.error('Email confirmation error:', error, errorDescription)
+        // Clean URL
+        window.history.replaceState({}, document.title, window.location.pathname)
+      }
+    }
+
+    // Check for email confirmation on mount
+    handleEmailConfirmation()
+
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -108,11 +124,39 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [])
 
-  const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
+  const signUp = async (email: string, password: string, fullName?: string) => {
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          full_name: fullName || ''
+        }
+      }
     })
+
+    // If signup successful and user exists, create profile
+    if (!error && data.user) {
+      try {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              user_id: data.user.id,
+              email: email,
+              full_name: fullName || null,
+              profile_type: 'client'
+            }
+          ])
+        
+        if (profileError) {
+          console.error('Error creating profile:', profileError)
+        }
+      } catch (profileError) {
+        console.error('Error inserting profile:', profileError)
+      }
+    }
+
     return { error }
   }
 

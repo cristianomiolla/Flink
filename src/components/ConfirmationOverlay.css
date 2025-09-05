@@ -1,10 +1,5 @@
 /* Confirmation Overlay Styles - inherits from auth-overlay */
 
-/* Override auth-content padding */
-.auth-overlay .auth-modal .auth-content {
-  padding: 0 1.5rem 2rem 1.5rem;
-}
-
 /* Custom confirmation header */
 .confirmation-header-title {
   text-align: center;

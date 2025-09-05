@@ -46,7 +46,8 @@
   line-height: 1.5;
 }
 
-.confirmation-modal .modal-actions {
+/* Modal actions styling for auth-form context */
+.auth-modal .modal-actions {
   display: flex;
   gap: 1rem;
   justify-content: center;
@@ -66,8 +67,8 @@
     font-size: 14px;
   }
   
-  .confirmation-modal .modal-actions {
-    flex-direction: column;
+  .auth-modal .modal-actions {
+    flex-direction: row;
     gap: 0.75rem;
   }
 }

@@ -115,17 +115,52 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
 
         {/* Details Section */}
         <div className="modal-details-section">
+          {/* Action Buttons */}
+          <div className="modal-portfolio-actions">
+            {tableExists && (
+              <ActionButton
+                icon={<HeartIcon />}
+                text={likeCount > 0 ? `Mi piace (${likeCount})` : "Mi piace"}
+                variant="modal"
+                active={isLiked}
+                disabled={loading}
+                requiresAuth={true}
+                onAuthRequired={onAuthRequired}
+                onClick={handleLike}
+              />
+            )}
+            <ActionButton
+              icon={<BookmarkIcon />}
+              text={isTattooSaved(item.id) ? 'Salvato' : 'Salva'}
+              variant="modal"
+              active={isTattooSaved(item.id)}
+              requiresAuth={true}
+              onAuthRequired={onAuthRequired}
+              onClick={() => toggleSave(item.id)}
+            />
+            {/* Non mostrare "Contatta artista" se l'elemento appartiene all'utente corrente */}
+            {profile?.user_id !== item.user_id && (
+              <ActionButton
+                icon={<MessageIcon />}
+                text="Contatta artista"
+                variant="modal"
+                requiresAuth={true}
+                onAuthRequired={onAuthRequired}
+                onClick={() => onContactArtist && onContactArtist(item.user_id)}
+              />
+            )}
+          </div>
+
           {/* Artist Info */}
           <div className="modal-artist-info">
-            <div onClick={handleArtistNameClick} style={{ cursor: 'pointer' }}>
-              <Avatar
-                src={item.artist_avatar_url}
-                name={displayName}
-                alt={`Avatar di ${displayName}`}
-                size="lg"
-                variant="default"
-              />
-            </div>
+            <Avatar
+              src={item.artist_avatar_url}
+              name={displayName}
+              alt={`Avatar di ${displayName}`}
+              size="md"
+              variant="default"
+              onClick={handleArtistNameClick}
+            />
             <span 
               className="modal-artist-name"
               onClick={handleArtistNameClick}
@@ -178,42 +213,9 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
               </div>
             )}
           </div>
-
-          {/* Action Buttons */}
-          <div className="modal-portfolio-actions">
-            {tableExists && (
-              <ActionButton
-                icon={<HeartIcon />}
-                text={likeCount > 0 ? `Mi piace (${likeCount})` : "Mi piace"}
-                variant="modal"
-                active={isLiked}
-                disabled={loading}
-                requiresAuth={true}
-                onAuthRequired={onAuthRequired}
-                onClick={handleLike}
-              />
-            )}
-            <ActionButton
-              icon={<BookmarkIcon />}
-              text={isTattooSaved(item.id) ? 'Salvato' : 'Salva'}
-              variant="modal"
-              active={isTattooSaved(item.id)}
-              requiresAuth={true}
-              onAuthRequired={onAuthRequired}
-              onClick={() => toggleSave(item.id)}
-            />
-            {/* Non mostrare "Contatta artista" se l'elemento appartiene all'utente corrente */}
-            {profile?.user_id !== item.user_id && (
-              <ActionButton
-                icon={<MessageIcon />}
-                text="Contatta artista"
-                variant="modal"
-                requiresAuth={true}
-                onAuthRequired={onAuthRequired}
-                onClick={() => onContactArtist && onContactArtist(item.user_id)}
-              />
-            )}
-          </div>
+          
+          {/* Spacer element for bottom spacing */}
+          <div className="modal-bottom-spacer"></div>
         </div>
       </div>
     </div>

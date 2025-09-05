@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import './ConfirmationOverlay.css'
+import './AuthOverlay.css'
 
 interface ConfirmationOverlayProps {
   isOpen: boolean
@@ -61,41 +62,45 @@ export function ConfirmationOverlay({
         </div>
         
         <div className="auth-modal-header">
-          <div className="confirmation-header-title">
-            <h2 className="confirmation-title">{title}</h2>
-          </div>
+          {/* Empty header section to maintain layout consistency */}
         </div>
         
         <div className="auth-content">
-          <div className="confirmation-message-section">
-            <p className="confirmation-text">{message}</p>
+          <div className="header-card">
+            <h2>{title}</h2>
+            <p>{message}</p>
           </div>
           
-          <div className="confirmation-actions">
-            <button 
-              className="action-btn confirmation-cancel-action"
-              onClick={handleCancel}
-            >
-              <span className="action-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M18 6L6 18M6 6l12 12"/>
-                </svg>
-              </span>
-              <span className="action-text">{cancelText}</span>
-            </button>
-            <button 
-              className="action-btn confirmation-confirm-action"
-              onClick={handleConfirm}
-            >
-              <span className="action-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <polyline points="3,6 5,6 21,6"/>
-                  <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"/>
-                </svg>
-              </span>
-              <span className="action-text">{confirmText}</span>
-            </button>
-          </div>
+          <form className="auth-form" onSubmit={(e) => { e.preventDefault(); handleConfirm(); }}>
+            <div className="modal-actions">
+              <button 
+                type="button"
+                className="action-btn"
+                onClick={handleCancel}
+              >
+                <span className="action-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                  </svg>
+                </span>
+                <span className="action-text">{cancelText}</span>
+              </button>
+              <button 
+                type="submit"
+                className="action-btn"
+              >
+                <span className="action-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <polyline points="3,6 5,6 21,6"/>
+                    <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"/>
+                    <line x1="10" y1="11" x2="10" y2="17"/>
+                    <line x1="14" y1="11" x2="14" y2="17"/>
+                  </svg>
+                </span>
+                <span className="action-text">{confirmText}</span>
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

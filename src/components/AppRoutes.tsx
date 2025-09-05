@@ -6,6 +6,7 @@ import { SavedItemsPage } from './SavedItemsPage'
 import { MessagesPage } from './MessagesPage'
 import { BecomeArtistPage } from './BecomeArtistPage'
 import { MobileProfilePage } from './MobileProfilePage'
+import { SettingsPage } from './SettingsPage'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
@@ -38,6 +39,7 @@ export function AppRoutes() {
       <Route path="/messages" element={<MessagesPage />} />
       <Route path="/messages/:artistId" element={<MessagesPage />} />
       
+      <Route path="/settings" element={<SettingsPage onLogoClick={handleLogoClick} />} />
       <Route path="/become-artist" element={<BecomeArtistPage onLogoClick={handleLogoClick} />} />
     </Routes>
   )

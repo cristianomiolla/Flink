@@ -146,7 +146,7 @@ export function AuthOverlay({ isOpen, onClose }: AuthOverlayProps) {
           onClose()
         }
       } else {
-        const { error } = await signUp(formData.email, formData.password)
+        const { error } = await signUp(formData.email, formData.password, formData.fullName.trim())
         
         if (error) {
           if (error.message.includes('User already registered')) {

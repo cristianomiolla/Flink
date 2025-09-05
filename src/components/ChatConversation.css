@@ -144,7 +144,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 200px;
+  max-width: 17ch; /* Limit to approximately 17 characters */
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .participant-name {
+    font-size: 14px;
+    font-weight: 700;
+  }
 }
 
 .conversation-actions {
@@ -152,6 +160,8 @@
   align-items: center;
   gap: 0.5rem;
 }
+
+/* Mobile styles handled in MessagesPage.css for mobile conversation view */
 
 /* Messages Container */
 .messages-container {

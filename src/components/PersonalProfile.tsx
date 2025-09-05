@@ -567,7 +567,20 @@ export function PersonalProfile() {
               <div className="tab-content">
                 {activeTab === 'portfolio' && (
                   <div className="tab-panel portfolio-panel">
-                    <h3>GALLERIA LAVORI ({portfolioItems.filter(item => !item.is_flash).length})</h3>
+                    <div className="tab-header">
+                      <h3>GALLERIA LAVORI ({portfolioItems.filter(item => !item.is_flash).length})</h3>
+                      <button 
+                        className="action-btn"
+                        onClick={() => setShowUploadOverlay(true)}
+                      >
+                        <span className="action-icon">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M12 5v14m7-7l-7-7-7 7"></path>
+                          </svg>
+                        </span>
+                        <span className="action-text">Aggiungi Lavoro</span>
+                      </button>
+                    </div>
                     {portfolioLoading ? (
                       <div className="portfolio-loading">
                         <LoadingSpinner size="large" />
@@ -592,11 +605,6 @@ export function PersonalProfile() {
                         <div className="empty-state">
                           <h4>Portfolio vuoto</h4>
                           <p>I tuoi lavori appariranno qui una volta che inizierai a caricarli.</p>
-                          <ActionButton
-                            icon={<UploadIcon />}
-                            text="Aggiungi Lavoro"
-                            onClick={() => setShowUploadOverlay(true)}
-                          />
                         </div>
                       </div>
                     )}
@@ -617,7 +625,23 @@ export function PersonalProfile() {
 
                 {activeTab === 'flash' && (
                   <div className="tab-panel flash-panel">
-                    <h3>DISEGNI FLASH DISPONIBILI ({portfolioItems.filter(item => item.is_flash).length})</h3>
+                    <div className="tab-header">
+                      <h3>DISEGNI FLASH DISPONIBILI ({portfolioItems.filter(item => item.is_flash).length})</h3>
+                      <button 
+                        className="action-btn"
+                        onClick={() => {
+                          setUploadData(prev => ({ ...prev, is_flash: true }))
+                          setShowUploadOverlay(true)
+                        }}
+                      >
+                        <span className="action-icon">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M12 5v14m7-7l-7-7-7 7"></path>
+                          </svg>
+                        </span>
+                        <span className="action-text">Aggiungi Lavoro</span>
+                      </button>
+                    </div>
                     {portfolioLoading ? (
                       <div className="portfolio-loading">
                         <LoadingSpinner size="large" />
@@ -642,14 +666,6 @@ export function PersonalProfile() {
                         <div className="empty-state">
                           <h4>Nessun flash disponibile</h4>
                           <p>I tuoi disegni flash appariranno qui una volta che inizierai a caricarli.</p>
-                          <ActionButton
-                            icon={<UploadIcon />}
-                            text="Aggiungi Flash"
-                            onClick={() => {
-                              setUploadData(prev => ({ ...prev, is_flash: true }))
-                              setShowUploadOverlay(true)
-                            }}
-                          />
                         </div>
                       </div>
                     )}
@@ -687,16 +703,18 @@ export function PersonalProfile() {
             <div className="auth-modal-header">
             </div>
             
-            <div className="complete-profile-content">
-              <h2 className="complete-profile-title">
-                {isProfileIncomplete ? 'COMPLETA IL TUO PROFILO' : 'MODIFICA PROFILO'}
-              </h2>
-              <p className="complete-profile-description">
-                {isProfileIncomplete 
-                  ? 'Aggiungi le informazioni mancanti per completare il tuo profilo'
-                  : 'Modifica le informazioni del tuo profilo'
-                }
-              </p>
+            <div className="auth-content">
+              <div className="header-card">
+                <h2>
+                  {isProfileIncomplete ? 'COMPLETA IL TUO PROFILO' : 'MODIFICA PROFILO'}
+                </h2>
+                <p>
+                  {isProfileIncomplete 
+                    ? 'Aggiungi le informazioni mancanti per completare il tuo profilo'
+                    : 'Modifica le informazioni del tuo profilo'
+                  }
+                </p>
+              </div>
 
               <form className="complete-profile-form" onSubmit={(e) => e.preventDefault()}>
                 {/* Avatar Field */}
@@ -854,10 +872,10 @@ export function PersonalProfile() {
             </div>
             
             <div className="upload-portfolio-content">
-              <h2 className="upload-portfolio-title">AGGIUNGI LAVORO</h2>
-              <p className="upload-portfolio-description">
-                Carica un nuovo lavoro nel tuo portfolio
-              </p>
+              <div className="header-card">
+                <h2>AGGIUNGI LAVORO</h2>
+                <p>Carica un nuovo lavoro nel tuo portfolio</p>
+              </div>
 
               <form className="upload-portfolio-form" onSubmit={(e) => e.preventDefault()}>
                 {/* Title Field */}

@@ -53,6 +53,16 @@
 
 /* === SIZE VARIANTS === */
 
+/* Extra Small - 24px (Mobile navbar) */
+.avatar-xs {
+  width: 24px;
+  height: 24px;
+}
+
+.avatar-xs .avatar-placeholder {
+  font-size: 10px;
+}
+
 /* Small - 36px (Portfolio cards, header dropdown) */
 .avatar-sm {
   width: 36px;

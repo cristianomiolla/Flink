@@ -97,7 +97,7 @@ export function MobileProfilePage() {
           <div className="mobile-profile-avatar">
             <Avatar
               src={profile.avatar_url}
-              name={profile.full_name}
+              name={profile.full_name || getDisplayName()}
               alt={`Avatar di ${getDisplayName()}`}
               size="lg"
               variant="default"
@@ -137,10 +137,7 @@ export function MobileProfilePage() {
 
           <button 
             className="mobile-profile-item" 
-            onClick={() => {
-              // TODO: Navigate to settings page when implemented
-              alert('Impostazioni non ancora implementate')
-            }}
+            onClick={() => navigate('/settings')}
           >
             <span className="mobile-profile-item-text">Impostazioni</span>
             <svg className="mobile-profile-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">

@@ -189,11 +189,17 @@
 
 /* Details Section */
 .modal-details-section {
-  padding: 2rem 3rem;
+  padding: 0 3rem 4rem 3rem;
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
+}
+
+.modal-details-section::after {
+  content: '';
+  height: 0;
+  flex-shrink: 0;
 }
 
 /* Artist Info */
@@ -201,9 +207,8 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  height: 80px;
-  min-height: 80px;
   overflow: visible;
+  margin: 32px 0 0 0; /* Add 32px margin top only */
 }
 
 /* Avatar styles now handled by Avatar component */
@@ -281,7 +286,7 @@
   padding: 1.5rem;
   background: var(--muted);
   border-radius: 0;
-  margin: 0 0 20px 0;
+  margin: 0;
 }
 
 .modal-meta-item {
@@ -311,13 +316,24 @@
 .modal-portfolio-actions {
   display: flex;
   gap: 0;
-  margin-top: auto;
-  padding-top: 2rem;
-  padding-bottom: 32px;
-  border-top: 1px solid var(--border);
+  margin-left: -3rem;
+  margin-right: -3rem;
+}
+
+/* Desktop only: Increase padding for action buttons in modal-details-section */
+@media (min-width: 768px) {
+  .modal-details-section .action-btn {
+    padding: 1rem 0.75rem;
+  }
 }
 
 /* Modal action buttons now use unified ActionButton component */
+
+/* Bottom spacer */
+.modal-bottom-spacer {
+  height: 2rem;
+  flex-shrink: 0;
+}
 
 
 .modal-contact-btn {
@@ -346,27 +362,31 @@
   }
   
   .modal-details-section {
-    padding: 0.875rem 1rem;
+    padding: 0 1rem 0.875rem 1rem;
   }
   
   .modal-portfolio-title {
     font-size: 20px;
   }
   
-  /* Override avatar large to use small size on mobile */
-  .portfolio-modal-overlay .avatar-lg {
+  /* Override avatar medium to use small size on mobile */
+  .portfolio-modal-overlay .avatar-md {
     width: 36px !important;
     height: 36px !important;
   }
   
-  .portfolio-modal-overlay .avatar-lg .avatar-placeholder {
+  .portfolio-modal-overlay .avatar-md .avatar-placeholder {
     font-size: 14px !important;
   }
   
   .modal-artist-info {
-    height: 60px;
-    min-height: 60px;
+    margin-top: 20px;
   }
+  
+  .modal-bottom-spacer {
+    height: 20px;
+  }
+  
   
   .modal-artist-avatar-placeholder {
     width: 40px;
@@ -399,15 +419,15 @@
   
   .modal-badge.flash,
   .modal-badge.realizzato {
-    padding: 0.5rem 1rem;
+    padding: 0.4rem 0.8rem;
     font-size: 14px;
   }
   
   .modal-price {
-    bottom: 0.75rem;
-    right: 0.75rem;
-    padding: 0.6rem 1rem;
-    font-size: 18px;
+    bottom: 0.625rem;
+    right: 0.625rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 15px;
   }
   
   /* Mobile layout: arrange buttons in rows */
@@ -416,6 +436,13 @@
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto;
     gap: 0;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-bottom: 0;
+  }
+  
+  .modal-portfolio-actions .action-btn.modal {
+    padding-bottom: 0;
   }
   
   .modal-portfolio-actions .action-btn:nth-child(1) {
@@ -431,21 +458,35 @@
   .modal-portfolio-actions .action-btn:nth-child(3) {
     grid-column: 1 / -1;
     grid-row: 2;
-    margin-top: 0.75rem;
   }
   
   
   .modal-meta-info {
-    padding: 1.25rem;
+    padding: 12px;
+    flex-direction: row;
+    justify-content: space-between;
   }
   
   .modal-meta-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.25rem;
+    font-size: 11px;
   }
   
   .modal-meta-label {
     min-width: auto;
+  }
+  
+  .modal-artist-name {
+    font-size: 13px;
+  }
+  
+  .modal-section-title {
+    font-size: 13px;
+  }
+  
+  .modal-portfolio-description {
+    font-size: 13px;
   }
 }

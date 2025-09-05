@@ -12,13 +12,9 @@ export function PageHeader({ title, subtitle, actions, className = '' }: PageHea
   return (
     <div className={`page-header ${className}`}>
       <div className="header-card">
-        <div className="header-top">
-          <h2 className="grid-title">{title}</h2>
-          {actions && <div className="header-actions">{actions}</div>}
-        </div>
-        {subtitle && (
-          <p className="grid-subtitle">{subtitle}</p>
-        )}
+        <h2>{title}</h2>
+        {subtitle && <p>{subtitle}</p>}
+        {actions && <div className="header-actions">{actions}</div>}
       </div>
     </div>
   )

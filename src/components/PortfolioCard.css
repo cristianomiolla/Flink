@@ -105,7 +105,7 @@
 
 /* Content Section */
 .content-section {
-  padding: 1rem 1.5rem;
+  padding: 0 1.5rem 1rem 1.5rem; /* Remove top padding, keep sides and bottom */
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -219,9 +219,8 @@
 .portfolio-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
+  margin-top: 0; /* No margin since it's directly under image */
+  padding: 0 0 1rem 0; /* Remove all side padding, keep only bottom padding */
 }
 
 /* Action buttons now use unified ActionButton component */
@@ -296,8 +295,9 @@
     flex-direction: row;
     justify-content: space-between;
     gap: 0;
-    margin-top: 1rem;
-    padding-top: 1rem;
+    margin-top: 0; /* Remove margin for mobile too */
+    padding-top: 0; /* Remove top padding for mobile too */
+    padding-bottom: 0; /* Remove bottom padding for mobile */
   }
 
   .action-btn {

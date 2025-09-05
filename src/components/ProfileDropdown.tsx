@@ -83,33 +83,36 @@ export function ProfileDropdown() {
         {isOpen && (
           <div className="dropdown-menu">
             <div className="dropdown-header">
-              <div className="avatar avatar-sm avatar-default">
-                <div className="avatar-placeholder">
-                  {fallbackName.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase()}
-                </div>
-              </div>
+              <Avatar
+                name={fallbackName}
+                size="sm"
+                variant="default"
+              />
               <div className="user-info">
                 <div className="user-name">{fallbackName}</div>
                 <div className="user-type">Cliente</div>
               </div>
             </div>
             <div className="dropdown-divider"></div>
+            
             <button className="dropdown-item become-artist-btn" onClick={() => {
               navigate('/become-artist')
               setIsOpen(false)
             }}>
               Diventi un'artista
             </button>
-            <div className="dropdown-divider"></div>
             <button className="dropdown-item" onClick={() => {
-              // TODO: Navigate to settings page
+              navigate('/settings')
+              setIsOpen(false)
             }}>
               Impostazioni
             </button>
+            
             <div className="dropdown-divider"></div>
             <button className="dropdown-item logout-item" onClick={() => {
               signOut()
               setIsOpen(false)
+              navigate('/')
             }}>
               Esci
             </button>
@@ -123,7 +126,7 @@ export function ProfileDropdown() {
     <div className="profile-dropdown" ref={dropdownRef}>
       <Avatar
         src={profile.avatar_url}
-        name={profile.full_name}
+        name={profile.full_name || getDisplayName()}
         alt={`Avatar di ${getDisplayName()}`}
         size="sm"
         variant="default"
@@ -133,25 +136,20 @@ export function ProfileDropdown() {
       {isOpen && (
         <div className="dropdown-menu">
           <div className="dropdown-header">
-            <div className="avatar avatar-sm avatar-default" aria-label={`Avatar di ${getDisplayName()}`}>
-              {profile.avatar_url ? (
-                <img 
-                  src={profile.avatar_url} 
-                  alt={`Avatar di ${getDisplayName()}`}
-                  className="avatar-image"
-                />
-              ) : (
-                <div className="avatar-placeholder">
-                  {(profile.full_name || getDisplayName()).split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase()}
-                </div>
-              )}
-            </div>
+            <Avatar
+              src={profile.avatar_url}
+              name={profile.full_name || getDisplayName()}
+              alt={`Avatar di ${getDisplayName()}`}
+              size="sm"
+              variant="default"
+            />
             <div className="user-info">
               <div className="user-name">{profile.full_name && profile.full_name.trim() ? profile.full_name : getDisplayName()}</div>
               <div className="user-type">{getProfileTypeDisplayName(profile.profile_type)}</div>
             </div>
           </div>
           <div className="dropdown-divider"></div>
+          
           {profile.profile_type !== 'artist' && (
             <button className="dropdown-item become-artist-btn" onClick={() => {
               navigate('/become-artist')
@@ -160,7 +158,6 @@ export function ProfileDropdown() {
               Diventi un'artista
             </button>
           )}
-          <div className="dropdown-divider"></div>
           {profile.profile_type === 'artist' && (
             <button className="dropdown-item" onClick={() => {
               navigate('/profile')
@@ -170,14 +167,17 @@ export function ProfileDropdown() {
             </button>
           )}
           <button className="dropdown-item" onClick={() => {
-            // TODO: Navigate to settings page
+            navigate('/settings')
+            setIsOpen(false)
           }}>
             Impostazioni
           </button>
+          
           <div className="dropdown-divider"></div>
           <button className="dropdown-item logout-item" onClick={() => {
             signOut()
             setIsOpen(false)
+            navigate('/')
           }}>
             Esci
           </button>

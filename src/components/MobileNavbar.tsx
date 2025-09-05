@@ -39,9 +39,10 @@ export function MobileNavbar({ onSearchClick }: MobileNavbarProps) {
     }
   }
 
-  // Hide navbar in mobile conversation view
+  // Hide navbar in mobile conversation view and settings page
   const isConversationPage = location.pathname.startsWith('/messages/') && location.pathname !== '/messages'
-  if (isConversationPage) {
+  const isSettingsPage = location.pathname === '/settings'
+  if (isConversationPage || isSettingsPage) {
     return null
   }
 
@@ -89,7 +90,7 @@ export function MobileNavbar({ onSearchClick }: MobileNavbarProps) {
         <div className="mobile-nav-avatar">
           <Avatar
             src={profile?.avatar_url}
-            name={profile?.full_name}
+            name={user ? (profile?.full_name || getDisplayName()) : undefined}
             alt={`Avatar di ${getDisplayName()}`}
             size="xs"
             variant="default"

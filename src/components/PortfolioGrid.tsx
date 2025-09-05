@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, memo, useCallback } from 'react'
 import './PortfolioGrid.css'
 import { PortfolioCard } from './PortfolioCard'
 import { DataStateHandler } from './DataStateHandler'
+import { GridHeader, GridStats, GridSearchInfo } from './GridHeader'
 import type { PortfolioItem, FlashFilter } from '../types/portfolio'
 
 interface PortfolioGridProps {
@@ -33,14 +34,19 @@ const PortfolioGrid = memo(function PortfolioGrid({
   onAuthRequired,
   onContactArtist
 }: PortfolioGridProps) {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const [isDesktopDropdownOpen, setIsDesktopDropdownOpen] = useState(false)
+  const [isMobileDropdownOpen, setIsMobileDropdownOpen] = useState(false)
+  const desktopDropdownRef = useRef<HTMLDivElement>(null)
+  const mobileDropdownRef = useRef<HTMLDivElement>(null)
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false)
+      if (desktopDropdownRef.current && !desktopDropdownRef.current.contains(event.target as Node)) {
+        setIsDesktopDropdownOpen(false)
+      }
+      if (mobileDropdownRef.current && !mobileDropdownRef.current.contains(event.target as Node)) {
+        setIsMobileDropdownOpen(false)
       }
     }
 
@@ -50,9 +56,14 @@ const PortfolioGrid = memo(function PortfolioGrid({
     }
   }, [])
 
-  const handleFilterClick = useCallback((filter: FlashFilter) => {
+  const handleDesktopFilterClick = useCallback((filter: FlashFilter) => {
     onFlashFilterChange?.(filter)
-    setIsDropdownOpen(false)
+    setIsDesktopDropdownOpen(false)
+  }, [onFlashFilterChange])
+
+  const handleMobileFilterClick = useCallback((filter: FlashFilter) => {
+    onFlashFilterChange?.(filter)
+    setIsMobileDropdownOpen(false)
   }, [onFlashFilterChange])
 
   const getFilterLabel = (filter: FlashFilter) => {
@@ -77,65 +88,104 @@ const PortfolioGrid = memo(function PortfolioGrid({
     >
       <section className="grid-container">
         <div className="container">
-          <div className="grid-header">
-            <div className="header-card">
-              <div className="header-top">
-                <h2 className="grid-title">Portfolio opere</h2>
-                <div className="filter-dropdown" ref={dropdownRef}>
-                  <button 
-                    className="action-btn"
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    aria-expanded={isDropdownOpen}
-                  >
-                    <span className="action-icon">
-                      <svg className="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
-                      </svg>
-                    </span>
-                    <span className="action-text">{getFilterLabel(flashFilter)}</span>
-                    <span className="action-icon">
-                      <svg className={`chevron-icon ${isDropdownOpen ? 'open' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <polyline points="6,9 12,15 18,9"/>
-                      </svg>
-                    </span>
-                  </button>
-                  {isDropdownOpen && (
-                    <div className="filter-dropdown-menu">
-                      <button 
-                        className={`filter-option ${flashFilter === 'all' ? 'active' : ''}`}
-                        onClick={() => handleFilterClick('all')}
-                      >
-                        Tutti
-                      </button>
-                      <button 
-                        className={`filter-option ${flashFilter === 'flash' ? 'active' : ''}`}
-                        onClick={() => handleFilterClick('flash')}
-                      >
-                        Flash
-                      </button>
-                      <button 
-                        className={`filter-option ${flashFilter === 'realizzati' ? 'active' : ''}`}
-                        onClick={() => handleFilterClick('realizzati')}
-                      >
-                        Realizzati
-                      </button>
-                    </div>
-                  )}
-                </div>
+          <GridHeader 
+            title="Portfolio opere"
+            actions={
+              <div className="filter-dropdown-desktop" ref={desktopDropdownRef}>
+                <button 
+                  className="action-btn"
+                  onClick={() => setIsDesktopDropdownOpen(!isDesktopDropdownOpen)}
+                  aria-expanded={isDesktopDropdownOpen}
+                >
+                  <span className="action-icon">
+                    <svg className="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
+                    </svg>
+                  </span>
+                  <span className="action-text">{getFilterLabel(flashFilter)}</span>
+                  <span className="action-icon">
+                    <svg className={`chevron-icon ${isDesktopDropdownOpen ? 'open' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <polyline points="6,9 12,15 18,9"/>
+                    </svg>
+                  </span>
+                </button>
+                {isDesktopDropdownOpen && (
+                  <div className="filter-dropdown-menu">
+                    <button 
+                      className={`action-btn ${flashFilter === 'all' ? 'active' : ''}`}
+                      onClick={() => handleDesktopFilterClick('all')}
+                    >
+                      <span className="action-text">Tutti</span>
+                    </button>
+                    <button 
+                      className={`action-btn ${flashFilter === 'flash' ? 'active' : ''}`}
+                      onClick={() => handleDesktopFilterClick('flash')}
+                    >
+                      <span className="action-text">Flash</span>
+                    </button>
+                    <button 
+                      className={`action-btn ${flashFilter === 'realizzati' ? 'active' : ''}`}
+                      onClick={() => handleDesktopFilterClick('realizzati')}
+                    >
+                      <span className="action-text">Realizzati</span>
+                    </button>
+                  </div>
+                )}
               </div>
-              
-              <div className="grid-stats">
-                <span className="stat-count">{hasSearchTerms ? filteredCount : totalCount}</span>
-                <span className="stat-label">{hasSearchTerms ? 'risultati' : 'opere totali'}</span>
+            }
+          >
+            
+            <GridStats
+              count={hasSearchTerms ? filteredCount : totalCount}
+              label={hasSearchTerms ? 'risultati' : 'opere totali'}
+            />
+            
+            <GridSearchInfo
+              searchTerm={searchTerm}
+              locationFilter={locationFilter}
+            />
+          </GridHeader>
+
+          <div className="filter-dropdown filter-dropdown-mobile" ref={mobileDropdownRef}>
+            <button 
+              className="action-btn"
+              onClick={() => setIsMobileDropdownOpen(!isMobileDropdownOpen)}
+              aria-expanded={isMobileDropdownOpen}
+            >
+              <span className="action-icon">
+                <svg className="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
+                </svg>
+              </span>
+              <span className="action-text">{getFilterLabel(flashFilter)}</span>
+              <span className="action-icon">
+                <svg className={`chevron-icon ${isMobileDropdownOpen ? 'open' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <polyline points="6,9 12,15 18,9"/>
+                </svg>
+              </span>
+            </button>
+            {isMobileDropdownOpen && (
+              <div className="filter-dropdown-menu">
+                <button 
+                  className={`action-btn ${flashFilter === 'all' ? 'active' : ''}`}
+                  onClick={() => handleMobileFilterClick('all')}
+                >
+                  <span className="action-text">Tutti</span>
+                </button>
+                <button 
+                  className={`action-btn ${flashFilter === 'flash' ? 'active' : ''}`}
+                  onClick={() => handleMobileFilterClick('flash')}
+                >
+                  <span className="action-text">Flash</span>
+                </button>
+                <button 
+                  className={`action-btn ${flashFilter === 'realizzati' ? 'active' : ''}`}
+                  onClick={() => handleMobileFilterClick('realizzati')}
+                >
+                  <span className="action-text">Realizzati</span>
+                </button>
               </div>
-              
-              {hasSearchTerms && (
-                <div className="search-info">
-                  {searchTerm && <span className="search-term">"{searchTerm}"</span>}
-                  {locationFilter && <span className="location-term">{locationFilter}</span>}
-                </div>
-              )}
-            </div>
+            )}
           </div>
 
           <div className="portfolio-grid">

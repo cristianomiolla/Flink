@@ -37,6 +37,13 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
     }
   }
 
+  const handleAvatarClick = () => {
+    const artistId = item.user_id || item.id
+    if (onArtistClick && artistId) {
+      onArtistClick(artistId)
+    }
+  }
+
   const handleCardClick = (e: React.MouseEvent) => {
     // Don't open modal if clicking on portfolio-actions
     const target = e.target as HTMLElement
@@ -117,19 +124,46 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
         )}
       </div>
 
+      {/* Action Buttons - Moved to be directly under image */}
+      <div className="portfolio-actions">
+        {tableExists && (
+          <ActionButton
+            icon={<HeartIcon />}
+            text={likeCount > 0 ? `Mi piace (${likeCount})` : "Mi piace"}
+            variant="portfolio"
+            active={isLiked}
+            disabled={loading}
+            requiresAuth={true}
+            onAuthRequired={onAuthRequired}
+            onClick={handleLike}
+          />
+        )}
+        <ActionButton
+          icon={<BookmarkIcon />}
+          text={isTattooSaved(item.id) ? 'Salvato' : 'Salva'}
+          variant="portfolio"
+          active={isTattooSaved(item.id)}
+          requiresAuth={true}
+          onAuthRequired={onAuthRequired}
+          onClick={(e) => {
+            e.stopPropagation()
+            toggleSave(item.id)
+          }}
+        />
+      </div>
+
       {/* Content Section */}
       <div className="content-section">
         {/* Artist Info */}
         <div className="artist-info">
-          <div onClick={handleArtistNameClick} style={{ cursor: 'pointer' }}>
-            <Avatar
-              src={item.artist_avatar_url}
-              name={displayName}
-              alt={`Avatar di ${displayName}`}
-              size="sm"
-              variant="default"
-            />
-          </div>
+          <Avatar
+            src={item.artist_avatar_url}
+            name={displayName}
+            alt={`Avatar di ${displayName}`}
+            size="sm"
+            variant="default"
+            onClick={handleAvatarClick}
+          />
           <span 
             className="artist-name"
             onClick={handleArtistNameClick}
@@ -143,17 +177,6 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
         <h3 className="portfolio-title">
           {item.title || 'Senza titolo'}
         </h3>
-
-        {/* Tags */}
-        {item.tags && item.tags.length > 0 && (
-          <div className="portfolio-tags">
-            {item.tags.map((tag, index) => (
-              <span key={index} className="portfolio-tag">
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
 
         {/* Description */}
         {item.description && (
@@ -176,33 +199,6 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
           )}
         </div>
 
-        {/* Action Buttons */}
-        <div className="portfolio-actions">
-          {tableExists && (
-            <ActionButton
-              icon={<HeartIcon />}
-              text={likeCount > 0 ? `Mi piace (${likeCount})` : "Mi piace"}
-              variant="portfolio"
-              active={isLiked}
-              disabled={loading}
-              requiresAuth={true}
-              onAuthRequired={onAuthRequired}
-              onClick={handleLike}
-            />
-          )}
-          <ActionButton
-            icon={<BookmarkIcon />}
-            text={isTattooSaved(item.id) ? 'Salvato' : 'Salva'}
-            variant="portfolio"
-            active={isTattooSaved(item.id)}
-            requiresAuth={true}
-            onAuthRequired={onAuthRequired}
-            onClick={(e) => {
-              e.stopPropagation()
-              toggleSave(item.id)
-            }}
-          />
-        </div>
       </div>
     </article>
 

@@ -45,11 +45,9 @@
 @media (max-width: 768px) {
   .messages-page.mobile {
     background: var(--background);
-    min-height: 100vh;
   }
 
   .mobile-messages-container {
-    height: 100vh;
     display: flex;
     flex-direction: column;
   }
@@ -86,6 +84,11 @@
     margin-top: 70px; /* Account for fixed header */
     background: var(--background);
     padding: 0;
+  }
+
+  /* Adjust empty state position to compensate for fixed header */
+  .mobile-messages-container .chat-list-items .empty-state {
+    margin-top: -70px; /* Compensate for chat-list-header height */
   }
 
   /* Mobile Empty State */
@@ -131,17 +134,15 @@
   /* Mobile Conversation View */
   .messages-page.mobile.conversation {
     background: var(--background);
-    min-height: 100vh;
   }
 
   .mobile-conversation-container {
-    height: 100vh;
     display: flex;
     flex-direction: column;
   }
 
-  /* Fixed Conversation Header */
-  .conversation-header {
+  /* Fixed Conversation Header - Mobile only */
+  .messages-page.mobile.conversation .conversation-header {
     position: fixed;
     top: 0;
     left: 0;
@@ -160,14 +161,18 @@
   .back-to-messages {
     background: none;
     border: none;
-    font-size: 1.5rem;
     color: var(--foreground);
     cursor: pointer;
-    padding: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: var(--transition);
+    padding: 0; /* Remove default button padding */
+  }
+
+  .back-to-messages svg {
+    width: 24px;
+    height: 24px;
   }
 
   .back-to-messages:hover {
@@ -182,13 +187,6 @@
     margin-left: 1rem;
   }
 
-  .participant-name {
-    font-family: var(--font-heading);
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--foreground);
-    text-transform: uppercase;
-  }
 
   .conversation-delete-btn {
     background: none;
@@ -218,19 +216,15 @@
     margin-top: 70px; /* Account for fixed header */
     padding: 16px;
     padding-bottom: 100px; /* Account for fixed input */
-    overflow: hidden;
+    overflow-y: scroll !important; /* Force scroll */
     background: var(--background);
-  }
-
-  .messages-container {
-    height: 100%;
-    flex: 1;
-    overflow-y: auto;
-    padding: 0;
     display: flex;
     flex-direction: column;
     gap: 1rem;
     min-height: 0;
+    user-select: text;
+    -webkit-user-select: text;
+    -webkit-overflow-scrolling: touch; /* iOS smooth scrolling */
   }
 
   /* Message Styles - copied from ChatConversation.css */

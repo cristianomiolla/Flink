@@ -98,10 +98,10 @@
   text-align: center;
 }
 
-.confirmation-note {
-  font-size: 0.875rem;
+.auth-modal .header-card .confirmation-note {
+  font-size: 11px;
   color: var(--grey-dark);
-  margin: 16px 0;
+  margin-top: 16px;
   background: var(--grey-light);
   padding: 1rem;
   border: 1px solid var(--border);
