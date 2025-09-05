@@ -20,6 +20,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 ```bash
+# Install dependencies
+npm install
+
 # Start development server (default port 5173)
 npm run dev
 
@@ -31,6 +34,9 @@ npm run lint
 
 # Preview production build
 npm run preview
+
+# Deploy to GitHub Pages (builds and deploys to gh-pages branch)
+npm run deploy
 ```
 
 ## Supabase Integration
@@ -138,16 +144,32 @@ CREATE TABLE followers (
 );
 ```
 
+#### Table: `messages`
+```sql
+CREATE TABLE messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    sender_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    receiver_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    is_read BOOLEAN DEFAULT false,
+    deleted_at TIMESTAMPTZ
+);
+```
+
 #### Relationships
 - `portfolio_items.user_id` → `profiles.user_id` (Foreign Key)
 - `saved_tattoos.user_id` → `auth.users.id` (Foreign Key)
 - `saved_tattoos.portfolio_item_id` → `portfolio_items.id` (Foreign Key)
 - `followers.follower_id` → `auth.users.id` (Foreign Key)
 - `followers.following_id` → `profiles.user_id` (Foreign Key)
+- `messages.sender_id` → `auth.users.id` (Foreign Key)
+- `messages.receiver_id` → `auth.users.id` (Foreign Key)
 - Both portfolio and profile tables have RLS enabled with public read access
 - Artists are identified by `profiles.profile_type = 'artist'`
 - Saved items are ordered by `saved_tattoos.created_at` for chronological display
 - Follow relationships enable dynamic artist following functionality
+- Messages are ordered by `created_at` and support soft deletion via `deleted_at`
 
 ### Supabase Client Usage
 ```typescript
@@ -177,22 +199,29 @@ const { data: savedData, error: savedError } = await supabase
   .select('portfolio_item_id, created_at')
   .in('portfolio_item_id', savedIds)
   .order('created_at', { ascending: false })
+
+// Messages with profile joins (useMessages.ts)
+const { data: messagesData, error } = await supabase
+  .from('messages')
+  .select(`
+    *,
+    sender:profiles!messages_sender_id_fkey(user_id, full_name, username, avatar_url),
+    receiver:profiles!messages_receiver_id_fkey(user_id, full_name, username, avatar_url)
+  `)
+  .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+  .order('created_at', { ascending: false })
 ```
 
 ### Database Migration Guidelines
 
 When making code changes that require database modifications:
 
-1. **Create SQL scripts** in the project root with descriptive names
-2. **Test scripts** thoroughly before applying to production  
+1. **Use Supabase Dashboard** - Apply changes directly via the Supabase SQL Editor
+2. **Test thoroughly** before applying to production  
 3. **Update this documentation** with new schema changes
-4. **Apply scripts** via Supabase SQL Editor
+4. **Use MCP integration** - Database operations can be performed through Claude Code's Supabase MCP server
 
-**Migration Scripts Location**: See `database-migration-scripts.md` for examples and templates.
-
-**Current Migration Scripts**:
-- `rebuild-database-simple.sql` - Complete database recreation
-- `database-migration-scripts.md` - Templates for common changes
+**Database Management**: All database operations are now handled directly through Supabase Dashboard or via the configured MCP server integration.
 
 ## Design System & Styling
 
@@ -224,7 +253,7 @@ The app follows a modular React architecture with authentication and state manag
 ### Key Data Flow & Components
 
 - `App.tsx` - Wraps everything in AuthProvider, renders AppRoutes
-- `AppRoutes.tsx` - Route definitions (/, /artist/:artistId, /saved)
+- `AppRoutes.tsx` - Route definitions (/, /artist/:artistId, /saved, /messages, /messages/:artistId)
 - `MainPage.tsx` - Main container with search, category bar, portfolio/artist grids, and AuthOverlay
 - `usePortfolioSearch.ts` - Central data management hook:
   - Single Supabase JOIN query fetches portfolio items + artist profiles
@@ -234,6 +263,17 @@ The app follows a modular React architecture with authentication and state manag
 - `SavedItemsPage.tsx` - Displays user's saved tattoos ordered by save date (saved_tattoos.created_at)
 - `useSavedTattoos.ts` - Manages saved tattoo state and operations
 - `ActionButton.tsx` - Reusable button component with authentication integration
+- `DataStateHandler.tsx` - Centralized component for handling loading, error, and empty states across grids
+
+#### Messaging System
+- `MessagesPage.tsx` - Main messages interface with chat list and conversation view
+- `ChatList.tsx` - Displays list of conversations with participants and last messages
+- `ChatConversation.tsx` - Individual chat interface with message history and real-time polling
+- `useMessages.ts` - Central messaging hook managing conversations, message sending, and state
+  - Handles conversation creation, message fetching, and real-time updates
+  - Uses functional state updates to prevent infinite re-render loops
+  - Implements optimized local state management for better performance
+  - Supports conversation deletion and message read status tracking
 
 ### Component Hierarchy & Props Flow
 - Action buttons (ActionButton) check authentication and trigger `onAuthRequired` 
@@ -247,11 +287,23 @@ The app uses TypeScript interfaces defined in `src/types/portfolio.ts`:
 - `DatabasePortfolioItem` - Raw Supabase portfolio item data structure
 - `PortfolioItem` - Extended interface with artist information merged  
 - `DatabaseProfile`/`ArtistProfile` - User profile types with artist specialization
+- `ArtistService` - Interface for artist service offerings with pricing
+- `FollowerStats` - Interface tracking follower counts and following status
 - `ViewMode` - Union type for 'portfolio' | 'artists' view modes
 - `TabType` - Union type for portfolio tabs (portfolio, servizi, flash, recensioni)
 - `FlashFilter` - Union type for filtering flash vs realized tattoos ('all' | 'flash' | 'realizzati')
+- `PortfolioSearchFilters` - Optimized filter interface for performance
+- `GridCallbacks` - Reusable callback props interface for grid components
 
 **Data Fetching Pattern**: Uses Supabase's JOIN capabilities via `!inner` syntax to fetch related data in single queries, then transforms the nested data structure to flat interfaces for component consumption.
+
+## Deployment
+
+The application is configured for GitHub Pages deployment:
+- **Live URL**: https://cristianomiolla.github.io/Skunk/
+- **Deployment**: Automatic via `npm run deploy` which builds and pushes to gh-pages branch
+- **Build Tool**: Vite with base path configured for GitHub Pages subdirectory
+- **Static Assets**: Uses `.nojekyll` file to prevent Jekyll processing
 
 ## Important Notes
 
@@ -261,5 +313,19 @@ The app uses TypeScript interfaces defined in `src/types/portfolio.ts`:
 - **TypeScript**: Use strict typing - all interfaces are defined in `src/types/portfolio.ts`
 - **Data Queries**: Use optimized Supabase JOIN queries, transform nested results to flat component interfaces
 - **Saved Items**: Order by `saved_tattoos.created_at` (not `portfolio_items.created_at`) for chronological user experience
+
+### Messaging System Guidelines
+- **Conversation IDs**: Generated using format `userId1__userId2` (sorted alphabetically)
+- **Real-time Updates**: ChatConversation uses 3-second polling for new messages
+- **State Management**: Use functional state updates in useMessages to prevent infinite re-render loops
+- **Performance**: Avoid including frequently changing state (like `conversations`) in useCallback dependencies
+- **Message Threading**: Messages are grouped by conversation participants, not by threads
+- **Authentication Required**: All messaging features require user authentication
+
+### Recent Optimizations
+- **Mobile Components Removed**: All mobile-specific message components have been eliminated
+- **Unified Responsive Design**: Single MessagesPage component handles all screen sizes
+- **Infinite Loop Prevention**: Fixed useEffect dependency issues in ChatConversation and useMessages
+- **SQL Scripts Removed**: No local SQL migration files - use Supabase Dashboard directly
 
 

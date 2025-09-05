@@ -27,9 +27,6 @@
   color: #ffffff;
 }
 
-.header-icon-btn:active {
-  transform: scale(0.95);
-}
 
 .header-icon-btn.active,
 .header-icon-btn.active:hover {
@@ -65,11 +62,6 @@
 @media (max-width: 767px) {
   .header-icons {
     gap: 0.5rem;
-  }
-  
-  .header-icon-btn {
-    width: 32px;
-    height: 32px;
   }
   
   .header-icon {

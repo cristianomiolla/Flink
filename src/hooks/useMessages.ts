@@ -63,18 +63,18 @@ export function useMessages() {
       setLoading(true)
       setError(null)
 
-      // First, get user's deleted conversations
+      // Get user's deleted conversations with deletion dates
       const { data: deletedConversations, error: deletedError } = await supabase
         .from('user_conversation_deletions')
-        .select('participant_id')
+        .select('participant_id, deleted_at')
         .eq('user_id', user.id)
 
       if (deletedError && deletedError.code !== 'PGRST116') { // PGRST116 = no rows returned
         console.error('Error fetching deleted conversations:', deletedError)
       }
 
-      const deletedParticipantIds = new Set(
-        deletedConversations?.map(d => d.participant_id) || []
+      const deletedConversationsMap = new Map(
+        deletedConversations?.map(d => [d.participant_id, d.deleted_at]) || []
       )
 
       // Get all messages for current user
@@ -105,10 +105,16 @@ export function useMessages() {
         return
       }
 
-      // Filter out messages from deleted conversations
+      // Filter messages based on deletion dates (only show messages after deletion date)
       const filteredMessages = typedMessages.filter(message => {
         const participantId = message.sender_id === user.id ? message.receiver_id : message.sender_id
-        return !deletedParticipantIds.has(participantId)
+        const deletedAt = deletedConversationsMap.get(participantId)
+        
+        // If conversation was never deleted, include all messages
+        if (!deletedAt) return true
+        
+        // If conversation was deleted, only include messages after the deletion date
+        return new Date(message.created_at) > new Date(deletedAt)
       })
 
       if (filteredMessages.length === 0) {
@@ -230,10 +236,11 @@ export function useMessages() {
     if (!user) return []
 
     try {
-      // First, check if this conversation has been deleted by the user
+      // Check if this conversation has been deleted by the user
+      // and if there are messages newer than the deletion date
       const { data: deletedConversations, error: deletedError } = await supabase
         .from('user_conversation_deletions')
-        .select('participant_id')
+        .select('participant_id, deleted_at')
         .eq('user_id', user.id)
         .eq('participant_id', participantId)
 
@@ -241,12 +248,12 @@ export function useMessages() {
         console.error('Error checking deleted conversations:', deletedError)
       }
 
-      // If conversation was deleted by this user, return empty array
+      let deletedAt: string | null = null
       if (deletedConversations && deletedConversations.length > 0) {
-        return []
+        deletedAt = deletedConversations[0].deleted_at
       }
 
-      const { data: messagesData, error: messagesError } = await supabase
+      let query = supabase
         .from('messages')
         .select(`
           id,
@@ -259,6 +266,13 @@ export function useMessages() {
         .or(`and(sender_id.eq.${user?.id},receiver_id.eq.${participantId}),and(sender_id.eq.${participantId},receiver_id.eq.${user?.id})`)
         .is('deleted_at', null)
         .order('created_at', { ascending: true })
+
+      // If conversation was deleted, only show messages after the deletion date
+      if (deletedAt) {
+        query = query.gt('created_at', deletedAt)
+      }
+
+      const { data: messagesData, error: messagesError } = await query
 
       if (messagesError) {
         throw messagesError
@@ -329,24 +343,38 @@ export function useMessages() {
     if (!user) return
 
     try {
-      // Check if conversation already exists
+      // Generate conversation key
       const participants = [user.id, receiverId].sort()
       const conversationKey = `${participants[0]}__${participants[1]}`
-      const existingConv = conversations.find(conv => conv.id === conversationKey)
-
-      if (existingConv) {
-        // Update existing conversation
-        setConversations(prev => prev.map(conv => 
-          conv.id === conversationKey 
-            ? { 
-                ...conv, 
-                lastMessage: content,
-                timestamp: new Date().toISOString(),
-                isFromCurrentUser: true
-              }
-            : conv
-        ))
-      } else {
+      
+      // Track if we need to create a new conversation
+      let needsNewConversation = false
+      
+      // Use functional update to check if conversation exists and update accordingly
+      setConversations(prev => {
+        const existingConv = prev.find(conv => conv.id === conversationKey)
+        
+        if (existingConv) {
+          // Update existing conversation
+          return prev.map(conv => 
+            conv.id === conversationKey 
+              ? { 
+                  ...conv, 
+                  lastMessage: content,
+                  timestamp: new Date().toISOString(),
+                  isFromCurrentUser: true
+                }
+              : conv
+          )
+        } else {
+          // Mark that we need to create a new conversation
+          needsNewConversation = true
+          return prev
+        }
+      })
+      
+      // Handle new conversation creation if needed
+      if (needsNewConversation) {
         // Try to fetch profile for the receiver to create new conversation
         let participantProfile = null
         try {
@@ -385,12 +413,11 @@ export function useMessages() {
     } catch (err) {
       console.error('Error updating conversation locally:', err)
     }
-  }, [user, conversations])
+  }, [user])
 
   // Send a new message
   const sendMessage = useCallback(async (receiverId: string, content: string): Promise<boolean> => {
     if (!user || !content.trim()) return false
-
 
     try {
       const { error } = await supabase
@@ -407,6 +434,7 @@ export function useMessages() {
 
       // Instead of full refresh, just add/update the conversation locally
       await updateConversationAfterSend(receiverId, content.trim())
+      
       return true
     } catch (err) {
       console.error('Error sending message:', err)
@@ -447,7 +475,7 @@ export function useMessages() {
     if (!user) return
 
     try {
-      // Insert or update user_conversation_deletions record
+      // Insert or update user_conversation_deletions record with current timestamp
       const { error } = await supabase
         .from('user_conversation_deletions')
         .upsert({
@@ -462,7 +490,7 @@ export function useMessages() {
         throw error
       }
 
-      // Remove from local state
+      // Remove from local state (this will hide the conversation until new messages arrive)
       setConversations(prev => prev.filter(conv => conv.participant.user_id !== participantId))
     } catch (err) {
       console.error('Error deleting conversation:', err)
@@ -477,7 +505,7 @@ export function useMessages() {
 
   useEffect(() => {
     fetchConversations()
-  }, [user])
+  }, [user, fetchConversations])
 
   return {
     conversations,

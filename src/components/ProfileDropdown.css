@@ -3,6 +3,10 @@
 .profile-dropdown {
   position: relative;
   z-index: 200;
+  display: flex;
+  align-items: center;
+  height: 36px;
+  flex-shrink: 0;
 }
 
 /* Use artist-header styles for profile dropdown */
@@ -12,6 +16,11 @@
   cursor: pointer;
   padding: 0;
   transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .profile-dropdown .artist-header:hover {
@@ -127,6 +136,16 @@
 
 /* Mobile responsiveness */
 @media (max-width: 767px) {
+  .profile-dropdown {
+    height: 32px;
+  }
+  
+  .profile-dropdown .artist-header {
+    width: 32px;
+    height: 32px;
+  }
+  
+  
   .dropdown-menu {
     min-width: 200px;
     right: -10px;

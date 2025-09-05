@@ -44,6 +44,13 @@
   text-transform: uppercase;
 }
 
+/* Avatar Icon */
+.avatar .avatar-icon {
+  width: 60%;
+  height: 60%;
+  opacity: 0.7;
+}
+
 /* === SIZE VARIANTS === */
 
 /* Small - 36px (Portfolio cards, header dropdown) */
@@ -82,37 +89,3 @@
 
 /* Bordered variant - now redundant as all avatars have borders */
 
-/* === RESPONSIVE DESIGN === */
-
-/* Mobile adjustments */
-@media (max-width: 767px) {
-  /* Small - slightly smaller on mobile */
-  .avatar-sm {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .avatar-sm .avatar-placeholder {
-    font-size: 12px;
-  }
-  
-  /* Medium - slightly smaller on mobile */
-  .avatar-md {
-    width: 72px;
-    height: 72px;
-  }
-  
-  .avatar-md .avatar-placeholder {
-    font-size: 28px;
-  }
-  
-  /* Large - smaller but still prominent on mobile */
-  .avatar-lg {
-    width: 100px;
-    height: 100px;
-  }
-  
-  .avatar-lg .avatar-placeholder {
-    font-size: 40px;
-  }
-}

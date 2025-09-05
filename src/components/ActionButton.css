@@ -19,6 +19,13 @@
   flex: 1;
 }
 
+/* Center action buttons when inside empty-content */
+.empty-content .action-btn {
+  flex: none;
+  width: auto;
+  margin: 0 auto;
+}
+
 
 /* Filter dropdown icon alignment */
 .filter-dropdown .action-icon {

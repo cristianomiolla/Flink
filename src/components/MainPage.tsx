@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, lazy, Suspense, useMemo } from 'react'
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { SearchBar } from './SearchBar'
 import { CategoryBar } from './CategoryBar'
@@ -86,34 +86,6 @@ export function MainPage() {
     navigate(`/messages/${artistId}`)
   }, [navigate])
 
-  // Memoize props to prevent unnecessary re-renders
-  const portfolioGridProps = useMemo(() => ({
-    items: portfolioItems,
-    loading,
-    error,
-    searchTerm,
-    locationFilter,
-    flashFilter,
-    totalCount,
-    filteredCount,
-    onArtistClick: handleArtistProfileOpen,
-    onFlashFilterChange: handleFlashFilterChange,
-    onAuthRequired: handleAuthRequired,
-    onContactArtist: handleContactArtist
-  }), [portfolioItems, loading, error, searchTerm, locationFilter, flashFilter, totalCount, filteredCount, handleArtistProfileOpen, handleFlashFilterChange, handleAuthRequired, handleContactArtist])
-
-  const artistGridProps = useMemo(() => ({
-    profiles: artistProfiles,
-    loading,
-    error,
-    searchTerm,
-    locationFilter,
-    totalCount: profilesCount,
-    filteredCount: filteredProfilesCount,
-    onArtistClick: handleArtistProfileOpen,
-    onAuthRequired: handleAuthRequired,
-    onContactArtist: handleContactArtist
-  }), [artistProfiles, loading, error, searchTerm, locationFilter, profilesCount, filteredProfilesCount, handleArtistProfileOpen, handleAuthRequired, handleContactArtist])
 
   return (
     <div className="app">
@@ -134,9 +106,33 @@ export function MainPage() {
       
       <main className="main-content">
         {viewMode === 'portfolio' ? (
-          <PortfolioGrid {...portfolioGridProps} />
+          <PortfolioGrid 
+            items={portfolioItems}
+            loading={loading}
+            error={error}
+            searchTerm={searchTerm}
+            locationFilter={locationFilter}
+            flashFilter={flashFilter}
+            totalCount={totalCount}
+            filteredCount={filteredCount}
+            onArtistClick={handleArtistProfileOpen}
+            onFlashFilterChange={handleFlashFilterChange}
+            onAuthRequired={handleAuthRequired}
+            onContactArtist={handleContactArtist}
+          />
         ) : (
-          <ArtistGrid {...artistGridProps} />
+          <ArtistGrid 
+            profiles={artistProfiles}
+            loading={loading}
+            error={error}
+            searchTerm={searchTerm}
+            locationFilter={locationFilter}
+            totalCount={profilesCount}
+            filteredCount={filteredProfilesCount}
+            onArtistClick={handleArtistProfileOpen}
+            onAuthRequired={handleAuthRequired}
+            onContactArtist={handleContactArtist}
+          />
         )}
       </main>
       

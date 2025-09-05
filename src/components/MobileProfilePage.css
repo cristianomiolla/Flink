@@ -1,14 +1,17 @@
 /* Mobile Profile Page */
 .mobile-profile-page {
   background: var(--background);
-  min-height: 100vh;
-  padding-bottom: calc(70px + env(safe-area-inset-bottom));
+  min-height: calc(100vh - 2rem - 70px - env(safe-area-inset-bottom));
+  max-height: calc(100vh - 2rem - 70px - env(safe-area-inset-bottom));
+  height: calc(100vh - 2rem - 70px - env(safe-area-inset-bottom));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0;
 }
 
 .mobile-profile-header {
   background: var(--card);
-  border-bottom: 1px solid var(--border);
-  padding: 1rem;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -27,6 +30,8 @@
 
 .mobile-profile-content {
   padding: 0;
+  flex: 1;
+  overflow: hidden;
 }
 
 /* User Info Section */
@@ -70,8 +75,13 @@
 /* Menu Items */
 .mobile-profile-menu {
   background: var(--card);
-  margin-top: 1rem;
 }
+
+.mobile-profile-user-header {
+  display: flex;
+  justify-content: flex-end;
+}
+
 
 .mobile-profile-item {
   width: 100%;
@@ -144,10 +154,48 @@
 
 /* Mobile only */
 @media (max-width: 767px) {
-  .mobile-profile-page {
-    display: block;
+  /* Only apply flexbox when empty state is present */
+  .mobile-profile-page:has(.empty-state) {
+    min-height: calc(100vh - 2rem - 70px - env(safe-area-inset-bottom));
+    max-height: calc(100vh - 2rem - 70px - env(safe-area-inset-bottom));
+    height: calc(100vh - 2rem - 70px - env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0;
+    overflow: hidden;
+  }
+
+  .mobile-profile-page:has(.empty-state) .container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  .mobile-profile-page:has(.empty-state) .saved-items-content {
+    flex: 1;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  /* Mobile profile empty state styles are now handled globally in tokens.css */
+  
+  /* Hide header content on mobile when on profile menu page */
+  .mobile-profile-page .header-content {
+    display: none;
+  }
+  
+  .mobile-profile-page .header {
+    height: 0;
+    padding: 0;
+    border: none;
   }
 }
+
+
+/* Mobile Profile Page Empty State uses global rules from tokens.css */
 
 @media (min-width: 768px) {
   .mobile-profile-page {

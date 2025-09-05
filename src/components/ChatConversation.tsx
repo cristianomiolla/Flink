@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import './ChatConversation.css'
 import { Avatar } from './Avatar'
 import { useAuth } from '../hooks/useAuth'
 import { type Message as DatabaseMessage } from '../hooks/useMessages'
-import { ActionButton, DeleteIcon, BackIcon, SendIcon } from './ActionButton'
+import { ActionButton, DeleteIcon, SendIcon } from './ActionButton'
 
 interface Message {
   id: string
@@ -23,26 +23,59 @@ interface ChatConversationProps {
     timestamp: string
     unreadCount: number
   } | null
-  isVisible: boolean
   onRequestDeleteChat?: (chat: { id: string; participant: { name: string } }) => void
   sendMessage?: (receiverId: string, content: string) => Promise<boolean>
   fetchConversationMessages?: (participantId: string) => Promise<DatabaseMessage[]>
-  showOnMobile?: boolean
-  onBackToList?: () => void
+  hideHeaderAndInput?: boolean
 }
 
-export function ChatConversation({ chat, isVisible, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages, showOnMobile = true, onBackToList }: ChatConversationProps) {
+export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages, hideHeaderAndInput = false }: ChatConversationProps) {
   const { user } = useAuth()
   const [newMessage, setNewMessage] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(false)
+  const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null)
 
   // Extract participant ID from chat ID (format: "userId1__userId2")
-  const getParticipantId = (chatId: string): string | null => {
+  const getParticipantId = useCallback((chatId: string): string | null => {
     if (!user) return null
     const [userId1, userId2] = chatId.split('__')
     return userId1 === user.id ? userId2 : userId1
-  }
+  }, [user])
+
+  // Load messages function
+  const loadMessages = useCallback(async (showLoading = true) => {
+    if (!chat || !propFetchConversationMessages) return
+
+    const participantId = getParticipantId(chat.id)
+    if (!participantId) return
+
+    if (showLoading) setLoading(true)
+    try {
+      const conversationMessages = await propFetchConversationMessages(participantId)
+      
+      // Convert to local Message format
+      const formattedMessages: Message[] = conversationMessages.map((msg: DatabaseMessage) => ({
+        id: msg.id,
+        content: msg.content,
+        timestamp: msg.created_at,
+        isFromCurrentUser: msg.sender_id === user?.id
+      }))
+      
+      // Only update if messages have actually changed
+      setMessages(prevMessages => {
+        if (JSON.stringify(prevMessages) !== JSON.stringify(formattedMessages)) {
+          return formattedMessages
+        }
+        return prevMessages
+      })
+    } catch (error) {
+      console.error('Error loading conversation messages:', error)
+      setMessages([])
+    } finally {
+      if (showLoading) setLoading(false)
+    }
+  }, [chat, propFetchConversationMessages, user?.id, getParticipantId])
 
   // Reset messages when chat becomes null or changes
   useEffect(() => {
@@ -53,33 +86,31 @@ export function ChatConversation({ chat, isVisible, onRequestDeleteChat, sendMes
       return
     }
 
-    const loadMessages = async () => {
-      const participantId = getParticipantId(chat.id)
-      if (!participantId || !propFetchConversationMessages) return
+    // Load initial messages
+    loadMessages(true)
 
-      setLoading(true)
-      try {
-        const conversationMessages = await propFetchConversationMessages(participantId)
-        
-        // Convert to local Message format
-        const formattedMessages: Message[] = conversationMessages.map((msg: DatabaseMessage) => ({
-          id: msg.id,
-          content: msg.content,
-          timestamp: msg.created_at,
-          isFromCurrentUser: msg.sender_id === user?.id
-        }))
-        
-        setMessages(formattedMessages)
-      } catch (error) {
-        console.error('Error loading conversation messages:', error)
-        setMessages([])
-      } finally {
-        setLoading(false)
+    // Set up polling for new messages every 3 seconds
+    const interval = setInterval(() => {
+      loadMessages(false) // Don't show loading spinner for polling
+    }, 3000)
+
+    setPollingInterval(interval)
+
+    // Cleanup on unmount or chat change
+    return () => {
+      clearInterval(interval)
+      setPollingInterval(null)
+    }
+  }, [chat, user?.id, loadMessages])
+
+  // Cleanup polling interval on component unmount
+  useEffect(() => {
+    return () => {
+      if (pollingInterval) {
+        clearInterval(pollingInterval)
       }
     }
-
-    loadMessages()
-  }, [chat?.id, user?.id, propFetchConversationMessages])
+  }, [pollingInterval])
 
   const formatMessageTime = (timestamp: string) => {
     const date = new Date(timestamp)
@@ -95,28 +126,23 @@ export function ChatConversation({ chat, isVisible, onRequestDeleteChat, sendMes
     const participantId = getParticipantId(chat.id)
     if (!participantId) return
 
-    try {
-      // Add the new message to local state immediately for better UX
-      const tempMessage: Message = {
-        id: Date.now().toString(), // Temporary ID
-        content: newMessage.trim(),
-        timestamp: new Date().toISOString(),
-        isFromCurrentUser: true
-      }
-      setMessages(prev => [...prev, tempMessage])
-      setNewMessage('')
+    const messageContent = newMessage.trim()
+    setNewMessage('') // Clear input immediately
 
-      const success = await propSendMessage(participantId, newMessage.trim())
+    try {
+      const success = await propSendMessage(participantId, messageContent)
       
-      if (!success) {
-        // If send failed, remove the temporary message
-        setMessages(prev => prev.filter(m => m.id !== tempMessage.id))
-        setNewMessage(newMessage.trim()) // Restore message
+      if (success) {
+        // Immediately reload messages to show the sent message
+        await loadMessages(false)
+      } else {
+        // If send failed, restore the message to input
+        setNewMessage(messageContent)
       }
     } catch (error) {
       console.error('Error sending message:', error)
-      // Remove temporary message on error
-      setMessages(prev => prev.filter(m => m.id === Date.now().toString()))
+      // Restore message to input on error
+      setNewMessage(messageContent)
     }
   }
 
@@ -136,9 +162,9 @@ export function ChatConversation({ chat, isVisible, onRequestDeleteChat, sendMes
     }
   }
 
-  if (!isVisible || !chat) {
+  if (!chat) {
     return (
-      <div className={`chat-conversation empty ${showOnMobile ? 'mobile-visible' : ''}`}>
+      <div className="chat-conversation empty">
         <div className="empty-conversation">
           <div className="empty-conversation-icon">💬</div>
           <h3 className="empty-conversation-title">Seleziona una conversazione</h3>
@@ -151,41 +177,35 @@ export function ChatConversation({ chat, isVisible, onRequestDeleteChat, sendMes
   }
 
   return (
-    <div className={`chat-conversation ${showOnMobile ? 'mobile-visible' : ''}`}>
+    <div className="chat-conversation">
       {/* Chat Header */}
-      <div className="conversation-header">
-        <div className="conversation-participant">
-          {/* Back button for mobile */}
-          <ActionButton
-            icon={<BackIcon />}
-            text="Indietro"
-            variant="secondary"
-            onClick={onBackToList}
-            className="mobile-back-action"
-          />
-          <Avatar
-            src={chat.participant.avatar}
-            name={chat.participant.name}
-            alt={`Avatar di ${chat.participant.name}`}
-            size="sm"
-            variant="default"
-          />
-          <h2 className="participant-name">{chat.participant.name || 'Nome non disponibile'}</h2>
+      {!hideHeaderAndInput && (
+        <div className="conversation-header">
+          <div className="conversation-participant">
+            <Avatar
+              src={chat.participant.avatar}
+              name={chat.participant.name}
+              alt={`Avatar di ${chat.participant.name}`}
+              size="sm"
+              variant="default"
+            />
+            <h2 className="participant-name">{chat.participant.name || 'Nome non disponibile'}</h2>
+          </div>
+          <div className="conversation-actions">
+            <ActionButton
+              icon={<DeleteIcon />}
+              text="Elimina"
+              variant="secondary"
+              onClick={(e) => {
+                e.stopPropagation()
+                e.preventDefault()
+                handleDeleteChat()
+              }}
+              className="delete-chat-action"
+            />
+          </div>
         </div>
-        <div className="conversation-actions">
-          <ActionButton
-            icon={<DeleteIcon />}
-            text="Elimina"
-            variant="secondary"
-            onClick={(e) => {
-              e.stopPropagation()
-              e.preventDefault()
-              handleDeleteChat()
-            }}
-            className="delete-chat-action"
-          />
-        </div>
-      </div>
+      )}
 
       {/* Messages */}
       <div className="messages-container">
@@ -217,26 +237,28 @@ export function ChatConversation({ chat, isVisible, onRequestDeleteChat, sendMes
       </div>
 
       {/* Message Input */}
-      <div className="message-input-container">
-        <div className="message-input-wrapper">
-          <textarea
-            className="message-input"
-            placeholder="Scrivi un messaggio..."
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            rows={1}
-          />
-          <ActionButton
-            icon={<SendIcon />}
-            text="Invia"
-            variant="secondary"
-            onClick={handleSendMessage}
-            disabled={!newMessage.trim()}
-            className="send-message-action"
-          />
+      {!hideHeaderAndInput && (
+        <div className="message-input-container">
+          <div className="message-input-wrapper">
+            <textarea
+              className="message-input"
+              placeholder="Scrivi un messaggio..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              rows={1}
+            />
+            <ActionButton
+              icon={<SendIcon />}
+              text="Invia"
+              variant="secondary"
+              onClick={handleSendMessage}
+              disabled={!newMessage.trim()}
+              className="send-message-action"
+            />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

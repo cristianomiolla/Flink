@@ -220,38 +220,11 @@ export function usePortfolioSearch() {
     }
   }, [fetchPortfolioItems, fetchArtistProfiles, dataFetched])
 
-  // Listen for portfolio items updates from other components
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'portfolioItemsUpdated') {
-        // Refetch data when portfolio items are updated elsewhere
-        setDataFetched(false)
-      }
-    }
-
-    // Listen for localStorage changes
-    window.addEventListener('storage', handleStorageChange)
-
-    // Also check for changes when the window gets focus (for same-tab changes)
-    const handleFocus = () => {
-      const lastUpdate = localStorage.getItem('portfolioItemsUpdated')
-      if (lastUpdate) {
-        const lastUpdateTime = parseInt(lastUpdate)
-        const currentTime = Date.now()
-        // Refetch if data was updated in the last 5 seconds
-        if (currentTime - lastUpdateTime < 5000) {
-          setDataFetched(false)
-          localStorage.removeItem('portfolioItemsUpdated') // Clean up
-        }
-      }
-    }
-
-    window.addEventListener('focus', handleFocus)
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-      window.removeEventListener('focus', handleFocus)
-    }
+  // Simplified refresh mechanism - only on explicit refetch
+  const handleRefetch = useCallback(() => {
+    setDataFetched(false)
+    setError(null) 
+    setLoading(true)
   }, [])
 
   // No longer need useEffect for filtering since we're using useMemo
@@ -271,11 +244,7 @@ export function usePortfolioSearch() {
     resetSearch,
     setFlashFilter: setFlashFilterValue,
     toggleViewMode,
-    refetch: useCallback(() => {
-      setDataFetched(false) // Reset cache to allow refetch
-      setError(null)
-      setLoading(true)
-    }, []),
+    refetch: handleRefetch,
     totalCount: portfolioItems.length,
     filteredCount: filteredItems.length,
     profilesCount: artistProfiles.length,

@@ -141,6 +141,21 @@
   white-space: nowrap;
   border-right: 1px solid var(--border);
   text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.tab-icon {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.5;
+  flex-shrink: 0;
+}
+
+.tab-text {
+  flex-shrink: 0;
 }
 
 .tab-button:last-child {
@@ -497,9 +512,19 @@
   
   /* Mobile Tabs Styles */
   .tab-button {
-    padding: 0.5rem 0.75rem;
+    padding: 0.75rem;
     font-size: 12px;
     font-weight: 600;
+    gap: 0;
+  }
+  
+  .tab-text {
+    display: none;
+  }
+  
+  .tab-icon {
+    width: 20px;
+    height: 20px;
   }
   
   .tabs-navigation {
@@ -523,10 +548,6 @@
   
   .empty-portfolio {
     min-height: 200px;
-  }
-  
-  .empty-state {
-    padding: 1.5rem;
   }
   
   .empty-icon {

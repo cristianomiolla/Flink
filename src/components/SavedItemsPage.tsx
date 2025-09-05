@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense, useCallback } from 'react'
 import './SavedItemsPage.css'
 import './PortfolioGrid.css'
 import { SearchBar } from './SearchBar'
@@ -6,8 +6,12 @@ import { PageHeader } from './PageHeader'
 import LoadingSpinner from './LoadingSpinner'
 import { PortfolioCard } from './PortfolioCard'
 import { useSavedTattoos } from '../hooks/useSavedTattoos'
+import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import type { PortfolioItem } from '../types/portfolio'
+
+// Lazy load AuthOverlay component
+const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
 
 interface SavedItemsPageProps {
   onLogoClick?: () => void
@@ -15,10 +19,16 @@ interface SavedItemsPageProps {
 }
 
 export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPageProps) {
+  const { user } = useAuth()
   const { savedTattoos, loading: savedLoading, refreshSavedTattoos } = useSavedTattoos()
   const [savedItems, setSavedItems] = useState<PortfolioItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showAuthOverlay, setShowAuthOverlay] = useState(false)
+
+  const handleAuthRequired = useCallback(() => {
+    setShowAuthOverlay(true)
+  }, [])
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -28,6 +38,13 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
   // Load full portfolio items for saved tattoos
   useEffect(() => {
     const loadSavedItems = async () => {
+      // If user is not authenticated, set loading to false immediately
+      if (!user) {
+        setSavedItems([])
+        setLoading(false)
+        return
+      }
+      
       if (savedLoading || savedTattoos.size === 0) {
         setSavedItems([])
         setLoading(false)
@@ -105,7 +122,7 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
     }
 
     loadSavedItems()
-  }, [savedTattoos, savedLoading])
+  }, [savedTattoos, savedLoading, user])
 
 
   if (loading || savedLoading) {
@@ -124,7 +141,34 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
       <SearchBar onLogoClick={onLogoClick} hideOnMobile={true} />
       
       <div className="container">
-        <div className="saved-items-content">
+        {/* Empty state - outside saved-items-content */}
+        {!error && savedItems.length === 0 && (
+          <div className="empty-state">
+            <div className="empty-content">
+              <div className="empty-icon">💾</div>
+              <h2 className="empty-title">
+                {!user ? 'Accedi per visualizzare i tatuaggi salvati' : 'Nessun tatuaggio salvato'}
+              </h2>
+              <p className="empty-description">
+                {!user 
+                  ? 'Effettua il login per vedere i tatuaggi che hai salvato e gestire la tua collezione personale.'
+                  : 'Inizia a esplorare i portfolio degli artisti e salva i tatuaggi che ti piacciono.'
+                }
+              </p>
+              <button 
+                className="action-btn" 
+                onClick={!user ? handleAuthRequired : onLogoClick}
+                style={{ marginTop: '1.5rem' }}
+              >
+                {!user ? 'Accedi' : 'Esplora Portfolio'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Content area only when there are items or errors */}
+        {(savedItems.length > 0 || error) && (
+          <div className="saved-items-content">
           {/* Header - solo se ci sono elementi salvati */}
           {savedItems.length > 0 && (
             <PageHeader 
@@ -152,24 +196,6 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
             </div>
           )}
 
-          {!error && savedItems.length === 0 && (
-            <div className="empty-state">
-              <div className="empty-content">
-                <div className="empty-icon">💾</div>
-                <h2 className="empty-title">Nessun tatuaggio salvato</h2>
-                <p className="empty-description">
-                  Inizia a esplorare i portfolio degli artisti e salva i tatuaggi che ti piacciono.
-                </p>
-                <button 
-                  className="btn btn-accent" 
-                  onClick={onLogoClick}
-                  style={{ marginTop: '1.5rem' }}
-                >
-                  Esplora Portfolio
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* Grid */}
           {!error && savedItems.length > 0 && (
@@ -183,8 +209,19 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
               ))}
             </div>
           )}
-        </div>
+          </div>
+        )}
       </div>
+      
+      {/* Auth Overlay */}
+      {showAuthOverlay && (
+        <Suspense fallback={<div />}>
+          <AuthOverlay
+            isOpen={showAuthOverlay}
+            onClose={() => setShowAuthOverlay(false)}
+          />
+        </Suspense>
+      )}
     </div>
   )
 }

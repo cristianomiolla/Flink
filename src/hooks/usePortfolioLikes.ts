@@ -48,24 +48,14 @@ export function usePortfolioLikes(portfolioItemId: string) {
 
   const fetchLikeData = async () => {
     try {
-      // Combine count and user like check into a single optimized query
       if (user) {
-        // For authenticated users, get both count and user's like status in one query
-        const [{ count }, { data: userLike, error: userLikeError }] = await Promise.all([
-          supabase
-            .from('portfolio_likes')
-            .select('*', { count: 'exact', head: true })
-            .eq('portfolio_item_id', portfolioItemId),
-          supabase
-            .from('portfolio_likes')
-            .select('id')
-            .eq('portfolio_item_id', portfolioItemId)
-            .eq('user_id', user.id)
-            .maybeSingle()
-        ])
+        // Single query to get count and user's like in one call
+        const { data: likes, count, error } = await supabase
+          .from('portfolio_likes')
+          .select('user_id', { count: 'exact' })
+          .eq('portfolio_item_id', portfolioItemId)
 
-        // Handle any policy errors
-        if (userLikeError && (userLikeError.code === 'PGRST116' || userLikeError.message?.includes('406') || userLikeError.code === '42501')) {
+        if (error && (error.code === 'PGRST116' || error.message?.includes('406') || error.code === '42501')) {
           console.warn('Portfolio likes: RLS policies not configured correctly, using fallback')
           setLikeCount(0)
           setIsLiked(false)
@@ -73,22 +63,19 @@ export function usePortfolioLikes(portfolioItemId: string) {
         }
 
         setLikeCount(count || 0)
-        setIsLiked(!!userLike)
+        setIsLiked(likes?.some(like => like.user_id === user.id) || false)
       } else {
         // For anonymous users, only get the count
-        const { count, error: countError } = await supabase
+        const { count, error } = await supabase
           .from('portfolio_likes')
           .select('*', { count: 'exact', head: true })
           .eq('portfolio_item_id', portfolioItemId)
 
-        if (countError) {
-          if (countError.code === 'PGRST116' || countError.message?.includes('406') || countError.code === '42501') {
-            console.warn('Portfolio likes: RLS policies not configured correctly, using fallback')
-            setLikeCount(0)
-            setIsLiked(false)
-            return
-          }
-          throw countError
+        if (error && (error.code === 'PGRST116' || error.message?.includes('406') || error.code === '42501')) {
+          console.warn('Portfolio likes: RLS policies not configured correctly, using fallback')
+          setLikeCount(0)
+          setIsLiked(false)
+          return
         }
 
         setLikeCount(count || 0)

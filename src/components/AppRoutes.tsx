@@ -33,8 +33,11 @@ export function AppRoutes() {
       <Route path="/profile" element={<PersonalProfile />} />
       <Route path="/profile-menu" element={<MobileProfilePage />} />
       <Route path="/saved" element={<SavedItemsPage onLogoClick={handleLogoClick} onArtistClick={handleArtistClick} />} />
-      <Route path="/messages" element={<MessagesPage onLogoClick={handleLogoClick} />} />
-      <Route path="/messages/:artistId" element={<MessagesPage onLogoClick={handleLogoClick} />} />
+      
+      {/* Messages Routes */}
+      <Route path="/messages" element={<MessagesPage />} />
+      <Route path="/messages/:artistId" element={<MessagesPage />} />
+      
       <Route path="/become-artist" element={<BecomeArtistPage onLogoClick={handleLogoClick} />} />
     </Routes>
   )

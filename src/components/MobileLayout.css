@@ -40,21 +40,33 @@
 }
 
 .mobile-search-container .search-form {
+  display: flex;
+  flex-direction: column;
   margin: 0;
   max-width: none;
-  flex-direction: column;
   gap: 0.5rem;
+  align-items: stretch;
+  border: none;
 }
 
 .mobile-search-container .search-input,
 .mobile-search-container .location-input {
   padding: 0.5rem 1rem 0.5rem 2rem;
   font-size: 14px;
+  border: 1px solid var(--border-red) !important;
+  border-radius: 0;
+  background: var(--background);
 }
 
 .mobile-search-container .search-input-container,
 .mobile-search-container .location-input-container {
   min-height: 40px;
+  width: 100%;
+  flex: none;
+  min-width: auto;
+  max-width: none;
+  border: none;
+  position: relative;
 }
 
 .mobile-search-container .btn {
@@ -62,15 +74,7 @@
   font-size: 14px;
 }
 
-/* Mobile search form styling - remove border when only search input is visible */
-.mobile-search-container .search-input-container {
-  border-bottom: none !important;
-}
-
-/* Only add border back when location input is shown */
-.mobile-search-container .search-form:has(.location-input-container) .search-input-container {
-  border-bottom: 1px solid var(--border-red) !important;
-}
+/* Remove conflicting border rules - now handled above */
 
 /* Mobile search form animations */
 .mobile-search-container .location-input-container,

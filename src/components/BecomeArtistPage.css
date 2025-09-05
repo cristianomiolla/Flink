@@ -1,5 +1,3 @@
-@import '../styles/tokens.css';
-
 .become-artist-page {
   background: var(--background);
   min-height: 100vh;

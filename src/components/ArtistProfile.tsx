@@ -160,25 +160,39 @@ export function ArtistProfile() {
                     className={`tab-button ${activeTab === 'portfolio' ? 'active' : ''}`}
                     onClick={() => setActiveTab('portfolio')}
                   >
-                    PORTFOLIO
+                    <svg className="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                      <circle cx="8.5" cy="8.5" r="1.5"/>
+                      <polyline points="21,15 16,10 5,21"/>
+                    </svg>
+                    <span className="tab-text">PORTFOLIO</span>
                   </button>
                   <button 
                     className={`tab-button ${activeTab === 'flash' ? 'active' : ''}`}
                     onClick={() => setActiveTab('flash')}
                   >
-                    FLASH
+                    <svg className="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/>
+                    </svg>
+                    <span className="tab-text">FLASH</span>
                   </button>
                   <button 
                     className={`tab-button ${activeTab === 'servizi' ? 'active' : ''}`}
                     onClick={() => setActiveTab('servizi')}
                   >
-                    SERVIZI
+                    <svg className="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                    </svg>
+                    <span className="tab-text">SERVIZI</span>
                   </button>
                   <button 
                     className={`tab-button ${activeTab === 'recensioni' ? 'active' : ''}`}
                     onClick={() => setActiveTab('recensioni')}
                   >
-                    RECENSIONI
+                    <svg className="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2"/>
+                    </svg>
+                    <span className="tab-text">RECENSIONI</span>
                   </button>
                 </div>
 

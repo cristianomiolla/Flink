@@ -17,36 +17,7 @@
   min-height: 50vh;
 }
 
-/* Empty State - specific to saved items page */
-.saved-items-page .empty-state {
-  min-height: 50vh;
-}
-
-.empty-content {
-  text-align: center;
-  max-width: 400px;
-}
-
-.empty-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-  opacity: 0.6;
-}
-
-.empty-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--foreground);
-  text-transform: uppercase;
-  margin-bottom: 0.5rem;
-  letter-spacing: 0.02em;
-}
-
-.empty-description {
-  color: var(--grey-dark);
-  margin-bottom: 2rem;
-  line-height: 1.6;
-}
+/* Empty state content styles are now global in tokens.css */
 
 /* Error State - extends global state styles */
 .error-state {
@@ -72,9 +43,21 @@
 }
 
 @media (max-width: 767px) {
-  .saved-items-content {
-    padding: 1rem 0;
+  .saved-items-page {
+    min-height: calc(100vh - 2rem - 70px - env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
   }
+  
+  .saved-items-page .container {
+    margin: 0;
+  }
+
+  .saved-items-content {
+    flex: 1;
+  }
+  
+  /* Mobile empty state is now handled globally in tokens.css */
   
   /* Hide header content on mobile when on saved items page */
   .saved-items-page .header-content {
@@ -87,15 +70,5 @@
     border: none;
   }
 
-  .empty-icon {
-    font-size: 2.5rem;
-  }
-
-  .empty-title {
-    font-size: 1.25rem;
-  }
-
-  .empty-content, .error-content {
-    padding: 1rem;
-  }
+  /* Mobile empty state content styles are now global in tokens.css */
 }

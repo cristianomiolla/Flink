@@ -83,8 +83,8 @@ body {
 /* === LAYOUT === */
 .container {
   max-width: 1200px;
-  margin: 0 auto;
   padding: 0 1rem;
+  margin: 0 auto;
 }
 
 @media (min-width: 768px) {
@@ -175,11 +175,68 @@ body {
   align-items: center;
   flex-direction: column;
   min-height: 300px;
-  padding: 2rem;
   text-align: center;
   background: var(--background);
   border: none;
   border-radius: 0;
+}
+
+/* Mobile adjustments for state classes */
+@media (max-width: 767px) {
+  /* Specific pages mobile empty states */
+  .saved-items-page .empty-state,
+  .messages-page .empty-state,
+  .mobile-profile-page .empty-state {
+    min-height: auto;
+    height: calc(100vh - 2rem - 70px - env(safe-area-inset-bottom));
+  }
+}
+
+/* Page-specific empty state base styles */
+
+/* Empty State Content Styles - shared across all pages */
+.empty-content {
+  text-align: center;
+  max-width: 400px;
+}
+
+/* Padding for empty content in specific pages */
+.saved-items-page .empty-content,
+.messages-page .empty-content,
+.mobile-profile-page .empty-content {
+  padding: 32px;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.6;
+}
+
+.empty-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--foreground);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.02em;
+}
+
+.empty-description {
+  color: var(--grey-dark);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* Mobile adjustments for empty state content */
+@media (max-width: 767px) {
+  .empty-icon {
+    font-size: 2.5rem;
+  }
+
+  .empty-title {
+    font-size: 1.25rem;
+  }
 }
 
 /* === GRID TITLE CLASSES === */

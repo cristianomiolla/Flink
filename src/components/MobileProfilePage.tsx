@@ -1,12 +1,20 @@
-import { useEffect } from 'react'
+import { useEffect, useState, useCallback, lazy, Suspense } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { Avatar } from './Avatar'
 import './MobileProfilePage.css'
 
+// Lazy load AuthOverlay component
+const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
+
 export function MobileProfilePage() {
   const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
+  const [showAuthOverlay, setShowAuthOverlay] = useState(false)
+
+  const handleAuthRequired = useCallback(() => {
+    setShowAuthOverlay(true)
+  }, [])
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -48,22 +56,44 @@ export function MobileProfilePage() {
   if (!user || !profile) {
     return (
       <div className="mobile-profile-page">
-        <div className="mobile-profile-loading">
-          <p>Caricamento profilo...</p>
+        <div className="container">
+          <div className="empty-state">
+            <div className="empty-content">
+              <div className="empty-icon">👤</div>
+              <h2 className="empty-title">Accedi per visualizzare il profilo</h2>
+              <p className="empty-description">Effettua il login per accedere alle impostazioni del tuo profilo e gestire il tuo account.</p>
+              <button className="action-btn" style={{ marginTop: '1.5rem' }} onClick={handleAuthRequired}>
+                Accedi
+              </button>
+            </div>
+          </div>
         </div>
+        
+        {/* Auth Overlay */}
+        {showAuthOverlay && (
+          <Suspense fallback={<div />}>
+            <AuthOverlay
+              isOpen={showAuthOverlay}
+              onClose={() => setShowAuthOverlay(false)}
+            />
+          </Suspense>
+        )}
       </div>
     )
   }
 
   return (
     <div className="mobile-profile-page">
-      <div className="mobile-profile-header">
-        <h1 className="mobile-profile-title">Profilo</h1>
-      </div>
-
       <div className="mobile-profile-content">
         {/* User Info Section */}
         <div className="mobile-profile-user">
+          <div className="mobile-profile-user-header">
+            <button className="header-icon-btn" aria-label="Notifiche" title="Notifiche">
+              <svg className="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+              </svg>
+            </button>
+          </div>
           <div className="mobile-profile-avatar">
             <Avatar
               src={profile.avatar_url}
@@ -109,7 +139,7 @@ export function MobileProfilePage() {
             className="mobile-profile-item" 
             onClick={() => {
               // TODO: Navigate to settings page when implemented
-              console.log('Settings not implemented yet')
+              alert('Impostazioni non ancora implementate')
             }}
           >
             <span className="mobile-profile-item-text">Impostazioni</span>

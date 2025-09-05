@@ -85,7 +85,7 @@
     display: flex !important;
   }
   
-  /* Add bottom padding to main content to prevent overlap */
+  /* Add padding to main content to prevent overlap */
   .app-container {
     padding-bottom: calc(70px + env(safe-area-inset-bottom));
   }

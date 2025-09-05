@@ -15,10 +15,9 @@ interface ChatListProps {
   selectedChatId: string | null
   onChatSelect: (chatId: string) => void
   onRequestDeleteChat: (chat: { id: string; participant: { name: string } }) => void
-  showOnMobile?: boolean
 }
 
-export function ChatList({ chats, selectedChatId, onChatSelect, onRequestDeleteChat, showOnMobile = true }: ChatListProps) {
+export function ChatList({ chats, selectedChatId, onChatSelect, onRequestDeleteChat }: ChatListProps) {
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp)
     const now = new Date()
@@ -45,7 +44,7 @@ export function ChatList({ chats, selectedChatId, onChatSelect, onRequestDeleteC
   }
 
   return (
-    <div className={`chat-list ${showOnMobile ? 'mobile-visible' : ''}`}>
+    <div className="chat-list">
       <div className="chat-list-header">
         <h2 className="chat-list-title">MESSAGGI</h2>
         <span className="chat-count">{chats.length} conversazioni</span>

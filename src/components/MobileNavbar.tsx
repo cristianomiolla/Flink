@@ -39,6 +39,12 @@ export function MobileNavbar({ onSearchClick }: MobileNavbarProps) {
     }
   }
 
+  // Hide navbar in mobile conversation view
+  const isConversationPage = location.pathname.startsWith('/messages/') && location.pathname !== '/messages'
+  if (isConversationPage) {
+    return null
+  }
+
   return (
     <div className="mobile-navbar">
       <button 
