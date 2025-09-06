@@ -3,6 +3,8 @@ import { MainPage } from './MainPage'
 import { ArtistProfile } from './ArtistProfile'
 import { PersonalProfile } from './PersonalProfile'
 import { SavedItemsPage } from './SavedItemsPage'
+import { FeaturedWorksPage } from './FeaturedWorksPage'
+import { FollowedArtistsWorksPage } from './FollowedArtistsWorksPage'
 import { MessagesPage } from './MessagesPage'
 import { BecomeArtistPage } from './BecomeArtistPage'
 import { MobileProfilePage } from './MobileProfilePage'
@@ -35,6 +37,8 @@ export function AppRoutes() {
       <Route path="/profile" element={<PersonalProfile />} />
       <Route path="/profile-menu" element={<MobileProfilePage />} />
       <Route path="/saved" element={<SavedItemsPage onLogoClick={handleLogoClick} onArtistClick={handleArtistClick} />} />
+      <Route path="/featured" element={<FeaturedWorksPage onLogoClick={handleLogoClick} onArtistClick={handleArtistClick} />} />
+      <Route path="/following" element={<FollowedArtistsWorksPage onLogoClick={handleLogoClick} onArtistClick={handleArtistClick} />} />
       
       {/* Messages Routes */}
       <Route path="/messages" element={<MessagesPage />} />

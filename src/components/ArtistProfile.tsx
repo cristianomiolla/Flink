@@ -200,7 +200,7 @@ export function ArtistProfile() {
                 <div className="tab-content">
                   {activeTab === 'portfolio' && (
                     <div className="tab-panel portfolio-panel">
-                      <h3>GALLERIA LAVORI {!loading && `(${regularPortfolioItems.length})`}</h3>
+                      <h3>Realizzati</h3>
                       {loading ? (
                         <div className="portfolio-loading">
                           <LoadingSpinner size="large" />
@@ -321,7 +321,7 @@ export function ArtistProfile() {
 
                   {activeTab === 'flash' && (
                     <div className="tab-panel flash-panel">
-                      <h3>DISEGNI FLASH DISPONIBILI {!loading && `(${flashItems.length})`}</h3>
+                      <h3>Flash</h3>
                       {loading ? (
                         <div className="portfolio-loading">
                           <LoadingSpinner size="large" />

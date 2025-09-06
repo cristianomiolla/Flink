@@ -570,7 +570,7 @@ export function PersonalProfile() {
                 {activeTab === 'portfolio' && (
                   <div className="tab-panel portfolio-panel">
                     <div className="tab-header">
-                      <h3>GALLERIA LAVORI ({portfolioItems.filter(item => !item.is_flash).length})</h3>
+                      <h3>Realizzati</h3>
                       <button 
                         className="action-btn"
                         onClick={() => setShowUploadOverlay(true)}
@@ -580,7 +580,7 @@ export function PersonalProfile() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M12 5v14m7-7l-7-7-7 7"></path>
                           </svg>
                         </span>
-                        <span className="action-text">Aggiungi Lavoro</span>
+                        <span className="action-text">Aggiungi</span>
                       </button>
                     </div>
                     {portfolioLoading ? (
@@ -628,7 +628,7 @@ export function PersonalProfile() {
                 {activeTab === 'flash' && (
                   <div className="tab-panel flash-panel">
                     <div className="tab-header">
-                      <h3>DISEGNI FLASH DISPONIBILI ({portfolioItems.filter(item => item.is_flash).length})</h3>
+                      <h3>Flash</h3>
                       <button 
                         className="action-btn"
                         onClick={() => {
@@ -641,7 +641,7 @@ export function PersonalProfile() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M12 5v14m7-7l-7-7-7 7"></path>
                           </svg>
                         </span>
-                        <span className="action-text">Aggiungi Lavoro</span>
+                        <span className="action-text">Aggiungi</span>
                       </button>
                     </div>
                     {portfolioLoading ? (
@@ -1040,7 +1040,7 @@ export function PersonalProfile() {
                       <path d="M12 5v14m7-7l-7-7-7 7"/>
                     </svg>
                     <span className="action-text">
-                      {isSubmitting ? 'Caricando...' : 'Aggiungi Lavoro'}
+                      {isSubmitting ? 'Caricando...' : 'Aggiungi'}
                     </span>
                   </button>
                 </div>

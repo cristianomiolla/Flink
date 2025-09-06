@@ -5,6 +5,7 @@ import type { PortfolioItem, ArtistProfile, ViewMode, DatabasePortfolioItem, Dat
 
 interface PortfolioItemWithProfile extends DatabasePortfolioItem {
   profiles: DatabaseProfile | null
+  portfolio_likes: { id: string }[] | null
 }
 
 export function usePortfolioSearch() {
@@ -35,7 +36,8 @@ export function usePortfolioSearch() {
             bio,
             avatar_url,
             location
-          )
+          ),
+          portfolio_likes!left(id)
         `)
         .eq('profiles.profile_type', 'artist')
         .order('created_at', { ascending: false })
@@ -48,17 +50,21 @@ export function usePortfolioSearch() {
       // Transform the joined data
       const transformedData: PortfolioItem[] = portfolioData?.map((item: PortfolioItemWithProfile) => {
         const profile = item.profiles
+        const likeCount = item.portfolio_likes?.length || 0
+        
         
         return {
           ...item,
           profiles: undefined, // Remove the nested profiles object
+          portfolio_likes: undefined, // Remove the nested portfolio_likes object
           description: item.description ?? '',
           tags: Array.isArray(item.tags) ? item.tags : [],
           image_url: item.image_url ?? '',
           artist_name: profile?.full_name ?? profile?.username ?? '',
           full_name: profile?.full_name ?? null,
           artist_avatar_url: profile?.avatar_url ?? null,
-          location: profile?.location ?? item.location ?? null
+          location: profile?.location ?? item.location ?? null,
+          like_count: likeCount
         }
       }) || []
 
@@ -227,6 +233,17 @@ export function usePortfolioSearch() {
     setLoading(true)
   }, [])
 
+  // Method to get portfolio items from followed artists only
+  const getFollowedArtistsItems = useCallback((followedArtistIds: string[]) => {
+    if (followedArtistIds.length === 0) {
+      return []
+    }
+
+    return portfolioItems
+      .filter(item => followedArtistIds.includes(item.user_id))
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) // Sort by creation date, newest first
+  }, [portfolioItems])
+
   // No longer need useEffect for filtering since we're using useMemo
 
   return {
@@ -245,6 +262,7 @@ export function usePortfolioSearch() {
     setFlashFilter: setFlashFilterValue,
     toggleViewMode,
     refetch: handleRefetch,
+    getFollowedArtistsItems,
     totalCount: portfolioItems.length,
     filteredCount: filteredItems.length,
     profilesCount: artistProfiles.length,

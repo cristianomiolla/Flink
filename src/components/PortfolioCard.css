@@ -235,6 +235,11 @@
   padding: 0 0 1rem 0; /* Remove all side padding, keep only bottom padding */
 }
 
+.portfolio-actions .action-btn {
+  font-size: 11px;
+  border-top: none;
+}
+
 /* Action buttons now use unified ActionButton component */
 
 /* Mobile Design - Under 768px */

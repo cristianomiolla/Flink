@@ -219,8 +219,8 @@
 }
 
 .tab-header .action-btn {
-  width: 200px !important;
-  max-width: 200px;
+  width: 150px !important;
+  max-width: 150px;
   flex-shrink: 0;
   padding: 0.5rem 0.25rem !important;
 }
@@ -569,6 +569,13 @@
   
   .tab-header h3 {
     font-size: 1.25rem;
+  }
+
+  .tab-header .action-btn {
+    width: 120px !important;
+    max-width: 120px;
+    font-size: 11px !important;
+    padding: 0.4rem 0.2rem !important;
   }
   
   .artist-portfolio-grid {

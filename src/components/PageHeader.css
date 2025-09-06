@@ -133,11 +133,6 @@
   color: var(--accent-foreground);
 }
 
-.portfolio-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-}
 
 .artist-grid {
   display: grid;

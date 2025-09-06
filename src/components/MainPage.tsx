@@ -1,11 +1,13 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from 'react'
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { SearchBar } from './SearchBar'
 import { CategoryBar } from './CategoryBar'
 import { PortfolioGrid } from './PortfolioGrid'
 import { ArtistGrid } from './ArtistGrid'
+import { HorizontalPortfolioSection } from './HorizontalPortfolioSection'
 import { usePortfolioSearch } from '../hooks/usePortfolioSearch'
 import { useAuth } from '../hooks/useAuth'
+import { useFollowedArtists } from '../hooks/useFollowedArtists'
 import LoadingSpinner from './LoadingSpinner'
 
 // Lazy load heavy modal component
@@ -30,11 +32,15 @@ export function MainPage() {
     search,
     setFlashFilter,
     toggleViewMode,
+    getFollowedArtistsItems,
     totalCount,
     filteredCount,
     profilesCount,
     filteredProfilesCount
   } = usePortfolioSearch()
+
+  // Hook per ottenere gli artisti seguiti
+  const { followedArtistIds } = useFollowedArtists()
 
   // Gestisci parametri URL al caricamento iniziale
   useEffect(() => {
@@ -86,6 +92,27 @@ export function MainPage() {
     navigate(`/messages/${artistId}`)
   }, [navigate])
 
+  const handleShowFeaturedWorks = useCallback(() => {
+    navigate('/featured')
+  }, [navigate])
+
+  const handleShowFollowedWorks = useCallback(() => {
+    navigate('/following')
+  }, [navigate])
+
+  // Memoized list of items sorted by likes for featured section
+  const featuredItems = useMemo(() => {
+    return [...portfolioItems].sort((a, b) => {
+      const aLikes = a.like_count ?? 0
+      const bLikes = b.like_count ?? 0
+      return bLikes - aLikes // Sort descending (most likes first)
+    })
+  }, [portfolioItems])
+
+  // Memoized list of items from followed artists, sorted by creation date
+  const followedArtistsItems = useMemo(() => {
+    return getFollowedArtistsItems(followedArtistIds)
+  }, [getFollowedArtistsItems, followedArtistIds])
 
   return (
     <div className="app">
@@ -105,34 +132,64 @@ export function MainPage() {
       />
       
       <main className="main-content">
-        {viewMode === 'portfolio' ? (
-          <PortfolioGrid 
-            items={portfolioItems}
-            loading={loading}
-            error={error}
-            searchTerm={searchTerm}
-            locationFilter={locationFilter}
-            flashFilter={flashFilter}
-            totalCount={totalCount}
-            filteredCount={filteredCount}
-            onArtistClick={handleArtistProfileOpen}
-            onFlashFilterChange={handleFlashFilterChange}
-            onAuthRequired={handleAuthRequired}
-            onContactArtist={handleContactArtist}
-          />
-        ) : (
-          <ArtistGrid 
-            profiles={artistProfiles}
-            loading={loading}
-            error={error}
-            searchTerm={searchTerm}
-            locationFilter={locationFilter}
-            totalCount={profilesCount}
-            filteredCount={filteredProfilesCount}
-            onArtistClick={handleArtistProfileOpen}
-            onAuthRequired={handleAuthRequired}
-            onContactArtist={handleContactArtist}
-          />
+        {/* Show horizontal sections when no search is active and in portfolio mode */}
+        {!searchTerm && !locationFilter && viewMode === 'portfolio' && flashFilter === 'all' && (
+          <>
+            {/* Featured Portfolio Section */}
+            <HorizontalPortfolioSection
+              title="Opere in evidenza"
+              items={featuredItems}
+              onArtistClick={handleArtistProfileOpen}
+              onAuthRequired={handleAuthRequired}
+              onContactArtist={handleContactArtist}
+              onShowMore={handleShowFeaturedWorks}
+            />
+            
+            {/* Following Artists Section */}
+            <HorizontalPortfolioSection
+              title="Opere degli artisti che segui"
+              items={followedArtistsItems}
+              onArtistClick={handleArtistProfileOpen}
+              onAuthRequired={handleAuthRequired}
+              onContactArtist={handleContactArtist}
+              onShowMore={handleShowFollowedWorks}
+            />
+          </>
+        )}
+        
+        {/* Show traditional grids when searching or in artist mode */}
+        {(searchTerm || locationFilter || viewMode === 'artists' || flashFilter !== 'all') && (
+          <>
+            {viewMode === 'portfolio' ? (
+              <PortfolioGrid 
+                items={portfolioItems}
+                loading={loading}
+                error={error}
+                searchTerm={searchTerm}
+                locationFilter={locationFilter}
+                flashFilter={flashFilter}
+                totalCount={totalCount}
+                filteredCount={filteredCount}
+                onArtistClick={handleArtistProfileOpen}
+                onFlashFilterChange={handleFlashFilterChange}
+                onAuthRequired={handleAuthRequired}
+                onContactArtist={handleContactArtist}
+              />
+            ) : (
+              <ArtistGrid 
+                profiles={artistProfiles}
+                loading={loading}
+                error={error}
+                searchTerm={searchTerm}
+                locationFilter={locationFilter}
+                totalCount={profilesCount}
+                filteredCount={filteredProfilesCount}
+                onArtistClick={handleArtistProfileOpen}
+                onAuthRequired={handleAuthRequired}
+                onContactArtist={handleContactArtist}
+              />
+            )}
+          </>
         )}
       </main>
       

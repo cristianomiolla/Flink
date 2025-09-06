@@ -1,0 +1,115 @@
+/* HorizontalPortfolioSection Styles */
+
+.horizontal-section {
+  margin-bottom: 3rem;
+  padding: 0;
+}
+
+/* The tab-header styles are already defined in ArtistProfile.css and imported */
+
+.horizontal-scroll-container {
+  position: relative;
+  overflow: visible; /* Allow arrows to be visible outside */
+  display: flex;
+  align-items: center;
+}
+
+.scroll-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.scroll-arrow:hover {
+  background: rgba(239, 67, 67, 0.9);
+  color: white;
+  border-color: rgba(239, 67, 67, 0.9);
+}
+
+.scroll-arrow svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+}
+
+.scroll-arrow-left {
+  left: -20px;
+}
+
+.scroll-arrow-right {
+  right: -20px;
+}
+
+.horizontal-portfolio-grid {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 0.5rem;
+  
+  /* Hide scrollbar but keep functionality */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.horizontal-portfolio-grid::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.horizontal-card-wrapper {
+  flex: 0 0 auto;
+  width: 280px;
+  scroll-snap-align: start;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .horizontal-card-wrapper {
+    width: 260px;
+  }
+}
+
+@media (max-width: 768px) {
+  .horizontal-section {
+    margin-bottom: 2rem;
+    padding: 0; /* Remove padding on mobile */
+  }
+
+  /* tab-header mobile styles are handled in ArtistProfile.css */
+
+  .horizontal-portfolio-grid {
+    gap: 1rem;
+  }
+
+  .horizontal-card-wrapper {
+    width: 240px;
+  }
+  
+  /* Hide navigation arrows on mobile */
+  .scroll-arrow {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .horizontal-card-wrapper {
+    width: 220px;
+  }
+  
+  .horizontal-portfolio-grid {
+    gap: 0.875rem;
+  }
+}

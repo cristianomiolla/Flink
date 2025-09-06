@@ -313,12 +313,12 @@
   
   
   .form-actions {
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.75rem;
   }
   
   .form-actions .action-btn {
-    width: 100%;
+    flex: 1;
     min-width: auto;
   }
   
