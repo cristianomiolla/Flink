@@ -4,11 +4,11 @@ import { useAuth } from '../hooks/useAuth'
 import { SearchBar } from './SearchBar'
 import { PageHeader } from './PageHeader'
 import { supabase } from '../lib/supabase'
+import { PasswordChangeOverlay } from './PasswordChangeOverlay'
 import './SettingsPage.css'
 import './AuthOverlay.css'
 
 // Lazy load overlay components
-const PasswordChangeOverlay = lazy(() => import('./PasswordChangeOverlay').then(module => ({ default: module.PasswordChangeOverlay })))
 const EmailChangeOverlay = lazy(() => import('./EmailChangeOverlay').then(module => ({ default: module.EmailChangeOverlay })))
 const FullNameChangeOverlay = lazy(() => import('./FullNameChangeOverlay').then(module => ({ default: module.FullNameChangeOverlay })))
 
@@ -199,12 +199,10 @@ export function SettingsPage({ onLogoClick }: SettingsPageProps) {
 
       {/* Password Change Overlay */}
       {showPasswordOverlay && (
-        <Suspense fallback={<div />}>
-          <PasswordChangeOverlay
-            isOpen={showPasswordOverlay}
-            onClose={() => setShowPasswordOverlay(false)}
-          />
-        </Suspense>
+        <PasswordChangeOverlay
+          isOpen={showPasswordOverlay}
+          onClose={() => setShowPasswordOverlay(false)}
+        />
       )}
 
       {/* Email Change Overlay */}
