@@ -142,7 +142,7 @@ export function PasswordChangeOverlay({ isOpen, onClose }: PasswordChangeOverlay
         onClose()
       }, 2000)
 
-    } catch (error) {
+    } catch {
       setErrors({ general: 'Si è verificato un errore. Riprova.' })
     } finally {
       setIsSubmitting(false)
@@ -206,7 +206,7 @@ export function PasswordChangeOverlay({ isOpen, onClose }: PasswordChangeOverlay
             {/* Current Password */}
             <div className="form-group">
               <label className="form-label" htmlFor="currentPassword">
-                Password attuale *
+                Password attuale <span className="required-indicator">*</span>
               </label>
               <input
                 id="currentPassword"
@@ -225,7 +225,7 @@ export function PasswordChangeOverlay({ isOpen, onClose }: PasswordChangeOverlay
             {/* New Password */}
             <div className="form-group">
               <label className="form-label" htmlFor="newPassword">
-                Nuova password *
+                Nuova password <span className="required-indicator">*</span>
               </label>
               <input
                 id="newPassword"
@@ -248,7 +248,7 @@ export function PasswordChangeOverlay({ isOpen, onClose }: PasswordChangeOverlay
             {/* Confirm Password */}
             <div className="form-group">
               <label className="form-label" htmlFor="confirmPassword">
-                Conferma nuova password *
+                Conferma nuova password <span className="required-indicator">*</span>
               </label>
               <input
                 id="confirmPassword"

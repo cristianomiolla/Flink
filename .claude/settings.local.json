@@ -48,7 +48,8 @@
       "Read(/C:\\Users\\crist\\OneDrive\\Documenti\\progetti\\Skunk\\src\\components/**)",
       "Read(/C:\\Users\\crist\\OneDrive\\Documenti\\progetti\\Skunk\\src\\components/**)",
       "Read(/C:\\Users\\crist\\OneDrive\\Documenti\\progetti\\Skunk\\src\\components/**)",
-      "Read(/C:\\Users\\crist\\OneDrive\\Documenti\\progetti\\Skunk\\src\\components/**)"
+      "Read(/C:\\Users\\crist\\OneDrive\\Documenti\\progetti\\Skunk\\src\\components/**)",
+      "Bash(cat:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

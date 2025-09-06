@@ -65,7 +65,7 @@
 
   /* Show mobile dropdown centered */
   .filter-dropdown-mobile {
-    position: static !important;
+    position: relative !important;
     right: auto !important;
     display: flex !important;
     justify-content: center;
@@ -82,10 +82,11 @@
   /* Mobile dropdown menu positioning */
   .filter-dropdown-mobile .filter-dropdown-menu {
     position: absolute;
-    right: auto;
-    left: 50%;
-    transform: translateX(-50%);
-    min-width: 120px;
+    top: 100%;
+    left: 0;
+    right: 0;
+    width: 100%;
+    margin-top: 0.25rem;
   }
 
   /* Hide mobile filter button */

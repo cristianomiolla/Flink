@@ -391,3 +391,44 @@
     font-size: 0.8125rem;
   }
 }
+
+/* Forgot Password Link */
+.forgot-password-container {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.forgot-password-link {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0.25rem 0;
+  transition: color 0.2s ease;
+  text-transform: none;
+}
+
+.forgot-password-link:hover:not(:disabled) {
+  color: var(--accent);
+}
+
+.forgot-password-link:disabled {
+  color: var(--muted-foreground);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Success Message */
+.success-message {
+  background: #10B981;
+  color: white;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  font-size: 0.875rem;
+}

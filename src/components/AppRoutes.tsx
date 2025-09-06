@@ -7,6 +7,7 @@ import { MessagesPage } from './MessagesPage'
 import { BecomeArtistPage } from './BecomeArtistPage'
 import { MobileProfilePage } from './MobileProfilePage'
 import { SettingsPage } from './SettingsPage'
+import { ResetPasswordPage } from './ResetPasswordPage'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
@@ -41,6 +42,7 @@ export function AppRoutes() {
       
       <Route path="/settings" element={<SettingsPage onLogoClick={handleLogoClick} />} />
       <Route path="/become-artist" element={<BecomeArtistPage onLogoClick={handleLogoClick} />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
     </Routes>
   )
 }

@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import './Avatar.css'
 
 export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg'
@@ -13,7 +14,7 @@ interface AvatarProps {
   className?: string
 }
 
-export function Avatar({ 
+export const Avatar = memo(function Avatar({ 
   src, 
   alt, 
   name, 
@@ -115,4 +116,4 @@ export function Avatar({
       )}
     </div>
   )
-}
+})

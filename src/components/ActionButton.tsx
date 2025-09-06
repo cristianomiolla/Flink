@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react'
+import { type ReactNode, memo } from 'react'
 import './ActionButton.css'
 import { useAuth } from '../hooks/useAuth'
 
@@ -14,7 +14,7 @@ export interface ActionButtonProps {
   onAuthRequired?: () => void
 }
 
-export function ActionButton({
+export const ActionButton = memo(function ActionButton({
   icon,
   text,
   variant = 'portfolio',
@@ -27,10 +27,7 @@ export function ActionButton({
 }: ActionButtonProps) {
   const { user } = useAuth()
   const baseClass = 'action-btn'
-  
-  // Use variant for potential future styling variations
-  void variant
-  
+  const variantClass = variant !== 'portfolio' ? variant : ''
   const activeClass = active ? 'active' : ''
   const disabledClass = disabled ? 'disabled' : ''
   
@@ -48,7 +45,7 @@ export function ActionButton({
   
   return (
     <button
-      className={`${baseClass} ${activeClass} ${disabledClass} ${className}`.trim()}
+      className={`${baseClass} ${variantClass} ${activeClass} ${disabledClass} ${className}`.trim()}
       onClick={handleClick}
       disabled={disabled}
     >
@@ -60,7 +57,7 @@ export function ActionButton({
       </span>
     </button>
   )
-}
+})
 
 // Icone riutilizzabili come componenti
 export const BookmarkIcon = () => (

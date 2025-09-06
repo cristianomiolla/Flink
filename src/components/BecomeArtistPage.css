@@ -102,6 +102,7 @@
   font-size: 11px;
   color: var(--grey-dark);
   margin-top: 16px;
+  margin-bottom: 0;
   background: var(--grey-light);
   padding: 1rem;
   border: 1px solid var(--border);

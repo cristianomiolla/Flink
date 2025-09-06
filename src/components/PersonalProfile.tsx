@@ -47,7 +47,8 @@ export function PersonalProfile() {
     image_url: '',
     tags: '',
     is_flash: false,
-    price: ''
+    price: '',
+    location: ''
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
@@ -165,7 +166,7 @@ export function PersonalProfile() {
           tags: uploadData.tags ? uploadData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
           is_flash: uploadData.is_flash,
           price: uploadData.price ? parseFloat(uploadData.price) : null,
-          location: profile.location || null,
+          location: uploadData.location.trim() || null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
@@ -302,7 +303,8 @@ export function PersonalProfile() {
       image_url: '',
       tags: '',
       is_flash: false,
-      price: ''
+      price: '',
+      location: ''
     })
     setSelectedFile(null)
     setFilePreview(null)
@@ -962,6 +964,25 @@ export function PersonalProfile() {
                   />
                   <div className="form-help">
                     Separa i tag con virgole
+                  </div>
+                </div>
+
+                {/* Location Field */}
+                <div className="form-group">
+                  <label htmlFor="upload_location" className="form-label">
+                    LOCALITÀ
+                  </label>
+                  <input
+                    type="text"
+                    id="upload_location"
+                    className="form-input"
+                    placeholder="Es. Milano, Italia"
+                    value={uploadData.location}
+                    onChange={(e) => setUploadData(prev => ({ ...prev, location: e.target.value }))}
+                    maxLength={100}
+                  />
+                  <div className="form-help">
+                    Dove è stato realizzato questo lavoro
                   </div>
                 </div>
 

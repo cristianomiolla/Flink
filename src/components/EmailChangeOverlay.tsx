@@ -117,7 +117,7 @@ export function EmailChangeOverlay({ isOpen, onClose }: EmailChangeOverlayProps)
         onClose()
       }, 5000)
 
-    } catch (error) {
+    } catch {
       setErrors({ general: 'Si è verificato un errore. Riprova.' })
     } finally {
       setIsSubmitting(false)
@@ -162,7 +162,7 @@ export function EmailChangeOverlay({ isOpen, onClose }: EmailChangeOverlayProps)
         <div className="auth-content">
           <div className="header-card">
             <h2>CAMBIA EMAIL</h2>
-            <p>Aggiorna l'indirizzo email del tuo account. Riceverai due email di conferma: una sulla vecchia email e una sulla nuova. Dovrai confermare entrambe per completare il cambio.</p>
+            <p>Aggiorna l'indirizzo email del tuo account</p>
           </div>
 
           {errors.general && (
@@ -199,7 +199,7 @@ export function EmailChangeOverlay({ isOpen, onClose }: EmailChangeOverlayProps)
             {/* New Email */}
             <div className="form-group">
               <label className="form-label" htmlFor="newEmail">
-                Nuova email *
+                Nuova email <span className="required-indicator">*</span>
               </label>
               <input
                 id="newEmail"
@@ -213,6 +213,10 @@ export function EmailChangeOverlay({ isOpen, onClose }: EmailChangeOverlayProps)
               {errors.newEmail && (
                 <div className="form-error">{errors.newEmail}</div>
               )}
+            </div>
+
+            <div className="warning-message" style={{ background: 'rgb(254, 243, 199)', color: 'rgb(146, 64, 14)', padding: '1rem', borderRadius: '4px', fontSize: '0.875rem' }}>
+              <strong>Attenzione:</strong> Riceverai due email di conferma: una sulla vecchia email ({user?.email}) e una sulla nuova. Dovrai confermare entrambe per completare il cambio. Fino ad allora continuerai ad accedere con la vecchia email.
             </div>
 
             <button

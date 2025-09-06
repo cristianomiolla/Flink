@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import './LoadingSpinner.css';
 
 interface LoadingSpinnerProps {
@@ -5,7 +6,7 @@ interface LoadingSpinnerProps {
   size?: 'small' | 'medium' | 'large';
 }
 
-export default function LoadingSpinner({ fullScreen = false, size = 'medium' }: LoadingSpinnerProps) {
+const LoadingSpinner = memo(function LoadingSpinner({ fullScreen = false, size = 'medium' }: LoadingSpinnerProps) {
   const sizeClasses = {
     small: { width: '12px', height: '12px', gap: '3px' },
     medium: { width: '16px', height: '16px', gap: '4px' },
@@ -40,4 +41,6 @@ export default function LoadingSpinner({ fullScreen = false, size = 'medium' }: 
       </div>
     </div>
   );
-}
+})
+
+export default LoadingSpinner

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { validatePassword, validateEmail } from '../lib/passwordValidation'
+import { supabase } from '../lib/supabase'
 import './AuthOverlay.css'
 
 interface AuthOverlayProps {
@@ -196,6 +197,37 @@ export function AuthOverlay({ isOpen, onClose }: AuthOverlayProps) {
     }
   }
 
+  const handleForgotPassword = async () => {
+    if (!formData.email.trim()) {
+      setErrors({ email: 'Inserisci la tua email per recuperare la password' })
+      return
+    }
+
+    if (!validateEmail(formData.email)) {
+      setErrors({ email: 'Inserisci un indirizzo email valido' })
+      return
+    }
+
+    setIsSubmitting(true)
+    setErrors({})
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      })
+      
+      if (error) {
+        setErrors({ general: 'Errore durante l\'invio dell\'email di recupero. Riprova.' })
+      } else {
+        setSuccessMessage('Email di recupero inviata! Controlla la tua casella postale e segui le istruzioni per reimpostare la password.')
+      }
+    } catch {
+      setErrors({ general: 'Errore imprevisto. Riprova.' })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     
@@ -283,7 +315,7 @@ export function AuthOverlay({ isOpen, onClose }: AuthOverlayProps) {
             {activeTab === 'register' && (
               <div className="form-group">
                 <label className="form-label" htmlFor="fullName">
-                  Nome Completo *
+                  Nome Completo <span className="required-indicator">*</span>
                 </label>
                 <input
                   id="fullName"
@@ -301,7 +333,7 @@ export function AuthOverlay({ isOpen, onClose }: AuthOverlayProps) {
 
             <div className="form-group">
               <label className="form-label" htmlFor="email">
-                Email *
+                Email <span className="required-indicator">*</span>
               </label>
               <input
                 id="email"
@@ -318,7 +350,7 @@ export function AuthOverlay({ isOpen, onClose }: AuthOverlayProps) {
 
             <div className="form-group">
               <label className="form-label" htmlFor="password">
-                Password *
+                Password <span className="required-indicator">*</span>
               </label>
               <input
                 id="password"
@@ -363,7 +395,7 @@ export function AuthOverlay({ isOpen, onClose }: AuthOverlayProps) {
             {activeTab === 'register' && (
               <div className="form-group">
                 <label className="form-label" htmlFor="confirmPassword">
-                  Conferma Password *
+                  Conferma Password <span className="required-indicator">*</span>
                 </label>
                 <input
                   id="confirmPassword"
@@ -376,6 +408,20 @@ export function AuthOverlay({ isOpen, onClose }: AuthOverlayProps) {
                 {errors.confirmPassword && (
                   <div className="form-error">{errors.confirmPassword}</div>
                 )}
+              </div>
+            )}
+
+            {/* Forgot Password Link - only show in login tab */}
+            {activeTab === 'login' && (
+              <div className="forgot-password-container">
+                <button
+                  type="button"
+                  className="forgot-password-link"
+                  onClick={handleForgotPassword}
+                  disabled={isSubmitting}
+                >
+                  Hai dimenticato la password?
+                </button>
               </div>
             )}
 

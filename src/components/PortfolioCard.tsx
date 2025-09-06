@@ -179,10 +179,12 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
         </h3>
 
         {/* Description */}
-        {item.description && (
+        {item.description ? (
           <p className="portfolio-description">
             {item.description}
           </p>
+        ) : (
+          <div className="portfolio-description-spacer"></div>
         )}
 
         {/* Meta Info */}

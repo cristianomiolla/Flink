@@ -168,10 +168,10 @@ export function BecomeArtistPage({ onLogoClick }: BecomeArtistPageProps) {
                 <h2>CONFERMA UPGRADE</h2>
                 <p>
                   Sei sicuro di voler diventare un artista? Questa azione cambierà il tuo profilo 
-                  da cliente ad artista.
+                  da cliente ad artista
                 </p>
                 <p className="confirmation-note">
-                  <strong>Nota:</strong> Potrai sempre tornare indietro dalle impostazioni del profilo.
+                  <strong>Nota:</strong> Potrai sempre tornare indietro dalle impostazioni del profilo
                 </p>
               </div>
               

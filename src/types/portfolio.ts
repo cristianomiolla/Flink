@@ -38,13 +38,6 @@ export interface ArtistProfile extends DatabaseProfile {
   follower_count?: number
 }
 
-export interface DatabaseFollower {
-  id: string
-  follower_id: string
-  following_id: string
-  created_at: string
-}
-
 export interface FollowerStats {
   user_id: string
   follower_count: number

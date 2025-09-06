@@ -188,6 +188,18 @@
   min-height: 39.2px;
 }
 
+/* Spacer for missing description - desktop only */
+.portfolio-description-spacer {
+  height: 39.2px;
+  margin: 0 0 0.75rem 0;
+}
+
+@media (max-width: 767px) {
+  .portfolio-description-spacer {
+    display: none;
+  }
+}
+
 .meta-info {
   display: flex;
   align-items: center;

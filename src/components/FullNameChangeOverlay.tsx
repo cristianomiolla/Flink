@@ -134,7 +134,7 @@ export function FullNameChangeOverlay({ isOpen, onClose }: FullNameChangeOverlay
         onClose()
       }, 2000)
 
-    } catch (error) {
+    } catch {
       setErrors({ general: 'Si è verificato un errore. Riprova.' })
     } finally {
       setIsSubmitting(false)
@@ -179,7 +179,7 @@ export function FullNameChangeOverlay({ isOpen, onClose }: FullNameChangeOverlay
         <div className="auth-content">
           <div className="header-card">
             <h2>CAMBIA NOME</h2>
-            <p>Aggiorna il nome visualizzato sul tuo profilo. Questo nome sarà visibile agli altri utenti.</p>
+            <p>Aggiorna il nome visualizzato sul tuo profilo. Questo nome sarà visibile agli altri utenti</p>
           </div>
 
           {errors.general && (
@@ -208,7 +208,7 @@ export function FullNameChangeOverlay({ isOpen, onClose }: FullNameChangeOverlay
             {/* New Full Name */}
             <div className="form-group">
               <label className="form-label" htmlFor="newFullName">
-                Nuovo nome *
+                Nuovo nome <span className="required-indicator">*</span>
               </label>
               <input
                 id="newFullName"
