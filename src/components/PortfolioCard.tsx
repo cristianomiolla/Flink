@@ -1,4 +1,4 @@
-import { useState, memo } from 'react'
+import { useState, memo, useRef, useEffect } from 'react'
 import './PortfolioCard.css'
 import { PortfolioModal } from './PortfolioModal'
 import { Avatar } from './Avatar'
@@ -15,12 +15,15 @@ interface PortfolioCardProps {
   onContactArtist?: (artistId: string) => void
   showDeleteButton?: boolean
   onDelete?: (itemId: string) => void
+  onEdit?: (itemId: string) => void
 }
 
-export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactArtist, showDeleteButton, onDelete }: PortfolioCardProps) {
+export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactArtist, showDeleteButton, onDelete, onEdit }: PortfolioCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [showActionsDropdown, setShowActionsDropdown] = useState(false)
   const { toggleSave, isTattooSaved } = useSavedTattoos()
   const { isLiked, likeCount, toggleLike, loading, tableExists } = usePortfolioLikes(item.id)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   
   // Badge basato sui dati del database
   const badge = item.is_flash ? 'FLASH' : 'REALIZZATO';
@@ -66,8 +69,34 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
     }
   }
 
-  const handleDelete = (e: React.MouseEvent) => {
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowActionsDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleActionsToggle = (e: React.MouseEvent) => {
     e.stopPropagation() // Previene l'apertura del modal
+    setShowActionsDropdown(!showActionsDropdown)
+  }
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowActionsDropdown(false)
+    if (onEdit) {
+      onEdit(item.id)
+    }
+  }
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowActionsDropdown(false)
     if (onDelete) {
       onDelete(item.id)
     }
@@ -76,20 +105,48 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
   return (
     <>
       <article className="card portfolio-card" onClick={handleCardClick}>
-        {/* Delete Button - solo nel profilo personale */}
+        {/* Actions Dropdown - solo nel profilo personale */}
         {showDeleteButton && (
-          <button 
-            className="modal-close-btn delete-portfolio-btn" 
-            onClick={handleDelete}
-            title="Elimina elemento"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <polyline points="3,6 5,6 21,6"></polyline>
-              <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
-              <line x1="10" y1="11" x2="10" y2="17"></line>
-              <line x1="14" y1="11" x2="14" y2="17"></line>
-            </svg>
-          </button>
+          <div className="portfolio-actions-dropdown" ref={dropdownRef}>
+            <button 
+              className="modal-close-btn portfolio-actions-btn" 
+              onClick={handleActionsToggle}
+              title="Azioni portfolio"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="1"></circle>
+                <circle cx="12" cy="5" r="1"></circle>
+                <circle cx="12" cy="19" r="1"></circle>
+              </svg>
+            </button>
+            
+            {showActionsDropdown && (
+              <div className="portfolio-actions-menu">
+                <button 
+                  className="action-btn portfolio-action-item"
+                  onClick={handleEdit}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="m18,2l4,4l-14,14h-4v-4L18,2z"></path>
+                    <path d="m13,7l4,4"></path>
+                  </svg>
+                  <span>Modifica</span>
+                </button>
+                <button 
+                  className="action-btn portfolio-action-item delete-action"
+                  onClick={handleDelete}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <polyline points="3,6 5,6 21,6"></polyline>
+                    <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                  </svg>
+                  <span>Elimina</span>
+                </button>
+              </div>
+            )}
+          </div>
         )}
         {/* Image Section */}
       <div className="image-section">

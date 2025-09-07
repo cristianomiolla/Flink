@@ -54,6 +54,8 @@ export function PersonalProfile() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [avatarPreview, setAvatarPreview] = useState<string>('')
   const [filePreview, setFilePreview] = useState<string | null>(null)
+  const [editingItemId, setEditingItemId] = useState<string | null>(null)
+  const [isEditMode, setIsEditMode] = useState(false)
 
   const handleSearch = (searchTerm: string, location: string) => {
     navigate(`/?search=${encodeURIComponent(searchTerm)}&location=${encodeURIComponent(location)}`)
@@ -156,20 +158,36 @@ export function PersonalProfile() {
         }
       }
       
-      const { error } = await supabase
-        .from('portfolio_items')
-        .insert({
-          user_id: profile.user_id,
-          title: uploadData.title.trim(),
-          description: uploadData.description.trim() || null,
-          image_url: imageUrl,
-          tags: uploadData.tags ? uploadData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
-          is_flash: uploadData.is_flash,
-          price: uploadData.price ? parseFloat(uploadData.price) : null,
-          location: uploadData.location.trim() || null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
+      const portfolioData = {
+        title: uploadData.title.trim(),
+        description: uploadData.description.trim() || null,
+        image_url: imageUrl,
+        tags: uploadData.tags ? uploadData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
+        is_flash: uploadData.is_flash,
+        price: uploadData.price ? parseFloat(uploadData.price) : null,
+        location: uploadData.location.trim() || null,
+        updated_at: new Date().toISOString()
+      }
+
+      let error
+      if (isEditMode && editingItemId) {
+        // Update existing item
+        const { error: updateError } = await supabase
+          .from('portfolio_items')
+          .update(portfolioData)
+          .eq('id', editingItemId)
+        error = updateError
+      } else {
+        // Insert new item
+        const { error: insertError } = await supabase
+          .from('portfolio_items')
+          .insert({
+            ...portfolioData,
+            user_id: profile.user_id,
+            created_at: new Date().toISOString()
+          })
+        error = insertError
+      }
 
       if (error) {
         console.error('Error uploading portfolio item:', error)
@@ -308,6 +326,8 @@ export function PersonalProfile() {
     })
     setSelectedFile(null)
     setFilePreview(null)
+    setEditingItemId(null)
+    setIsEditMode(false)
   }
 
   const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -400,6 +420,33 @@ export function PersonalProfile() {
   const handleDeletePortfolioItem = (itemId: string) => {
     setItemToDelete(itemId)
     setShowConfirmationModal(true)
+  }
+
+  // Funzione per modificare un portfolio item
+  const handleEditPortfolioItem = (itemId: string) => {
+    const itemToEdit = portfolioItems.find(item => item.id === itemId)
+    if (!itemToEdit) return
+
+    // Popola il form con i dati esistenti
+    setUploadData({
+      title: itemToEdit.title || '',
+      description: itemToEdit.description || '',
+      image_url: itemToEdit.image_url || '',
+      tags: itemToEdit.tags ? itemToEdit.tags.join(', ') : '',
+      is_flash: itemToEdit.is_flash || false,
+      price: itemToEdit.price?.toString() || '',
+      location: itemToEdit.location || ''
+    })
+
+    // Imposta l'anteprima dell'immagine se presente
+    if (itemToEdit.image_url) {
+      setFilePreview(itemToEdit.image_url)
+    }
+
+    // Imposta la modalità editing
+    setEditingItemId(itemId)
+    setIsEditMode(true)
+    setShowUploadOverlay(true)
   }
 
   // Conferma eliminazione
@@ -599,6 +646,7 @@ export function PersonalProfile() {
                             }}
                             showDeleteButton={true}
                             onDelete={handleDeletePortfolioItem}
+                            onEdit={handleEditPortfolioItem}
                           />
                         ))}
                       </div>
@@ -660,6 +708,7 @@ export function PersonalProfile() {
                             }}
                             showDeleteButton={true}
                             onDelete={handleDeletePortfolioItem}
+                            onEdit={handleEditPortfolioItem}
                           />
                         ))}
                       </div>
@@ -875,8 +924,8 @@ export function PersonalProfile() {
             
             <div className="upload-portfolio-content">
               <div className="header-card">
-                <h2>AGGIUNGI LAVORO</h2>
-                <p>Carica un nuovo lavoro nel tuo portfolio</p>
+                <h2>{isEditMode ? 'MODIFICA LAVORO' : 'AGGIUNGI LAVORO'}</h2>
+                <p>{isEditMode ? 'Modifica i dettagli del tuo lavoro' : 'Carica un nuovo lavoro nel tuo portfolio'}</p>
               </div>
 
               <form className="upload-portfolio-form" onSubmit={(e) => e.preventDefault()}>
@@ -1040,7 +1089,10 @@ export function PersonalProfile() {
                       <path d="M12 5v14m7-7l-7-7-7 7"/>
                     </svg>
                     <span className="action-text">
-                      {isSubmitting ? 'Caricando...' : 'Aggiungi'}
+                      {isSubmitting 
+                        ? (isEditMode ? 'Aggiornando...' : 'Caricando...')
+                        : (isEditMode ? 'Aggiorna' : 'Aggiungi')
+                      }
                     </span>
                   </button>
                 </div>

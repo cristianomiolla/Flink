@@ -326,24 +326,40 @@
     font-size: 15px;
   }
   
-  .portfolio-card .modal-close-btn.delete-portfolio-btn {
+  .portfolio-actions-dropdown {
     top: 0.625rem;
     right: 0.625rem;
+  }
+
+  .portfolio-card .modal-close-btn.portfolio-actions-btn {
     width: 28px;
     height: 28px;
   }
   
-  .portfolio-card .modal-close-btn.delete-portfolio-btn svg {
+  .portfolio-card .modal-close-btn.portfolio-actions-btn svg {
     width: 18px;
     height: 18px;
   }
+
+  .portfolio-actions-menu {
+    min-width: 110px;
+  }
+
+  .portfolio-action-item {
+    padding: 0.625rem;
+    font-size: 12px;
+  }
 }
 
-/* Delete Button for Portfolio Card - styled like modal-close-btn */
-.portfolio-card .modal-close-btn.delete-portfolio-btn {
+/* Portfolio Actions Dropdown */
+.portfolio-actions-dropdown {
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
+  z-index: 10;
+}
+
+.portfolio-card .modal-close-btn.portfolio-actions-btn {
   width: 32px;
   height: 32px;
   background: rgba(255, 255, 255, 0.95);
@@ -356,19 +372,65 @@
   font-weight: 300;
   color: var(--foreground);
   cursor: pointer;
-  z-index: 10;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   box-sizing: border-box;
   pointer-events: all;
 }
 
-.portfolio-card .modal-close-btn.delete-portfolio-btn:hover {
+.portfolio-card .modal-close-btn.portfolio-actions-btn:hover {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.portfolio-card .modal-close-btn.portfolio-actions-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.portfolio-actions-menu {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  right: 0;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  min-width: 120px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+}
+
+.portfolio-action-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.portfolio-action-item:last-child {
+  border-bottom: none;
+}
+
+.portfolio-action-item:hover {
+  background: var(--muted);
+}
+
+.portfolio-action-item.delete-action:hover {
   background: #EF4343;
   color: #ffffff;
 }
 
-.portfolio-card .modal-close-btn.delete-portfolio-btn svg {
-  width: 20px;
-  height: 20px;
+.portfolio-action-item svg {
+  width: 16px;
+  height: 16px;
 }
