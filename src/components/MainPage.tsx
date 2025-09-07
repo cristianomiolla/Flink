@@ -96,6 +96,14 @@ export function MainPage() {
     navigate('/featured')
   }, [navigate])
 
+  const handleShowFeaturedArtists = useCallback(() => {
+    navigate('/featured-artists')
+  }, [navigate])
+
+  const handleShowRecentArtists = useCallback(() => {
+    navigate('/recent-artists')
+  }, [navigate])
+
   const handleShowFollowedWorks = useCallback(() => {
     navigate('/following')
   }, [navigate])
@@ -213,6 +221,8 @@ export function MainPage() {
                 onArtistClick={handleArtistProfileOpen}
                 onAuthRequired={handleAuthRequired}
                 onContactArtist={handleContactArtist}
+                onShowMoreFeatured={handleShowFeaturedArtists}
+                onShowMoreRecent={handleShowRecentArtists}
               />
             )}
           </>
