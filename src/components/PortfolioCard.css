@@ -441,3 +441,36 @@
   width: 16px;
   height: 16px;
 }
+
+/* Mobile-only grid: Show only images in 3-column layout */
+@media (max-width: 767px) {
+  /* Hide everything except the image */
+  .portfolio-grid .portfolio-card .content-section,
+  .portfolio-grid .portfolio-card .badge,
+  .portfolio-grid .portfolio-card .price,
+  .portfolio-grid .portfolio-card .portfolio-actions-dropdown {
+    display: none !important;
+  }
+  
+  /* Make the card just the image */
+  .portfolio-grid .portfolio-card {
+    height: auto;
+    border-radius: 0;
+  }
+  
+  .portfolio-grid .image-section {
+    /* Square aspect ratio for mobile grid */
+    aspect-ratio: 1 / 1;
+    border-radius: 0;
+  }
+  
+  .portfolio-grid .portfolio-image {
+    border-radius: 0;
+    border-bottom: none;
+  }
+  
+  .portfolio-grid .image-placeholder {
+    border-bottom: none;
+    border-radius: 0;
+  }
+}
