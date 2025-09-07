@@ -636,7 +636,7 @@ export function PersonalProfile() {
                         <p>Caricamento portfolio...</p>
                       </div>
                     ) : portfolioItems.filter(item => !item.is_flash).length > 0 ? (
-                      <div className="artist-portfolio-grid">
+                      <div className="portfolio-grid">
                         {portfolioItems.filter(item => !item.is_flash).map((item) => (
                           <PortfolioCard
                             key={item.id}
@@ -698,7 +698,7 @@ export function PersonalProfile() {
                         <p>Caricamento flash...</p>
                       </div>
                     ) : portfolioItems.filter(item => item.is_flash).length > 0 ? (
-                      <div className="artist-portfolio-grid">
+                      <div className="portfolio-grid">
                         {portfolioItems.filter(item => item.is_flash).map((item) => (
                           <PortfolioCard
                             key={item.id}

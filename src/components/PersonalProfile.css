@@ -455,11 +455,7 @@
   border-radius: 0 !important;
 }
 
-/* Tab Content */
-.tab-content {
-  padding: 16px;
-  min-height: 400px;
-}
+/* Tab Content - styles moved to ArtistProfile.css to avoid duplication */
 
 /* Mobile Responsiveness for Tabs */
 @media (max-width: 767px) {

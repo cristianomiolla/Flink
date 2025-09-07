@@ -183,7 +183,7 @@
 
 /* Tab Content */
 .tab-content {
-  padding: 2rem;
+  padding: 0 2rem 2rem 2rem;
   min-height: 400px;
 }
 
@@ -225,12 +225,7 @@
   padding: 0.5rem 0.25rem !important;
 }
 
-/* Portfolio Tab Styles - Fixed 3 columns layout */
-.artist-portfolio-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-}
+/* Portfolio Tab Styles - Now uses .portfolio-grid from PortfolioGrid.css */
 
 
 /* Loading state styles */
@@ -554,7 +549,7 @@
   }
   
   .tab-content {
-    padding: 1.5rem;
+    padding: 0 8px 8px 8px;
     min-height: 300px;
   }
   
@@ -578,10 +573,7 @@
     padding: 0.4rem 0.2rem !important;
   }
   
-  .artist-portfolio-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
+  /* artist-portfolio-grid removed - now uses .portfolio-grid from PortfolioGrid.css */
   
   .empty-portfolio {
     min-height: 200px;

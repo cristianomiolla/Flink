@@ -207,7 +207,7 @@ export function ArtistProfile() {
                           <p>Caricamento portfolio...</p>
                         </div>
                       ) : regularPortfolioItems.length > 0 ? (
-                        <div className="artist-portfolio-grid">
+                        <div className="portfolio-grid">
                           {regularPortfolioItems.map((item) => (
                             <PortfolioCard
                               key={item.id}
@@ -328,7 +328,7 @@ export function ArtistProfile() {
                           <p>Caricamento flash...</p>
                         </div>
                       ) : flashItems.length > 0 ? (
-                        <div className="artist-portfolio-grid">
+                        <div className="portfolio-grid">
                           {flashItems.map((item) => (
                             <PortfolioCard
                               key={item.id}
