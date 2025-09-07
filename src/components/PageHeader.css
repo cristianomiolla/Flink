@@ -241,7 +241,6 @@
     font-size: 13px;
   }
   
-  .portfolio-grid,
   .artist-grid {
     grid-template-columns: 1fr;
     gap: 1.25rem;
