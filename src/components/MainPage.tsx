@@ -16,7 +16,7 @@ const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default
 export function MainPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { profile } = useAuth()
+  const { profile, user } = useAuth()
   const [searchSource, setSearchSource] = useState<'search-bar' | 'category' | null>(null)
   const [showAuthOverlay, setShowAuthOverlay] = useState(false)
   
@@ -100,6 +100,10 @@ export function MainPage() {
     navigate('/following')
   }, [navigate])
 
+  const handleShowRecentWorks = useCallback(() => {
+    navigate('/recent')
+  }, [navigate])
+
   // Memoized list of items sorted by likes for featured section
   const featuredItems = useMemo(() => {
     return [...portfolioItems].sort((a, b) => {
@@ -113,6 +117,15 @@ export function MainPage() {
   const followedArtistsItems = useMemo(() => {
     return getFollowedArtistsItems(followedArtistIds)
   }, [getFollowedArtistsItems, followedArtistIds])
+
+  // Memoized list of all items sorted by most recent
+  const recentItems = useMemo(() => {
+    return [...portfolioItems].sort((a, b) => {
+      const aDate = new Date(a.created_at).getTime()
+      const bDate = new Date(b.created_at).getTime()
+      return bDate - aDate // Sort descending (most recent first)
+    })
+  }, [portfolioItems])
 
   return (
     <div className="app">
@@ -137,7 +150,7 @@ export function MainPage() {
           <>
             {/* Featured Portfolio Section */}
             <HorizontalPortfolioSection
-              title="Opere in evidenza"
+              title="In evidenza"
               items={featuredItems}
               onArtistClick={handleArtistProfileOpen}
               onAuthRequired={handleAuthRequired}
@@ -145,14 +158,26 @@ export function MainPage() {
               onShowMore={handleShowFeaturedWorks}
             />
             
-            {/* Following Artists Section */}
+            {/* Following Artists Section - Only for authenticated users */}
+            {user && (
+              <HorizontalPortfolioSection
+                title="Artisti che segui"
+                items={followedArtistsItems}
+                onArtistClick={handleArtistProfileOpen}
+                onAuthRequired={handleAuthRequired}
+                onContactArtist={handleContactArtist}
+                onShowMore={handleShowFollowedWorks}
+              />
+            )}
+            
+            {/* Recent Works Section */}
             <HorizontalPortfolioSection
-              title="Opere degli artisti che segui"
-              items={followedArtistsItems}
+              title="Uscite recentemente"
+              items={recentItems}
               onArtistClick={handleArtistProfileOpen}
               onAuthRequired={handleAuthRequired}
               onContactArtist={handleContactArtist}
-              onShowMore={handleShowFollowedWorks}
+              onShowMore={handleShowRecentWorks}
             />
           </>
         )}

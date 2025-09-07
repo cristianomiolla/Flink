@@ -115,10 +115,6 @@
     border-bottom: none;
   }
   
-  /* Ensure main content has proper spacing */
-  .main-content {
-    padding-bottom: calc(70px + env(safe-area-inset-bottom));
-  }
   
 }
 

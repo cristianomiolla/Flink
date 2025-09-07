@@ -23,6 +23,8 @@ export function FeaturedWorksPage({ onLogoClick, onArtistClick }: FeaturedWorksP
   const { profile } = useAuth()
   const { portfolioItems, loading, error } = usePortfolioSearch()
   const [showAuthOverlay, setShowAuthOverlay] = useState(false)
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false)
+  const [flashFilter, setFlashFilter] = useState<'all' | 'flash' | 'realized'>('all')
 
   const handleAuthRequired = useCallback(() => {
     setShowAuthOverlay(true)
@@ -41,25 +43,49 @@ export function FeaturedWorksPage({ onLogoClick, onArtistClick }: FeaturedWorksP
     }
   }, [navigate, profile])
 
+  const handleFilterSelect = useCallback((filter: 'all' | 'flash' | 'realized') => {
+    setFlashFilter(filter)
+    setIsFilterDropdownOpen(false)
+  }, [])
+
+  const getFilterLabel = useCallback((filter: 'all' | 'flash' | 'realized') => {
+    switch (filter) {
+      case 'flash': return 'Flash'
+      case 'realized': return 'Realizzati'
+      default: return 'Tutti'
+    }
+  }, [])
+
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
 
-  // Memoized list of items sorted by likes for featured section
+  // Memoized list of items sorted by likes and filtered by flash status
   const featuredItems = useMemo(() => {
-    return [...portfolioItems].sort((a, b) => {
+    let filteredItems = [...portfolioItems]
+    
+    // Apply flash filter
+    if (flashFilter === 'flash') {
+      filteredItems = filteredItems.filter(item => item.is_flash === true)
+    } else if (flashFilter === 'realized') {
+      filteredItems = filteredItems.filter(item => item.is_flash === false)
+    }
+    // 'all' shows everything, no additional filtering needed
+    
+    // Sort by likes (most likes first)
+    return filteredItems.sort((a, b) => {
       const aLikes = a.like_count ?? 0
       const bLikes = b.like_count ?? 0
-      return bLikes - aLikes // Sort descending (most likes first)
+      return bLikes - aLikes
     })
-  }, [portfolioItems])
+  }, [portfolioItems, flashFilter])
 
   if (loading) {
     return (
-      <div className="saved-items-page">
+      <div className="page-container">
         <SearchBar onLogoClick={onLogoClick} hideOnMobile={true} />
-        <div className="saved-items-loading">
+        <div className="page-loading">
           <LoadingSpinner />
         </div>
       </div>
@@ -93,7 +119,7 @@ export function FeaturedWorksPage({ onLogoClick, onArtistClick }: FeaturedWorksP
 
         {/* Content area */}
         {(featuredItems.length > 0 || error) && (
-          <div className="saved-items-content">
+          <div className="page-content">
             {/* Header */}
             {featuredItems.length > 0 && (
               <PageHeader 
@@ -103,6 +129,47 @@ export function FeaturedWorksPage({ onLogoClick, onArtistClick }: FeaturedWorksP
                 ) : (
                   `${featuredItems.length} opere in evidenza`
                 )}
+                actions={
+                  <div className="filter-dropdown">
+                    <button 
+                      className="action-btn" 
+                      aria-expanded={isFilterDropdownOpen}
+                      onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
+                    >
+                      <svg className="filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/>
+                      </svg>
+                      <span className="action-text">{getFilterLabel(flashFilter)}</span>
+                      <span className="action-icon">
+                        <svg className={`chevron-icon ${isFilterDropdownOpen ? 'open' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <polyline points="6,9 12,15 18,9"/>
+                        </svg>
+                      </span>
+                    </button>
+                    {isFilterDropdownOpen && (
+                      <div className="filter-dropdown-menu">
+                        <button 
+                          className={`action-btn ${flashFilter === 'all' ? 'active' : ''}`}
+                          onClick={() => handleFilterSelect('all')}
+                        >
+                          <span className="action-text">Tutti</span>
+                        </button>
+                        <button 
+                          className={`action-btn ${flashFilter === 'flash' ? 'active' : ''}`}
+                          onClick={() => handleFilterSelect('flash')}
+                        >
+                          <span className="action-text">Flash</span>
+                        </button>
+                        <button 
+                          className={`action-btn ${flashFilter === 'realized' ? 'active' : ''}`}
+                          onClick={() => handleFilterSelect('realized')}
+                        >
+                          <span className="action-text">Realizzati</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                }
               />
             )}
 

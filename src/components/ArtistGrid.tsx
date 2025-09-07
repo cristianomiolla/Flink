@@ -55,17 +55,20 @@ export function ArtistGrid({
     >
       <section className="grid-container">
         <div className="container">
-          <GridHeader title="Artisti">
-            <GridStats
-              count={hasSearchTerms ? filteredCount : totalCount}
-              label={hasSearchTerms ? 'risultati' : 'artisti totali'}
-            />
-            
-            <GridSearchInfo
-              searchTerm={searchTerm}
-              locationFilter={locationFilter}
-            />
-          </GridHeader>
+          <GridHeader 
+            title="ARTISTI"
+            subtitle={hasSearchTerms ? (
+              filteredCount === 1 ? '1 risultato' : `${filteredCount} risultati`
+            ) : (
+              totalCount === 1 ? '1 artista totale' : `${totalCount} artisti totali`
+            )}
+            searchInfo={
+              <GridSearchInfo
+                searchTerm={searchTerm}
+                locationFilter={locationFilter}
+              />
+            }
+          />
 
           <div className="artist-grid">
             {profiles.map((profile) => (

@@ -12,6 +12,13 @@
 .page-header .header-card {
   text-align: center;
   margin-bottom: 2rem;
+  position: relative;
+}
+
+.page-header .header-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .page-header .header-card h2 {
@@ -67,6 +74,7 @@
   width: 14px;
   height: 14px;
   stroke-width: 2;
+  margin-right: 0.25rem;
 }
 
 .filter-label {
@@ -96,6 +104,14 @@
   z-index: 1000;
   min-width: 120px;
   margin-top: 2px;
+}
+
+.filter-dropdown-menu .action-btn {
+  display: block;
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  border: none;
 }
 
 .filter-option {
@@ -206,8 +222,16 @@
     right: auto;
   }
 
-  .header-actions {
+  .page-header .header-actions {
     position: static;
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+  
+  .page-header .header-card {
+    display: flex;
+    flex-direction: column;
   }
   
   .grid-title {

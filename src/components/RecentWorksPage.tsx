@@ -6,7 +6,6 @@ import { PageHeader } from './PageHeader'
 import LoadingSpinner from './LoadingSpinner'
 import { PortfolioCard } from './PortfolioCard'
 import { usePortfolioSearch } from '../hooks/usePortfolioSearch'
-import { useFollowedArtists } from '../hooks/useFollowedArtists'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import type { PortfolioItem } from '../types/portfolio'
@@ -14,16 +13,15 @@ import type { PortfolioItem } from '../types/portfolio'
 // Lazy load AuthOverlay component
 const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
 
-interface FollowedArtistsWorksPageProps {
+interface RecentWorksPageProps {
   onLogoClick?: () => void
   onArtistClick?: (artistId: string) => void
 }
 
-export function FollowedArtistsWorksPage({ onLogoClick, onArtistClick }: FollowedArtistsWorksPageProps) {
+export function RecentWorksPage({ onLogoClick, onArtistClick }: RecentWorksPageProps) {
   const navigate = useNavigate()
-  const { profile, user } = useAuth()
-  const { getFollowedArtistsItems, loading, error } = usePortfolioSearch()
-  const { followedArtistIds, loading: followedLoading } = useFollowedArtists()
+  const { profile } = useAuth()
+  const { portfolioItems, loading, error } = usePortfolioSearch()
   const [showAuthOverlay, setShowAuthOverlay] = useState(false)
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false)
   const [flashFilter, setFlashFilter] = useState<'all' | 'flash' | 'realized'>('all')
@@ -63,24 +61,27 @@ export function FollowedArtistsWorksPage({ onLogoClick, onArtistClick }: Followe
     window.scrollTo(0, 0)
   }, [])
 
-  // Memoized list of items from followed artists, sorted by creation date and filtered by flash status
-  const followedArtistsItems = useMemo(() => {
-    let items = getFollowedArtistsItems(followedArtistIds)
+  // Memoized list of items sorted by creation date and filtered by flash status
+  const recentItems = useMemo(() => {
+    let filteredItems = [...portfolioItems]
     
     // Apply flash filter
     if (flashFilter === 'flash') {
-      items = items.filter(item => item.is_flash === true)
+      filteredItems = filteredItems.filter(item => item.is_flash === true)
     } else if (flashFilter === 'realized') {
-      items = items.filter(item => item.is_flash === false)
+      filteredItems = filteredItems.filter(item => item.is_flash === false)
     }
     // 'all' shows everything, no additional filtering needed
     
-    return items
-  }, [getFollowedArtistsItems, followedArtistIds, flashFilter])
+    // Sort by creation date (most recent first)
+    return filteredItems.sort((a, b) => {
+      const aDate = new Date(a.created_at).getTime()
+      const bDate = new Date(b.created_at).getTime()
+      return bDate - aDate
+    })
+  }, [portfolioItems, flashFilter])
 
-  const isLoading = loading || followedLoading
-
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="page-container">
         <SearchBar onLogoClick={onLogoClick} hideOnMobile={true} />
@@ -96,57 +97,37 @@ export function FollowedArtistsWorksPage({ onLogoClick, onArtistClick }: Followe
       <SearchBar onLogoClick={onLogoClick} hideOnMobile={true} />
       
       <div className="container">
-        {/* Empty state - not authenticated */}
-        {!user && (
+        {/* Empty state */}
+        {!error && recentItems.length === 0 && (
           <div className="empty-state">
             <div className="empty-content">
-              <div className="empty-icon">👥</div>
-              <h2 className="empty-title">Accedi per vedere le opere degli artisti che segui</h2>
+              <div className="empty-icon">🆕</div>
+              <h2 className="empty-title">Nessuna opera recente</h2>
               <p className="empty-description">
-                Effettua il login per vedere le opere più recenti degli artisti che hai deciso di seguire.
-              </p>
-              <button 
-                className="action-btn" 
-                onClick={handleAuthRequired}
-                style={{ marginTop: '1.5rem' }}
-              >
-                Accedi
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Empty state - authenticated but no followed artists */}
-        {user && !error && followedArtistsItems.length === 0 && (
-          <div className="empty-state">
-            <div className="empty-content">
-              <div className="empty-icon">👥</div>
-              <h2 className="empty-title">Non segui ancora nessun artista</h2>
-              <p className="empty-description">
-                Inizia a seguire degli artisti per vedere le loro opere più recenti qui. Esplora i portfolio e trova i tuoi artisti preferiti.
+                Non ci sono ancora opere da mostrare. Torna più tardi per scoprire le ultime opere pubblicate dalla community.
               </p>
               <button 
                 className="action-btn" 
                 onClick={onLogoClick}
                 style={{ marginTop: '1.5rem' }}
               >
-                Esplora Artisti
+                Torna alla Home
               </button>
             </div>
           </div>
         )}
 
         {/* Content area */}
-        {user && (followedArtistsItems.length > 0 || error) && (
+        {(recentItems.length > 0 || error) && (
           <div className="page-content">
             {/* Header */}
-            {followedArtistsItems.length > 0 && (
+            {recentItems.length > 0 && (
               <PageHeader 
-                title="OPERE DEGLI ARTISTI CHE SEGUI"
-                subtitle={followedArtistsItems.length === 1 ? (
+                title="USCITE RECENTEMENTE"
+                subtitle={recentItems.length === 1 ? (
                   '1 opera recente'
                 ) : (
-                  `${followedArtistsItems.length} opere recenti`
+                  `${recentItems.length} opere recenti`
                 )}
                 actions={
                   <div className="filter-dropdown">
@@ -208,9 +189,9 @@ export function FollowedArtistsWorksPage({ onLogoClick, onArtistClick }: Followe
             )}
 
             {/* Grid */}
-            {!error && followedArtistsItems.length > 0 && (
+            {!error && recentItems.length > 0 && (
               <div className="portfolio-grid">
-                {followedArtistsItems.map(item => (
+                {recentItems.map(item => (
                   <PortfolioCard
                     key={item.id}
                     item={item}

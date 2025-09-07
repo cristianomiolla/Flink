@@ -12,16 +12,6 @@
   display: inline-block;
 }
 
-/* Mobile filter dropdown - hidden on desktop */
-.filter-dropdown-mobile {
-  display: none;
-}
-
-/* Desktop filter dropdown */
-.filter-dropdown-desktop {
-  position: relative;
-  display: inline-block;
-}
 
 .filter-dropdown-menu {
   position: absolute;
@@ -58,35 +48,10 @@
     gap: 1rem;
   }
 
-  /* Hide desktop dropdown on mobile */
-  .filter-dropdown-desktop {
-    display: none;
-  }
-
-  /* Show mobile dropdown centered */
-  .filter-dropdown-mobile {
-    position: relative !important;
-    right: auto !important;
-    display: flex !important;
-    justify-content: center;
-    margin-bottom: 1rem;
-    width: 100%;
-  }
-
   .filter-dropdown-menu {
     right: 0;
     left: auto;
     min-width: 110px;
-  }
-
-  /* Mobile dropdown menu positioning */
-  .filter-dropdown-mobile .filter-dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    width: 100%;
-    margin-top: 0.25rem;
   }
 
   /* Hide mobile filter button */

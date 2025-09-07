@@ -184,7 +184,7 @@ body {
 /* Mobile adjustments for state classes */
 @media (max-width: 767px) {
   /* Specific pages mobile empty states */
-  .saved-items-page .empty-state,
+  .page-container .empty-state,
   .messages-page .empty-state,
   .mobile-profile-page .empty-state {
     min-height: auto;
@@ -201,7 +201,7 @@ body {
 }
 
 /* Padding for empty content in specific pages */
-.saved-items-page .empty-content,
+.page-container .empty-content,
 .messages-page .empty-content,
 .mobile-profile-page .empty-content {
   padding: 32px;

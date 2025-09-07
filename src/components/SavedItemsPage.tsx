@@ -127,9 +127,9 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
 
   if (loading || savedLoading) {
     return (
-      <div className="saved-items-page">
+      <div className="page-container">
         <SearchBar onLogoClick={onLogoClick} hideOnMobile={true} />
-        <div className="saved-items-loading">
+        <div className="page-loading">
           <LoadingSpinner />
         </div>
       </div>
@@ -137,11 +137,11 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
   }
 
   return (
-    <div className="saved-items-page">
+    <div className="page-container">
       <SearchBar onLogoClick={onLogoClick} hideOnMobile={true} />
       
       <div className="container">
-        {/* Empty state - outside saved-items-content */}
+        {/* Empty state - outside page-content */}
         {!error && savedItems.length === 0 && (
           <div className="empty-state">
             <div className="empty-content">
@@ -168,7 +168,7 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
 
         {/* Content area only when there are items or errors */}
         {(savedItems.length > 0 || error) && (
-          <div className="saved-items-content">
+          <div className="page-content">
           {/* Header - solo se ci sono elementi salvati */}
           {savedItems.length > 0 && (
             <PageHeader 

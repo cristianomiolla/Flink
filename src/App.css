@@ -48,7 +48,7 @@
 /* Mobile Design - Under 768px */
 @media (max-width: 767px) {
   .main-content {
-    padding: 1rem 0;
+    padding: 24px 0 1rem 0;
   }
   
 }

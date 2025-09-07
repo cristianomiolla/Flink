@@ -3,24 +3,20 @@ import './GridHeader.css'
 
 interface GridHeaderProps {
   title: string
-  children?: ReactNode
-  className?: string
+  subtitle?: string
+  searchInfo?: ReactNode
   actions?: ReactNode
+  className?: string
 }
 
-export function GridHeader({ title, children, className = '', actions }: GridHeaderProps) {
+export function GridHeader({ title, subtitle, searchInfo, actions, className = '' }: GridHeaderProps) {
   return (
-    <div className={`grid-header ${className}`}>
-      <div className="grid-header-card">
-        {actions && (
-          <div className="grid-header-top-actions">
-            {actions}
-          </div>
-        )}
-        <h2 className="grid-header-title">{title}</h2>
-        <div className="grid-header-content">
-          {children}
-        </div>
+    <div className={`page-header ${className}`}>
+      <div className="header-card">
+        <h2>{title}</h2>
+        {subtitle && <p>{subtitle}</p>}
+        {searchInfo}
+        {actions && <div className="header-actions">{actions}</div>}
       </div>
     </div>
   )
@@ -61,9 +57,9 @@ export function GridSearchInfo({ searchTerm, locationFilter }: GridSearchInfoPro
   if (!searchTerm && !locationFilter) return null
   
   return (
-    <div className="grid-search-info">
-      {searchTerm && <span className="grid-search-term">"{searchTerm}"</span>}
-      {locationFilter && <span className="grid-location-term">{locationFilter}</span>}
+    <div className="search-info">
+      {searchTerm && <span className="search-term">"{searchTerm}"</span>}
+      {locationFilter && <span className="location-term">{locationFilter}</span>}
     </div>
   )
 }

@@ -442,7 +442,14 @@
   }
   
   .modal-portfolio-actions .action-btn.modal {
-    padding-bottom: 0;
+    font-size: 11px !important;
+    padding: 8px 12px !important;
+    padding-bottom: 8px !important;
+  }
+  
+  .modal-portfolio-actions .action-btn {
+    font-size: 11px !important;
+    padding: 8px 12px !important;
   }
   
   .modal-portfolio-actions .action-btn:nth-child(1) {
