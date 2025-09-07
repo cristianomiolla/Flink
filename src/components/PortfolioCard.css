@@ -105,7 +105,7 @@
 
 /* Content Section */
 .content-section {
-  padding: 0 1.5rem 1rem 1.5rem; /* Remove top padding, keep sides and bottom */
+  padding: 0 1.25rem 1rem 1.25rem; /* Remove top padding, keep sides and bottom */
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -194,11 +194,6 @@
   margin: 0 0 0.75rem 0;
 }
 
-@media (max-width: 767px) {
-  .portfolio-description-spacer {
-    display: none;
-  }
-}
 
 .meta-info {
   display: flex;
@@ -240,6 +235,18 @@
   border-top: none;
 }
 
+/* Artist card overrides when using portfolio-actions */
+.artist-card .portfolio-actions .action-btn {
+  border-top: 1px solid var(--border);
+}
+
+/* Mobile: font-size 11px for artist-card in search results */
+@media (max-width: 767px) {
+  .artist-card .portfolio-actions .action-btn {
+    font-size: 11px;
+  }
+}
+
 /* Action buttons now use unified ActionButton component */
 
 /* Mobile Design - Under 768px */
@@ -253,7 +260,7 @@
   }
   
   .content-section {
-    padding: 0.875rem 1.25rem;
+    padding: 0.75rem 1rem;
   }
   
   .portfolio-title {
@@ -274,6 +281,11 @@
   .portfolio-description {
     font-size: 13px;
     margin-bottom: 0.75rem;
+  }
+  
+  .portfolio-description-spacer {
+    height: 26px;
+    margin: 0 0 0.75rem 0;
   }
   
   .portfolio-tag {
@@ -317,11 +329,6 @@
     padding-bottom: 0; /* Remove bottom padding for mobile */
   }
 
-  .action-btn {
-    font-size: 13px;
-    padding: 0.5rem 0.75rem;
-  }
-
   .action-icon {
     font-size: 15px;
   }
@@ -331,12 +338,12 @@
     right: 0.625rem;
   }
 
-  .portfolio-card .modal-close-btn.portfolio-actions-btn {
+  .portfolio-card .portfolio-edit-delete-btn {
     width: 28px;
     height: 28px;
   }
   
-  .portfolio-card .modal-close-btn.portfolio-actions-btn svg {
+  .portfolio-card .portfolio-edit-delete-btn svg {
     width: 18px;
     height: 18px;
   }
@@ -359,7 +366,7 @@
   z-index: 10;
 }
 
-.portfolio-card .modal-close-btn.portfolio-actions-btn {
+.portfolio-card .portfolio-edit-delete-btn {
   width: 32px;
   height: 32px;
   background: rgba(255, 255, 255, 0.95);
@@ -378,12 +385,12 @@
   pointer-events: all;
 }
 
-.portfolio-card .modal-close-btn.portfolio-actions-btn:hover {
+.portfolio-card .portfolio-edit-delete-btn:hover {
   background: var(--accent);
   color: #ffffff;
 }
 
-.portfolio-card .modal-close-btn.portfolio-actions-btn svg {
+.portfolio-card .portfolio-edit-delete-btn svg {
   width: 20px;
   height: 20px;
 }

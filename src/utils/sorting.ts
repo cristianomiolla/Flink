@@ -68,8 +68,7 @@ export const filterAndSortItems = (
   if (filters.location) {
     const locationLower = filters.location.toLowerCase()
     filtered = filtered.filter(item =>
-      item.location?.toLowerCase().includes(locationLower) ||
-      item.profiles?.location?.toLowerCase().includes(locationLower)
+      item.location?.toLowerCase().includes(locationLower)
     )
   }
 

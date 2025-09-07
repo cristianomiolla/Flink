@@ -28,7 +28,6 @@ export function ArtistGrid({
   error, 
   searchTerm, 
   locationFilter,
-  totalCount,
   filteredCount,
   onArtistClick,
   onAuthRequired,

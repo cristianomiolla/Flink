@@ -112,11 +112,6 @@
 
 /* Mobile responsive */
 @media (max-width: 767px) {
-  .action-btn {
-    font-size: 13px;
-    padding: 0.5rem 0.75rem;
-  }
-  
   .action-btn.modal {
     padding: 1rem 1.5rem;
     font-size: 16px;

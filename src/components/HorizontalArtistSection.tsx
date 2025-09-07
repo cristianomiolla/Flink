@@ -1,26 +1,26 @@
 import { useRef, useState, useEffect } from 'react'
-import { type PortfolioItem } from '../types/portfolio'
-import { PortfolioCard } from './PortfolioCard'
+import { type ArtistProfile } from '../types/portfolio'
+import { ArtistCard } from './ArtistCard'
 import './HorizontalPortfolioSection.css'
 import './ArtistProfile.css' // Import for .tab-header styles
 
-interface HorizontalPortfolioSectionProps {
+interface HorizontalArtistSectionProps {
   title: string
-  items: PortfolioItem[]
+  artists: ArtistProfile[]
   onArtistClick?: (artistId: string) => void
   onAuthRequired?: () => void
   onContactArtist?: (artistId: string) => void
   onShowMore?: () => void
 }
 
-export function HorizontalPortfolioSection({ 
+export function HorizontalArtistSection({ 
   title, 
-  items, 
+  artists, 
   onArtistClick, 
   onAuthRequired, 
   onContactArtist,
   onShowMore 
-}: HorizontalPortfolioSectionProps) {
+}: HorizontalArtistSectionProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [showLeftArrow, setShowLeftArrow] = useState(false)
   const [showRightArrow, setShowRightArrow] = useState(true)
@@ -39,7 +39,7 @@ export function HorizontalPortfolioSection({
 
   useEffect(() => {
     updateArrowVisibility()
-  }, [items])
+  }, [artists])
 
   useEffect(() => {
     const container = scrollContainerRef.current
@@ -105,13 +105,14 @@ export function HorizontalPortfolioSection({
             ref={scrollContainerRef}
             className="horizontal-portfolio-grid"
           >
-            {items.slice(0, 12).map((item) => (
-              <div key={item.id} className="horizontal-card-wrapper">
-                <PortfolioCard 
-                  item={item}
+            {artists.slice(0, 12).map((artist) => (
+              <div key={artist.id} className="horizontal-card-wrapper">
+                <ArtistCard 
+                  profile={artist}
                   onArtistClick={onArtistClick}
                   onAuthRequired={onAuthRequired}
                   onContactArtist={onContactArtist}
+                  isHorizontal={true}
                 />
               </div>
             ))}

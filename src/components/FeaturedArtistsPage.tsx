@@ -9,7 +9,6 @@ import { usePortfolioSearch } from '../hooks/usePortfolioSearch'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { useFollowers } from '../hooks/useFollowers'
-import type { ArtistProfile } from '../types/portfolio'
 
 // Lazy load AuthOverlay component
 const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))

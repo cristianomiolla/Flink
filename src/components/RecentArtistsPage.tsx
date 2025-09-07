@@ -8,8 +8,6 @@ import { ArtistCard } from './ArtistCard'
 import { usePortfolioSearch } from '../hooks/usePortfolioSearch'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
-import { useFollowers } from '../hooks/useFollowers'
-import type { ArtistProfile } from '../types/portfolio'
 
 // Lazy load AuthOverlay component
 const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
@@ -22,7 +20,6 @@ export function RecentArtistsPage({ onLogoClick }: RecentArtistsPageProps) {
   const navigate = useNavigate()
   const { profile } = useAuth()
   const { artistProfiles, loading, error } = usePortfolioSearch()
-  const { fetchFollowerStats, getFollowerStats } = useFollowers()
   const [showAuthOverlay, setShowAuthOverlay] = useState(false)
 
   const handleAuthRequired = useCallback(() => {
@@ -47,13 +44,6 @@ export function RecentArtistsPage({ onLogoClick }: RecentArtistsPageProps) {
     window.scrollTo(0, 0)
   }, [])
 
-  // Fetch follower stats for all artists
-  useEffect(() => {
-    if (artistProfiles.length > 0) {
-      const artistUserIds = artistProfiles.map(p => p.user_id)
-      fetchFollowerStats(artistUserIds)
-    }
-  }, [artistProfiles, fetchFollowerStats])
 
   // Memoized list of recent artists (last 30 days) sorted by creation date
   const recentArtists = useMemo(() => {

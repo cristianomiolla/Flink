@@ -109,9 +109,9 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
         {showDeleteButton && (
           <div className="portfolio-actions-dropdown" ref={dropdownRef}>
             <button 
-              className="modal-close-btn portfolio-actions-btn" 
+              className="portfolio-edit-delete-btn" 
               onClick={handleActionsToggle}
-              title="Azioni portfolio"
+              title="Modifica o elimina portfolio"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <circle cx="12" cy="12" r="1"></circle>
