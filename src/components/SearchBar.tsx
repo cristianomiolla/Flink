@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './SearchBar.css'
 import { LocationSelect } from './LocationSelect'
@@ -11,7 +11,7 @@ interface SearchBarProps {
   hideOnMobile?: boolean
 }
 
-export function SearchBar({ onSearch, onLogoClick, hideOnMobile = false }: SearchBarProps) {
+export const SearchBar = memo(function SearchBar({ onSearch, onLogoClick, hideOnMobile = false }: SearchBarProps) {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
   const [location, setLocation] = useState('')
@@ -131,4 +131,4 @@ export function SearchBar({ onSearch, onLogoClick, hideOnMobile = false }: Searc
       />
     </>
   )
-}
+})

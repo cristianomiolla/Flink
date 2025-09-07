@@ -127,6 +127,7 @@ export function MainPage() {
     })
   }, [portfolioItems])
 
+
   return (
     <div className="app">
       {/* Mobile layout: Logo + Search */}

@@ -84,3 +84,38 @@ export interface GridStats {
   readonly totalCount: number
   readonly filteredCount: number
 }
+
+// Utility types for better type safety
+export type PortfolioItemId = string
+export type UserId = string
+export type ConversationId = `${UserId}__${UserId}`
+
+// Common props interfaces to reduce duplication
+export interface CommonPageProps {
+  onLogoClick?: () => void
+  onArtistClick?: (artistId: string) => void
+}
+
+export interface AuthRequiredProps {
+  onAuthRequired: () => void
+}
+
+export interface ContactArtistProps {
+  onContactArtist: (artistId: string) => void
+}
+
+// API response wrapper types
+export type ApiResponse<T> = {
+  data: T | null
+  error: string | null
+  loading?: boolean
+}
+
+// Database operation result type
+export type DatabaseResult<T> = {
+  data: T
+  error: null
+} | {
+  data: null
+  error: string
+}
