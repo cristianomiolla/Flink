@@ -457,6 +457,7 @@
   .portfolio-grid .portfolio-card {
     height: auto;
     border-radius: 0;
+    border: none !important;
   }
   
   .portfolio-grid .image-section {
@@ -467,7 +468,7 @@
   
   .portfolio-grid .portfolio-image {
     border-radius: 0;
-    border-bottom: none;
+    border: none !important;
   }
   
   .portfolio-grid .image-placeholder {

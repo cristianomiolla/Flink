@@ -44,8 +44,8 @@
 
 @media (max-width: 767px) {
   .portfolio-grid {
-    grid-template-columns: repeat(3, 1fr);
     gap: 0;
+    border: 1px solid var(--border-red);
   }
 
   .filter-dropdown-menu {

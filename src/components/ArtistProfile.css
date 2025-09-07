@@ -199,7 +199,7 @@
 
 /* Tab header with button */
 .tab-header {
-  border-bottom: 1px solid var(--border-red);
+  border-bottom: 1px solid var(--border);
   padding-bottom: 0.5rem;
   margin-bottom: 2rem;
   display: flex;
