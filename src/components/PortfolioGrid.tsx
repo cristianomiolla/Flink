@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, memo, useCallback } from 'react'
 import './PortfolioGrid.css'
 import { PortfolioCard } from './PortfolioCard'
 import { DataStateHandler } from './DataStateHandler'
-import { GridHeader, GridStats, GridSearchInfo } from './GridHeader'
+import { GridHeader, GridSearchInfo } from './GridHeader'
 import type { PortfolioItem, FlashFilter } from '../types/portfolio'
 
 interface PortfolioGridProps {

@@ -3,7 +3,7 @@ import './ArtistGrid.css'
 import { ArtistCard } from './ArtistCard'
 import { useFollowers } from '../hooks/useFollowers'
 import { DataStateHandler } from './DataStateHandler'
-import { GridHeader, GridStats, GridSearchInfo } from './GridHeader'
+import { GridHeader, GridSearchInfo } from './GridHeader'
 import type { ArtistProfile } from '../types/portfolio'
 
 interface ArtistGridProps {

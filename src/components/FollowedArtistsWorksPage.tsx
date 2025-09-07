@@ -9,17 +9,15 @@ import { usePortfolioSearch } from '../hooks/usePortfolioSearch'
 import { useFollowedArtists } from '../hooks/useFollowedArtists'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
-import type { PortfolioItem } from '../types/portfolio'
 
 // Lazy load AuthOverlay component
 const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
 
 interface FollowedArtistsWorksPageProps {
   onLogoClick?: () => void
-  onArtistClick?: (artistId: string) => void
 }
 
-export function FollowedArtistsWorksPage({ onLogoClick, onArtistClick }: FollowedArtistsWorksPageProps) {
+export function FollowedArtistsWorksPage({ onLogoClick }: FollowedArtistsWorksPageProps) {
   const navigate = useNavigate()
   const { profile, user } = useAuth()
   const { getFollowedArtistsItems, loading, error } = usePortfolioSearch()
@@ -229,8 +227,8 @@ export function FollowedArtistsWorksPage({ onLogoClick, onArtistClick }: Followe
       {showAuthOverlay && (
         <Suspense fallback={<div />}>
           <AuthOverlay 
+            isOpen={showAuthOverlay}
             onClose={() => setShowAuthOverlay(false)}
-            mode="login"
           />
         </Suspense>
       )}

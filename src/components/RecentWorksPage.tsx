@@ -8,17 +8,15 @@ import { PortfolioCard } from './PortfolioCard'
 import { usePortfolioSearch } from '../hooks/usePortfolioSearch'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
-import type { PortfolioItem } from '../types/portfolio'
 
 // Lazy load AuthOverlay component
 const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
 
 interface RecentWorksPageProps {
   onLogoClick?: () => void
-  onArtistClick?: (artistId: string) => void
 }
 
-export function RecentWorksPage({ onLogoClick, onArtistClick }: RecentWorksPageProps) {
+export function RecentWorksPage({ onLogoClick }: RecentWorksPageProps) {
   const navigate = useNavigate()
   const { profile } = useAuth()
   const { portfolioItems, loading, error } = usePortfolioSearch()
@@ -210,8 +208,8 @@ export function RecentWorksPage({ onLogoClick, onArtistClick }: RecentWorksPageP
       {showAuthOverlay && (
         <Suspense fallback={<div />}>
           <AuthOverlay 
+            isOpen={showAuthOverlay}
             onClose={() => setShowAuthOverlay(false)}
-            mode="login"
           />
         </Suspense>
       )}
