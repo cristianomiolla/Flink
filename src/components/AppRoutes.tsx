@@ -38,9 +38,9 @@ export function AppRoutes() {
       <Route path="/profile" element={<PersonalProfile />} />
       <Route path="/profile-menu" element={<MobileProfilePage />} />
       <Route path="/saved" element={<SavedItemsPage onLogoClick={handleLogoClick} onArtistClick={handleArtistClick} />} />
-      <Route path="/featured" element={<FeaturedWorksPage onLogoClick={handleLogoClick} onArtistClick={handleArtistClick} />} />
-      <Route path="/recent" element={<RecentWorksPage onLogoClick={handleLogoClick} onArtistClick={handleArtistClick} />} />
-      <Route path="/following" element={<FollowedArtistsWorksPage onLogoClick={handleLogoClick} onArtistClick={handleArtistClick} />} />
+      <Route path="/featured" element={<FeaturedWorksPage onLogoClick={handleLogoClick} />} />
+      <Route path="/recent" element={<RecentWorksPage onLogoClick={handleLogoClick} />} />
+      <Route path="/following" element={<FollowedArtistsWorksPage onLogoClick={handleLogoClick} />} />
       
       {/* Messages Routes */}
       <Route path="/messages" element={<MessagesPage />} />
