@@ -48,12 +48,28 @@ export function useArtistServices(userId?: string) {
 
     try {
       // Prepare data according to new schema and constraints
-      const insertData = {
+      const insertData: {
+        name: string
+        description: string | null
+        body_area: string | null
+        size_category: string | null
+        pricing_type: 'fixed' | 'range' | 'consultation'
+        fixed_price: number | null
+        price_min: number | null
+        price_max: number | null
+        discount_percentage: number
+        image_url: string | null
+        user_id: string
+        is_active: boolean
+      } = {
         name: serviceData.name,
         description: serviceData.description || null,
         body_area: serviceData.body_area || null,
         size_category: serviceData.size_category || null,
         pricing_type: serviceData.pricing_type,
+        fixed_price: null,
+        price_min: null,
+        price_max: null,
         discount_percentage: serviceData.discount_percentage || 0,
         image_url: serviceData.image_url || null,
         user_id: userId,
@@ -63,17 +79,11 @@ export function useArtistServices(userId?: string) {
       // Set price fields based on pricing type to satisfy constraints
       if (serviceData.pricing_type === 'fixed') {
         insertData.fixed_price = serviceData.fixed_price || null
-        insertData.price_min = null
-        insertData.price_max = null
       } else if (serviceData.pricing_type === 'range') {
-        insertData.fixed_price = null
         insertData.price_min = serviceData.price_min || null
         insertData.price_max = serviceData.price_max || null
-      } else if (serviceData.pricing_type === 'consultation') {
-        insertData.fixed_price = null
-        insertData.price_min = null
-        insertData.price_max = null
       }
+      // consultation type already has all price fields set to null
 
       console.log('Creating service with data:', insertData)
 
