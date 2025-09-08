@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 import LoadingSpinner from './LoadingSpinner'
+import '../styles/components.css'
 
 interface DataStateHandlerProps {
   loading: boolean
@@ -13,7 +14,7 @@ interface DataStateHandlerProps {
   fallbackEmptyMessage?: string
 }
 
-export function DataStateHandler({
+const DataStateHandler = memo(function DataStateHandler({
   loading,
   error,
   data,
@@ -74,4 +75,6 @@ export function DataStateHandler({
   }
 
   return <>{children}</>
-}
+})
+
+export { DataStateHandler }

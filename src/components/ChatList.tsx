@@ -1,6 +1,7 @@
 import { memo } from 'react'
 import './ChatList.css'
 import { Avatar } from './Avatar'
+import { formatChatTimestamp } from '../utils/dateFormatting'
 
 interface ChatListProps {
   chats: Array<{
@@ -19,25 +20,6 @@ interface ChatListProps {
 }
 
 const ChatList = memo(function ChatList({ chats, selectedChatId, onChatSelect, onRequestDeleteChat }: ChatListProps) {
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(timestamp)
-    const now = new Date()
-    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60)
-    
-    if (diffInHours < 24) {
-      return date.toLocaleTimeString('it-IT', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-      })
-    } else if (diffInHours < 48) {
-      return 'Ieri'
-    } else {
-      return date.toLocaleDateString('it-IT', { 
-        day: '2-digit', 
-        month: '2-digit' 
-      })
-    }
-  }
 
   const handleDeleteClick = (e: React.MouseEvent, chat: { id: string; participant: { name: string } }) => {
     e.stopPropagation()
@@ -81,7 +63,7 @@ const ChatList = memo(function ChatList({ chats, selectedChatId, onChatSelect, o
                   </h3>
                   <div className="chat-header-actions">
                     <span className="chat-timestamp">
-                      {formatTimestamp(chat.timestamp)}
+                      {formatChatTimestamp(chat.timestamp)}
                     </span>
                     <button
                       className="chat-delete-btn"

@@ -1,0 +1,211 @@
+/**
+ * Shared component styles
+ * Consolidates duplicate CSS classes across components
+ */
+
+/* Base button styles */
+.btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  font-weight: 600;
+  text-decoration: none;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+/* State components */
+.state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+  min-height: 300px;
+}
+
+.state-card {
+  background: var(--background);
+  border: 1px solid var(--border);
+  padding: 2rem;
+  max-width: 400px;
+  width: 100%;
+}
+
+/* Loading state */
+.loading-state {
+  composes: state-container;
+  min-height: 200px;
+}
+
+/* Error state */
+.error-state {
+  composes: state-container;
+}
+
+.error-card {
+  composes: state-card;
+  border-color: var(--destructive);
+}
+
+.error-title {
+  color: var(--destructive);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+}
+
+.error-message {
+  color: var(--muted-foreground);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}
+
+.retry-btn {
+  composes: btn-base;
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--destructive);
+}
+
+.retry-btn:hover {
+  background: var(--destructive);
+  opacity: 0.9;
+}
+
+/* Empty state */
+.empty-state {
+  composes: state-container;
+}
+
+.empty-card {
+  composes: state-card;
+  border-color: var(--border);
+}
+
+.empty-title {
+  color: var(--foreground);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+}
+
+.empty-message {
+  color: var(--muted-foreground);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Modal base styles */
+.modal-overlay-base {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-content-base {
+  background: var(--background);
+  border: 1px solid var(--border-red);
+  border-radius: 0;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.modal-close-btn-base {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 300;
+  color: var(--foreground);
+  cursor: pointer;
+  z-index: 10;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-sizing: border-box;
+  pointer-events: all;
+}
+
+.modal-close-btn-base:hover {
+  background: #EF4343;
+  color: #ffffff;
+}
+
+/* Header styles */
+.header-base {
+  background: var(--background);
+  border-bottom: 1px solid var(--border-red);
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.header-content-base {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Mobile adjustments */
+@media (max-width: 767px) {
+  .state-container {
+    padding: 2rem 1rem;
+    min-height: 200px;
+  }
+  
+  .state-card {
+    padding: 1.5rem;
+  }
+  
+  .modal-overlay-base {
+    padding: 0.5rem;
+  }
+  
+  .modal-close-btn-base {
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 35px;
+    height: 35px;
+    font-size: 20px;
+  }
+  
+  .header-base {
+    padding: 0.75rem 1rem;
+  }
+}
