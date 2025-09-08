@@ -57,15 +57,3 @@
   height: 20px;
   stroke-width: 2;
 }
-
-/* Mobile responsiveness */
-@media (max-width: 767px) {
-  .header-icons {
-    gap: 0.5rem;
-  }
-  
-  .header-icon {
-    width: 18px;
-    height: 18px;
-  }
-}

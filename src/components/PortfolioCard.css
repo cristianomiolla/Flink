@@ -366,7 +366,8 @@
   z-index: 10;
 }
 
-.portfolio-card .portfolio-edit-delete-btn {
+/* General portfolio-edit-delete-btn styles */
+.portfolio-edit-delete-btn {
   width: 32px;
   height: 32px;
   background: rgba(255, 255, 255, 0.95);
@@ -385,12 +386,13 @@
   pointer-events: all;
 }
 
-.portfolio-card .portfolio-edit-delete-btn:hover {
+.portfolio-edit-delete-btn:hover {
   background: var(--accent);
   color: #ffffff;
 }
 
-.portfolio-card .portfolio-edit-delete-btn svg {
+
+.portfolio-edit-delete-btn svg {
   width: 20px;
   height: 20px;
 }

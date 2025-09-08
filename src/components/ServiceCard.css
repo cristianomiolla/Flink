@@ -1,0 +1,248 @@
+/* Service Card Row Styles */
+
+.service-card-row {
+  position: relative;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.service-card-row:hover {
+  border-color: var(--border-red);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateX(2px);
+}
+
+/* Actions Dropdown */
+.service-actions-dropdown {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.service-card-row .portfolio-edit-delete-btn {
+  position: relative;
+  z-index: 10;
+}
+
+.service-edit-delete-btn {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.service-edit-delete-btn:hover {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  border-color: var(--accent);
+}
+
+.service-actions-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  min-width: 140px;
+  overflow: hidden;
+  z-index: 20;
+}
+
+.service-action-item {
+  width: 100%;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--foreground);
+  text-transform: uppercase;
+}
+
+.service-action-item:hover {
+  background: var(--muted);
+}
+
+.service-action-item.delete-action:hover {
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+}
+
+/* Image Thumbnail Section */
+.service-image-thumb {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
+  background: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.service-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.service-thumb-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-foreground);
+}
+
+.service-thumb-placeholder .placeholder-icon {
+  width: 32px;
+  height: 32px;
+  stroke-width: 1.5;
+  opacity: 0.6;
+}
+
+/* Discount Badge */
+.service-discount-badge {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  padding: 0.15rem 0.3rem;
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  z-index: 5;
+}
+
+/* Row Content Section */
+.service-row-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.service-row-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--foreground);
+  line-height: 1.3;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.service-row-description {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  line-height: 1.4;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Service Details */
+.service-row-details {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.service-detail-tag {
+  padding: 0.15rem 0.5rem;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  border-radius: 0;
+}
+
+/* Price Section */
+.service-row-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+  flex-shrink: 0;
+  text-align: right;
+  min-width: 80px;
+}
+
+/* Mobile Design */
+@media (max-width: 767px) {
+  .service-card-row {
+    padding: 12px;
+    gap: 0.75rem;
+  }
+  
+  .service-image-thumb {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .service-row-title {
+    font-size: 14px;
+  }
+  
+  .service-row-description {
+    font-size: 12px;
+  }
+  
+  .service-row-price {
+    font-size: 14px;
+    min-width: 60px;
+  }
+  
+  .service-detail-tag {
+    font-size: 10px;
+    padding: 0.1rem 0.3rem;
+  }
+  
+  .service-edit-delete-btn {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .service-discount-badge {
+    font-size: 9px;
+    padding: 0.1rem 0.25rem;
+  }
+  
+  .service-thumb-placeholder .placeholder-icon {
+    width: 24px;
+    height: 24px;
+  }
+}

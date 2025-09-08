@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, memo } from 'react'
 import './ArtistGrid.css'
 import { HorizontalArtistSection } from './HorizontalArtistSection'
 import { ArtistCard } from './ArtistCard'
@@ -22,7 +22,7 @@ interface ArtistGridProps {
   onShowMoreRecent?: () => void
 }
 
-export function ArtistGrid({ 
+const ArtistGrid = memo(function ArtistGrid({ 
   profiles, 
   loading, 
   error, 
@@ -160,7 +160,7 @@ export function ArtistGrid({
 
         {recentArtists.length > 0 && (
           <HorizontalArtistSection
-            title="Iscritti da poco"
+            title="New entry"
             artists={recentArtists}
             onArtistClick={onArtistClick}
             onAuthRequired={onAuthRequired}
@@ -171,4 +171,6 @@ export function ArtistGrid({
       </div>
     </DataStateHandler>
   )
-}
+})
+
+export { ArtistGrid }

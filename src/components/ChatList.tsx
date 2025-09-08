@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import './ChatList.css'
 import { Avatar } from './Avatar'
 
@@ -17,7 +18,7 @@ interface ChatListProps {
   onRequestDeleteChat: (chat: { id: string; participant: { name: string } }) => void
 }
 
-export function ChatList({ chats, selectedChatId, onChatSelect, onRequestDeleteChat }: ChatListProps) {
+const ChatList = memo(function ChatList({ chats, selectedChatId, onChatSelect, onRequestDeleteChat }: ChatListProps) {
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp)
     const now = new Date()
@@ -113,4 +114,6 @@ export function ChatList({ chats, selectedChatId, onChatSelect, onRequestDeleteC
       </div>
     </div>
   )
-}
+})
+
+export { ChatList }

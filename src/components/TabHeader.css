@@ -1,0 +1,46 @@
+/* Shared Tab Header Styles */
+
+.tab-header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.tab-header h3 {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--foreground);
+  margin: 0;
+  text-transform: uppercase;
+  border-bottom: none;
+  padding-bottom: 0;
+  flex: 1;
+}
+
+.tab-header .action-btn {
+  width: 150px !important;
+  max-width: 150px;
+  flex-shrink: 0;
+  padding: 0.5rem 0.25rem !important;
+}
+
+/* Mobile Design */
+@media (max-width: 767px) {
+  .tab-header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .tab-header h3 {
+    font-size: 1.25rem;
+  }
+
+  .tab-header .action-btn {
+    width: 120px !important;
+    max-width: 120px;
+    font-size: 11px !important;
+    padding: 0.4rem 0.2rem !important;
+  }
+}

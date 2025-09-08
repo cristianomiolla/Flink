@@ -269,6 +269,8 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
         onArtistClick={onArtistClick}
         onAuthRequired={onAuthRequired}
         onContactArtist={onContactArtist}
+        onEdit={onEdit}
+        onDelete={onDelete}
       />
     </>
   )

@@ -367,6 +367,7 @@
   
   .modal-portfolio-title {
     font-size: 20px;
+    padding: 0 16px;
   }
   
   /* Override avatar medium to use small size on mobile */
@@ -375,24 +376,16 @@
     height: 36px !important;
   }
   
-  .portfolio-modal-overlay .avatar-md .avatar-placeholder {
-    font-size: 14px !important;
-  }
   
   .modal-artist-info {
-    margin-top: 20px;
+    margin-top: 16px;
   }
   
   .modal-bottom-spacer {
-    height: 20px;
+    height: 16px;
   }
   
   
-  .modal-artist-avatar-placeholder {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
-  }
   
   .modal-artist-name {
     font-size: 15px;
@@ -400,6 +393,16 @@
   
   .modal-portfolio-description {
     font-size: 14px;
+  }
+  
+  .modal-portfolio-tags {
+    gap: 0.5rem;
+    margin: 0 0 16px 0;
+  }
+  
+  .modal-portfolio-tag {
+    padding: 0.2rem 0.5rem;
+    font-size: 10px;
   }
   
   .modal-close-btn {
@@ -452,6 +455,7 @@
     padding: 8px 12px !important;
   }
   
+  /* Default layout for 3 buttons (other users' posts): Mi piace, Salva, Contatta */
   .modal-portfolio-actions .action-btn:nth-child(1) {
     grid-column: 1;
     grid-row: 1;
@@ -464,6 +468,17 @@
   
   .modal-portfolio-actions .action-btn:nth-child(3) {
     grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  
+  /* Layout for 4 buttons (own posts): Mi piace, Salva (row 1), Modifica, Elimina (row 2) */
+  .modal-portfolio-actions:has(.action-btn:nth-child(4)) .action-btn:nth-child(3) {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  
+  .modal-portfolio-actions:has(.action-btn:nth-child(4)) .action-btn:nth-child(4) {
+    grid-column: 2;
     grid-row: 2;
   }
   

@@ -34,17 +34,12 @@
 
 /* Avatar styles now handled by Avatar component */
 
-.dropdown-menu {
-  position: absolute;
+/* .dropdown-menu styles moved to shared Dropdown.css */
+/* Profile-specific dropdown positioning */
+.profile-dropdown .dropdown-menu {
   top: calc(100% + 8px);
   right: 0;
-  background: var(--background);
-  border: 1px solid var(--border-red);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
   min-width: 220px;
-  overflow: hidden;
-  animation: dropdown-appear 0.15s ease-out;
 }
 
 @keyframes dropdown-appear {
@@ -89,30 +84,10 @@
   text-transform: capitalize;
 }
 
-.dropdown-divider {
-  height: 1px;
-  background: var(--border);
-  margin: 0;
-}
+/* .dropdown-divider styles moved to shared Dropdown.css */
 
-.dropdown-item {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: transparent;
-  border: none;
-  text-align: left;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--foreground);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-transform: uppercase;
-}
-
-.dropdown-item:hover {
-  background: var(--grey-light);
-  color: var(--accent);
-}
+/* .dropdown-item styles moved to shared Dropdown.css */
+/* Profile-specific dropdown item variations handled in Dropdown.css */
 
 .become-artist-btn {
   color: var(--accent);
@@ -146,7 +121,7 @@
   }
   
   
-  .dropdown-menu {
+  .profile-dropdown .dropdown-menu {
     min-width: 200px;
     right: -10px;
   }
@@ -156,8 +131,5 @@
     gap: 0.5rem;
   }
   
-  .dropdown-item {
-    padding: 0.625rem 0.75rem;
-    font-size: 13px;
-  }
+  /* Mobile dropdown item styles handled in shared Dropdown.css */
 }

@@ -3,14 +3,20 @@ import { useNavigate } from 'react-router-dom'
 import { SearchBar } from './SearchBar'
 import { useAuth } from '../hooks/useAuth'
 import { useFollowers } from '../hooks/useFollowers'
+import { useArtistServices } from '../hooks/useArtistServices'
 import LoadingSpinner from './LoadingSpinner'
 import { Avatar } from './Avatar'
 import { PortfolioCard } from './PortfolioCard'
+import { ServiceCard } from './ServiceCard'
+import { ServiceForm } from './ServiceForm'
 import { ActionButton, UploadIcon } from './ActionButton'
 import { ConfirmationModal } from './ConfirmationModal'
 import { supabase } from '../lib/supabase'
 import './PersonalProfile.css'
-import type { TabType, PortfolioItem } from '../types/portfolio'
+import './ImageUpload.css'
+import './TabHeader.css'
+import './TabsNavigation.css'
+import type { TabType, PortfolioItem, ArtistService, CreateServiceData } from '../types/portfolio'
 
 export function PersonalProfile() {
   const navigate = useNavigate()
@@ -56,6 +62,20 @@ export function PersonalProfile() {
   const [filePreview, setFilePreview] = useState<string | null>(null)
   const [editingItemId, setEditingItemId] = useState<string | null>(null)
   const [isEditMode, setIsEditMode] = useState(false)
+
+  // Services related state
+  const [showServiceForm, setShowServiceForm] = useState(false)
+  const [editingService, setEditingService] = useState<ArtistService | null>(null)
+  const [serviceToDelete, setServiceToDelete] = useState<string | null>(null)
+  
+  // Services hook
+  const { 
+    services, 
+    loading: servicesLoading, 
+    createService,
+    updateService,
+    deleteService 
+  } = useArtistServices(profile?.user_id)
 
   const handleSearch = (searchTerm: string, location: string) => {
     navigate(`/?search=${encodeURIComponent(searchTerm)}&location=${encodeURIComponent(location)}`)
@@ -486,6 +506,53 @@ export function PersonalProfile() {
     setItemToDelete(null)
   }
 
+  // Services handlers
+  const handleCreateService = () => {
+    setEditingService(null)
+    setShowServiceForm(true)
+  }
+
+  const handleEditService = (serviceId: string) => {
+    const service = services.find(s => s.id === serviceId)
+    if (service) {
+      setEditingService(service)
+      setShowServiceForm(true)
+    }
+  }
+
+  const handleDeleteService = (serviceId: string) => {
+    setServiceToDelete(serviceId)
+    setShowConfirmationModal(true)
+  }
+
+  const handleServiceFormSubmit = async (data: CreateServiceData): Promise<boolean> => {
+    if (editingService) {
+      return await updateService(editingService.id, data)
+    } else {
+      return await createService(data)
+    }
+  }
+
+  const handleServiceFormClose = () => {
+    setShowServiceForm(false)
+    setEditingService(null)
+  }
+
+  const confirmDeleteService = async () => {
+    if (!serviceToDelete) return
+
+    const success = await deleteService(serviceToDelete)
+    if (success) {
+      setShowConfirmationModal(false)
+      setServiceToDelete(null)
+    }
+  }
+
+  const cancelDeleteService = () => {
+    setShowConfirmationModal(false)
+    setServiceToDelete(null)
+  }
+
   if (loading) {
     return (
       <div className="artist-profile">
@@ -663,13 +730,46 @@ export function PersonalProfile() {
 
                 {activeTab === 'servizi' && (
                   <div className="tab-panel servizi-panel">
-                    <h3>I MIEI SERVIZI</h3>
-                    <div className="empty-portfolio">
-                      <div className="empty-state">
-                        <h4>Nessun servizio pubblicato</h4>
-                        <p>Aggiungi i tuoi servizi per far conoscere ai clienti cosa offri.</p>
-                      </div>
+                    <div className="tab-header">
+                      <h3>I MIEI SERVIZI {!servicesLoading && services.length > 0 && `(${services.length})`}</h3>
+                      <button 
+                        className="action-btn"
+                        onClick={handleCreateService}
+                      >
+                        <span className="action-icon">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M12 5v14m7-7l-7-7-7 7"></path>
+                          </svg>
+                        </span>
+                        <span className="action-text">Nuovo Servizio</span>
+                      </button>
                     </div>
+                    
+                    {servicesLoading ? (
+                      <div className="portfolio-loading">
+                        <LoadingSpinner size="large" />
+                        <p>Caricamento servizi...</p>
+                      </div>
+                    ) : services.length > 0 ? (
+                      <div className="services-list">
+                        {services.map((service) => (
+                          <ServiceCard
+                            key={service.id}
+                            service={service}
+                            showEditButton={true}
+                            onEdit={handleEditService}
+                            onDelete={handleDeleteService}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="empty-portfolio">
+                        <div className="empty-state">
+                          <h4>Nessun servizio pubblicato</h4>
+                          <p>Aggiungi i tuoi servizi per far conoscere ai clienti cosa offri.</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -775,29 +875,13 @@ export function PersonalProfile() {
                   </label>
                   <div className="avatar-upload-section">
                     <div className="current-avatar">
-                      {avatarPreview ? (
-                        <div className="avatar avatar-md avatar-default">
-                          <img 
-                            src={avatarPreview} 
-                            alt="Anteprima avatar" 
-                            className="avatar-image"
-                          />
-                        </div>
-                      ) : formData.avatar_url ? (
-                        <div className="avatar avatar-md avatar-default">
-                          <img 
-                            src={formData.avatar_url} 
-                            alt="Avatar attuale" 
-                            className="avatar-image"
-                          />
-                        </div>
-                      ) : (
-                        <div className="avatar avatar-md avatar-default">
-                          <div className="avatar-placeholder">
-                            {(profile?.full_name || profile?.username || user?.email || 'U').split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase()}
-                          </div>
-                        </div>
-                      )}
+                      <Avatar
+                        src={avatarPreview || formData.avatar_url}
+                        name={profile?.full_name || profile?.username || user?.email}
+                        alt={avatarPreview ? "Anteprima avatar" : "Avatar attuale"}
+                        size="md"
+                        variant="default"
+                      />
                     </div>
                     <div className="avatar-upload-controls">
                       <input
@@ -966,36 +1050,42 @@ export function PersonalProfile() {
 
                 {/* Image Upload Field */}
                 <div className="form-group">
-                  <label htmlFor="image_file" className="form-label">
-                    IMMAGINE
-                  </label>
-                  <input
-                    type="file"
-                    id="image_file"
-                    className="form-input file-input"
-                    accept="image/*"
-                    onChange={handleFileSelect}
-                  />
-                  <div className="form-help">
-                    Formati supportati: JPG, PNG, GIF, WebP (max 5MB)
-                  </div>
-                  {filePreview && (
-                    <div className="image-preview">
-                      <img src={filePreview} alt="Anteprima" className="preview-image" />
-                      <button
-                        type="button"
-                        className="remove-image-btn"
-                        onClick={() => {
-                          setSelectedFile(null)
-                          setFilePreview(null)
-                          const input = document.getElementById('image_file') as HTMLInputElement
-                          if (input) input.value = ''
-                        }}
-                      >
-                        ✕
-                      </button>
+                  <label htmlFor="image_file" className="form-label">IMMAGINE</label>
+                  <div className="image-upload-section">
+                    {filePreview && (
+                      <div className="image-preview-container">
+                        <img src={filePreview} alt="Anteprima" className="image-preview" />
+                        <button
+                          type="button"
+                          className="remove-image-btn"
+                          onClick={() => {
+                            setSelectedFile(null)
+                            setFilePreview(null)
+                            const input = document.getElementById('image_file') as HTMLInputElement
+                            if (input) input.value = ''
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
+                    <div className="file-upload-container">
+                      <input 
+                        id="image_file" 
+                        className="file-input" 
+                        accept="image/jpeg,image/jpg,image/png,image/webp" 
+                        type="file"
+                        onChange={handleFileSelect}
+                      />
+                      <label htmlFor="image_file" className="file-upload-btn">
+                        <svg className="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"></path>
+                        </svg>
+                        <span>Carica Immagine</span>
+                      </label>
                     </div>
-                  )}
+                    <p className="file-info">JPG, PNG o WebP. Max 5MB.</p>
+                  </div>
                 </div>
 
                 {/* Tags Field */}
@@ -1105,12 +1195,24 @@ export function PersonalProfile() {
       {/* Modal di conferma eliminazione */}
       <ConfirmationModal
         isOpen={showConfirmationModal}
-        title="Elimina elemento"
-        message="Sei sicuro di voler eliminare questo elemento dal portfolio? Questa azione non può essere annullata."
+        title={serviceToDelete ? "Elimina servizio" : "Elimina elemento"}
+        message={serviceToDelete 
+          ? "Sei sicuro di voler eliminare questo servizio? Questa azione non può essere annullata."
+          : "Sei sicuro di voler eliminare questo elemento dal portfolio? Questa azione non può essere annullata."
+        }
         confirmText="Elimina"
         cancelText="Annulla"
-        onConfirm={confirmDeleteItem}
-        onCancel={cancelDeleteItem}
+        onConfirm={serviceToDelete ? confirmDeleteService : confirmDeleteItem}
+        onCancel={serviceToDelete ? cancelDeleteService : cancelDeleteItem}
+      />
+
+      {/* Service Form Modal */}
+      <ServiceForm
+        isOpen={showServiceForm}
+        onClose={handleServiceFormClose}
+        onSubmit={handleServiceFormSubmit}
+        editingService={editingService}
+        isEditing={!!editingService}
       />
     </div>
   )

@@ -52,14 +52,28 @@ export interface ArtistService {
   description: string | null
   body_area: string | null
   size_category: string | null
-  price_min_range: number | null
-  price_max_range: number | null
-  is_price_range: boolean
+  pricing_type: 'fixed' | 'range' | 'consultation'
   fixed_price: number | null
+  price_min: number | null
+  price_max: number | null
   discount_percentage: number | null
   image_url: string | null
+  is_active: boolean
   created_at: string
   updated_at: string
+}
+
+export interface CreateServiceData {
+  name: string
+  description: string
+  body_area: string
+  size_category: string
+  pricing_type: 'fixed' | 'range' | 'consultation'
+  fixed_price: number | null
+  price_min: number | null
+  price_max: number | null
+  discount_percentage: number | null
+  image_url: string
 }
 
 export type ViewMode = 'portfolio' | 'artists'

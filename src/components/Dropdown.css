@@ -1,0 +1,183 @@
+/* Shared Dropdown Styles */
+
+/* Custom Dropdown Base Styles */
+.custom-dropdown {
+  position: relative;
+}
+
+.dropdown-trigger {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 14px;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  text-align: left;
+}
+
+.dropdown-trigger:hover,
+.dropdown-trigger:focus {
+  border-color: var(--border-red);
+  outline: none;
+}
+
+.dropdown-text {
+  flex: 1;
+  color: var(--foreground);
+}
+
+.dropdown-icon {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.5;
+  transition: transform 0.2s ease;
+}
+
+/* Base Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  background: var(--background);
+  border: 1px solid var(--border-red);
+  border-radius: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 50;
+}
+
+/* Base Dropdown Item */
+.dropdown-item {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--foreground);
+  font-size: 14px;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.dropdown-item:hover {
+  background: var(--muted);
+  color: var(--accent);
+}
+
+.dropdown-item.active {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  font-weight: 600;
+}
+
+/* Custom Select Dropdown (ServiceForm style) */
+.select-dropdown-menu {
+  top: 100%;
+  left: 0;
+  right: 0;
+  border-top: none;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Profile Dropdown specific styles */
+.profile-dropdown-menu {
+  top: calc(100% + 8px);
+  right: 0;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  min-width: 220px;
+  animation: dropdown-appear 0.15s ease-out;
+}
+
+@keyframes dropdown-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: white;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0;
+}
+
+/* Profile dropdown item variations */
+.profile-dropdown-item {
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.profile-dropdown-item:hover {
+  background: var(--muted);
+  color: var(--accent);
+}
+
+.become-artist-btn {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.become-artist-btn:hover {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.logout-item {
+  color: var(--accent);
+  border-top: 1px solid var(--border);
+}
+
+.logout-item:hover {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+/* Mobile Design */
+@media (max-width: 767px) {
+  .dropdown-trigger {
+    padding: 0.625rem;
+    font-size: 13px;
+  }
+  
+  .dropdown-item {
+    padding: 0.625rem 0.75rem;
+    font-size: 13px;
+  }
+  
+  .profile-dropdown-menu {
+    min-width: 200px;
+    right: -10px;
+  }
+  
+  .dropdown-header {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+  
+  .profile-dropdown-item {
+    padding: 0.625rem 0.75rem;
+    font-size: 13px;
+  }
+}

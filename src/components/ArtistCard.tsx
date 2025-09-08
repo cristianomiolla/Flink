@@ -84,16 +84,16 @@ export function ArtistCard({ profile, onArtistClick, onAuthRequired, onContactAr
           src={profile.avatar_url}
           name={displayName}
           alt={`Avatar di ${displayName}`}
-          size={isHorizontal ? "sm" : "md"}
+          size="md"
           variant="card"
         />
+        <h3 className="artist-name">{displayName}</h3>
         
-        <div className="artist-info">
-          <h3 className="artist-name">{displayName}</h3>
-          {!isHorizontal && profile.location && (
+        {!isHorizontal && profile.location && (
+          <div className="artist-info">
             <span className="artist-location">📍 {profile.location}</span>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       <p className="artist-bio">{profile.bio || ' '}</p>

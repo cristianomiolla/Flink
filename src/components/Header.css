@@ -49,6 +49,60 @@
   font-size: 0.875rem;
 }
 
+/* Header card styles - adapted for header layout */
+.header .header-card {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin-bottom: 0;
+}
+
+/* These styles only apply to page headers, not the main header */
+.page-header .header-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.page-header .header-card h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
+}
+
+.page-header .header-card p {
+  font-size: 14px;
+  color: var(--grey-dark);
+  margin: 0;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+/* Search info and filter styles - keep the existing PageHeader styles */
+.search-info {
+  margin: 0.5rem 0;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 14px;
+  color: var(--muted-foreground);
+}
+
+.search-term {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.filter-dropdown {
+  position: absolute;
+  right: 0;
+  display: inline-block;
+}
+
 /* Mobile Design - Under 768px */
 @media (max-width: 767px) {
   .header {

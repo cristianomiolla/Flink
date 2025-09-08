@@ -18,6 +18,8 @@ interface PortfolioGridProps {
   onFlashFilterChange?: (filter: FlashFilter) => void
   onAuthRequired?: () => void
   onContactArtist?: (artistId: string) => void
+  onEdit?: (itemId: string) => void
+  onDelete?: (itemId: string) => void
 }
 
 const PortfolioGrid = memo(function PortfolioGrid({ 
@@ -32,7 +34,9 @@ const PortfolioGrid = memo(function PortfolioGrid({
   onArtistClick,
   onFlashFilterChange,
   onAuthRequired,
-  onContactArtist
+  onContactArtist,
+  onEdit,
+  onDelete
 }: PortfolioGridProps) {
   const [isDesktopDropdownOpen, setIsDesktopDropdownOpen] = useState(false)
   const desktopDropdownRef = useRef<HTMLDivElement>(null)
@@ -143,6 +147,8 @@ const PortfolioGrid = memo(function PortfolioGrid({
                 onArtistClick={onArtistClick}
                 onAuthRequired={onAuthRequired}
                 onContactArtist={onContactArtist}
+                onEdit={onEdit}
+                onDelete={onDelete}
               />
             ))}
           </div>

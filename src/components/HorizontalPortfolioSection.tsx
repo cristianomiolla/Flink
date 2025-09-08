@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react'
 import { type PortfolioItem } from '../types/portfolio'
 import { PortfolioCard } from './PortfolioCard'
 import './HorizontalPortfolioSection.css'
-import './ArtistProfile.css' // Import for .tab-header styles
+import './TabHeader.css'
 
 interface HorizontalPortfolioSectionProps {
   title: string
@@ -11,6 +11,8 @@ interface HorizontalPortfolioSectionProps {
   onAuthRequired?: () => void
   onContactArtist?: (artistId: string) => void
   onShowMore?: () => void
+  onEdit?: (itemId: string) => void
+  onDelete?: (itemId: string) => void
 }
 
 export function HorizontalPortfolioSection({ 
@@ -19,7 +21,9 @@ export function HorizontalPortfolioSection({
   onArtistClick, 
   onAuthRequired, 
   onContactArtist,
-  onShowMore 
+  onShowMore,
+  onEdit,
+  onDelete
 }: HorizontalPortfolioSectionProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [showLeftArrow, setShowLeftArrow] = useState(false)
@@ -112,6 +116,8 @@ export function HorizontalPortfolioSection({
                   onArtistClick={onArtistClick}
                   onAuthRequired={onAuthRequired}
                   onContactArtist={onContactArtist}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
                 />
               </div>
             ))}

@@ -3,6 +3,7 @@ import { useAuth } from '../hooks/useAuth'
 import { Avatar } from './Avatar'
 import { useNavigate } from 'react-router-dom'
 import './ProfileDropdown.css'
+import './Dropdown.css'
 
 export function ProfileDropdown() {
   const { user, profile, loading, signOut } = useAuth()
@@ -81,7 +82,7 @@ export function ProfileDropdown() {
           onClick={() => setIsOpen(!isOpen)}
         />
         {isOpen && (
-          <div className="dropdown-menu">
+          <div className="dropdown-menu profile-dropdown-menu">
             <div className="dropdown-header">
               <Avatar
                 name={fallbackName}
@@ -95,13 +96,13 @@ export function ProfileDropdown() {
             </div>
             <div className="dropdown-divider"></div>
             
-            <button className="dropdown-item become-artist-btn" onClick={() => {
+            <button className="dropdown-item profile-dropdown-item become-artist-btn" onClick={() => {
               navigate('/become-artist')
               setIsOpen(false)
             }}>
               Diventi un'artista
             </button>
-            <button className="dropdown-item" onClick={() => {
+            <button className="dropdown-item profile-dropdown-item" onClick={() => {
               navigate('/settings')
               setIsOpen(false)
             }}>
@@ -109,7 +110,7 @@ export function ProfileDropdown() {
             </button>
             
             <div className="dropdown-divider"></div>
-            <button className="dropdown-item logout-item" onClick={() => {
+            <button className="dropdown-item profile-dropdown-item logout-item" onClick={() => {
               signOut()
               setIsOpen(false)
               navigate('/')
@@ -151,7 +152,7 @@ export function ProfileDropdown() {
           <div className="dropdown-divider"></div>
           
           {profile.profile_type !== 'artist' && (
-            <button className="dropdown-item become-artist-btn" onClick={() => {
+            <button className="dropdown-item profile-dropdown-item become-artist-btn" onClick={() => {
               navigate('/become-artist')
               setIsOpen(false)
             }}>
@@ -159,14 +160,14 @@ export function ProfileDropdown() {
             </button>
           )}
           {profile.profile_type === 'artist' && (
-            <button className="dropdown-item" onClick={() => {
+            <button className="dropdown-item profile-dropdown-item" onClick={() => {
               navigate('/profile')
               setIsOpen(false)
             }}>
               Il mio profilo
             </button>
           )}
-          <button className="dropdown-item" onClick={() => {
+          <button className="dropdown-item profile-dropdown-item" onClick={() => {
             navigate('/settings')
             setIsOpen(false)
           }}>
@@ -174,7 +175,7 @@ export function ProfileDropdown() {
           </button>
           
           <div className="dropdown-divider"></div>
-          <button className="dropdown-item logout-item" onClick={() => {
+          <button className="dropdown-item profile-dropdown-item logout-item" onClick={() => {
             signOut()
             setIsOpen(false)
             navigate('/')

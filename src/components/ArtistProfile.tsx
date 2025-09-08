@@ -8,6 +8,8 @@ import LoadingSpinner from './LoadingSpinner'
 import { PortfolioCard } from './PortfolioCard'
 import { Avatar } from './Avatar'
 import './ArtistProfile.css'
+import './TabHeader.css'
+import './TabsNavigation.css'
 import type { TabType } from '../types/portfolio'
 
 export function ArtistProfile() {
@@ -284,23 +286,29 @@ export function ArtistProfile() {
                                 {service.discount_percentage ? (
                                   <div className="price-with-discount">
                                     <span className="original-price">
-                                      {service.is_price_range 
-                                        ? `€${service.price_min_range}-${service.price_max_range}`
-                                        : `€${service.fixed_price}`
+                                      {service.pricing_type === 'range' 
+                                        ? `€${service.price_min}-${service.price_max}`
+                                        : service.pricing_type === 'fixed' 
+                                        ? `€${service.fixed_price}`
+                                        : 'Su consultazione'
                                       }
                                     </span>
                                     <span className="discounted-price">
-                                      {service.is_price_range 
-                                        ? `€${Math.round(service.price_min_range! * (100 - service.discount_percentage) / 100)}-${Math.round(service.price_max_range! * (100 - service.discount_percentage) / 100)}`
-                                        : `€${Math.round(service.fixed_price! * (100 - service.discount_percentage) / 100)}`
+                                      {service.pricing_type === 'range' 
+                                        ? `€${Math.round(service.price_min! * (100 - service.discount_percentage) / 100)}-${Math.round(service.price_max! * (100 - service.discount_percentage) / 100)}`
+                                        : service.pricing_type === 'fixed' 
+                                        ? `€${Math.round(service.fixed_price! * (100 - service.discount_percentage) / 100)}`
+                                        : 'Su consultazione'
                                       }
                                     </span>
                                   </div>
                                 ) : (
                                   <span>
-                                    {service.is_price_range 
-                                      ? `€${service.price_min_range}-${service.price_max_range}`
-                                      : `€${service.fixed_price}`
+                                    {service.pricing_type === 'range' 
+                                      ? `€${service.price_min}-${service.price_max}`
+                                      : service.pricing_type === 'fixed' 
+                                      ? `€${service.fixed_price}`
+                                      : 'Su consultazione'
                                     }
                                   </span>
                                 )}

@@ -112,6 +112,20 @@ export function MainPage() {
     navigate('/recent')
   }, [navigate])
 
+  // Handle edit portfolio item - redirect to profile
+  const handleEditPortfolioItem = useCallback((itemId: string) => {
+    // Store the item ID to edit in localStorage so PersonalProfile can pick it up
+    localStorage.setItem('editItemId', itemId)
+    navigate('/profile')
+  }, [navigate])
+
+  // Handle delete portfolio item - redirect to profile  
+  const handleDeletePortfolioItem = useCallback((itemId: string) => {
+    // Store the item ID to delete in localStorage so PersonalProfile can pick it up
+    localStorage.setItem('deleteItemId', itemId)
+    navigate('/profile')
+  }, [navigate])
+
   // Memoized list of items sorted by likes for featured section
   const featuredItems = useMemo(() => {
     return [...portfolioItems].sort((a, b) => {
@@ -165,28 +179,34 @@ export function MainPage() {
               onAuthRequired={handleAuthRequired}
               onContactArtist={handleContactArtist}
               onShowMore={handleShowFeaturedWorks}
+              onEdit={handleEditPortfolioItem}
+              onDelete={handleDeletePortfolioItem}
             />
             
             {/* Following Artists Section - Only for authenticated users */}
             {user && (
               <HorizontalPortfolioSection
-                title="Artisti che segui"
+                title="Seguiti"
                 items={followedArtistsItems}
                 onArtistClick={handleArtistProfileOpen}
                 onAuthRequired={handleAuthRequired}
                 onContactArtist={handleContactArtist}
                 onShowMore={handleShowFollowedWorks}
+                onEdit={handleEditPortfolioItem}
+                onDelete={handleDeletePortfolioItem}
               />
             )}
             
             {/* Recent Works Section */}
             <HorizontalPortfolioSection
-              title="Uscite recentemente"
+              title="Recenti"
               items={recentItems}
               onArtistClick={handleArtistProfileOpen}
               onAuthRequired={handleAuthRequired}
               onContactArtist={handleContactArtist}
               onShowMore={handleShowRecentWorks}
+              onEdit={handleEditPortfolioItem}
+              onDelete={handleDeletePortfolioItem}
             />
           </>
         )}
@@ -208,6 +228,8 @@ export function MainPage() {
                 onFlashFilterChange={handleFlashFilterChange}
                 onAuthRequired={handleAuthRequired}
                 onContactArtist={handleContactArtist}
+                onEdit={handleEditPortfolioItem}
+                onDelete={handleDeletePortfolioItem}
               />
             ) : (
               <ArtistGrid 

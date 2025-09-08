@@ -52,12 +52,12 @@
   right: -20px;
 }
 
-.horizontal-portfolio-grid {
+.horizontal-portfolio-grid,
+.horizontal-artist-grid {
   display: flex;
   gap: 1.5rem;
   overflow-x: auto;
   scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
   padding-bottom: 0.5rem;
   
   /* Hide scrollbar but keep functionality */
@@ -65,14 +65,14 @@
   -ms-overflow-style: none; /* IE and Edge */
 }
 
-.horizontal-portfolio-grid::-webkit-scrollbar {
+.horizontal-portfolio-grid::-webkit-scrollbar,
+.horizontal-artist-grid::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
 
 .horizontal-card-wrapper {
   flex: 0 0 auto;
   width: 280px;
-  scroll-snap-align: start;
 }
 
 /* Responsive adjustments */
@@ -90,7 +90,8 @@
 
   /* tab-header mobile styles are handled in ArtistProfile.css */
 
-  .horizontal-portfolio-grid {
+  .horizontal-portfolio-grid,
+  .horizontal-artist-grid {
     gap: 1rem;
   }
 
@@ -109,7 +110,8 @@
     width: 220px;
   }
   
-  .horizontal-portfolio-grid {
+  .horizontal-portfolio-grid,
+  .horizontal-artist-grid {
     gap: 0.875rem;
   }
 }

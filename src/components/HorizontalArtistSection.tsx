@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react'
 import { type ArtistProfile } from '../types/portfolio'
 import { ArtistCard } from './ArtistCard'
 import './HorizontalPortfolioSection.css'
-import './ArtistProfile.css' // Import for .tab-header styles
+import './TabHeader.css'
 
 interface HorizontalArtistSectionProps {
   title: string
@@ -13,7 +13,7 @@ interface HorizontalArtistSectionProps {
   onShowMore?: () => void
 }
 
-export function HorizontalArtistSection({ 
+function HorizontalArtistSection({ 
   title, 
   artists, 
   onArtistClick, 
@@ -28,6 +28,10 @@ export function HorizontalArtistSection({
   const updateArrowVisibility = () => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current
+      
+      // Ensure container is rendered and has content
+      if (container.scrollWidth === 0) return
+      
       const scrollLeft = container.scrollLeft
       const scrollWidth = container.scrollWidth
       const clientWidth = container.clientWidth
@@ -103,7 +107,7 @@ export function HorizontalArtistSection({
           
           <div 
             ref={scrollContainerRef}
-            className="horizontal-portfolio-grid"
+            className="horizontal-artist-grid"
           >
             {artists.slice(0, 12).map((artist) => (
               <div key={artist.id} className="horizontal-card-wrapper">
@@ -134,3 +138,5 @@ export function HorizontalArtistSection({
     </section>
   )
 }
+
+export { HorizontalArtistSection }

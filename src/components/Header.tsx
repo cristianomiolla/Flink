@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react'
 import './Header.css'
+import './PageHeader.css'
 import { useAuth } from '../hooks/useAuth'
 import { HeaderIcons } from './HeaderIcons'
 import { ProfileDropdown } from './ProfileDropdown'
@@ -24,7 +25,11 @@ export function Header({ onLogoClick, children, onAuthRequired }: HeaderProps) {
         <div className="header-content">
           <span className="logo" onClick={onLogoClick}>SKUNK</span>
           
-          {children}
+          {children && (
+            <div className="header-card">
+              {children}
+            </div>
+          )}
           
           <div className="user-section">
             {loading ? (
