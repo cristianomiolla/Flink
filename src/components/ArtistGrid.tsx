@@ -67,18 +67,13 @@ const ArtistGrid = memo(function ArtistGrid({
     ).slice(0, 12)
     
     // All artists sorted by follower count for popular section
-    const artistsWithFollowerCount = profiles.map(profile => {
-      const stats = getFollowerStats(profile.user_id)
-      return {
-        ...profile,
-        followerCount: stats?.follower_count || 0
-      }
-    })
-    
-    // Sort by follower count descending, then by creation date for ties
-    const sortedByFollowers = artistsWithFollowerCount.sort((a, b) => {
-      if (b.followerCount !== a.followerCount) {
-        return b.followerCount - a.followerCount
+    // Use follower_count directly from the profile data (loaded with the profiles)
+    const sortedByFollowers = [...profiles].sort((a, b) => {
+      const aFollowers = a.follower_count || 0
+      const bFollowers = b.follower_count || 0
+      
+      if (bFollowers !== aFollowers) {
+        return bFollowers - aFollowers
       }
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     })
@@ -89,7 +84,7 @@ const ArtistGrid = memo(function ArtistGrid({
       popularArtists: popular,
       recentArtists: recent
     }
-  }, [profiles, hasSearchTerms, getFollowerStats])
+  }, [profiles, hasSearchTerms])
 
   // Show traditional grid when there are search terms
   if (hasSearchTerms) {
@@ -125,6 +120,7 @@ const ArtistGrid = memo(function ArtistGrid({
                   onArtistClick={onArtistClick}
                   onAuthRequired={onAuthRequired}
                   onContactArtist={onContactArtist}
+                  isHorizontal={true}
                 />
               ))}
             </div>

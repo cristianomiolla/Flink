@@ -20,7 +20,6 @@ export function useArtistServices(userId?: string) {
         .from('artist_services')
         .select('*')
         .eq('user_id', userId)
-        .eq('is_active', true)
         .order('created_at', { ascending: false })
 
       if (error) throw error
@@ -53,14 +52,13 @@ export function useArtistServices(userId?: string) {
         description: string | null
         body_area: string | null
         size_category: string | null
-        pricing_type: 'fixed' | 'range' | 'consultation'
+        pricing_type: 'fixed' | 'range'
         fixed_price: number | null
         price_min: number | null
         price_max: number | null
         discount_percentage: number
         image_url: string | null
         user_id: string
-        is_active: boolean
       } = {
         name: serviceData.name,
         description: serviceData.description || null,
@@ -72,18 +70,21 @@ export function useArtistServices(userId?: string) {
         price_max: null,
         discount_percentage: serviceData.discount_percentage || 0,
         image_url: serviceData.image_url || null,
-        user_id: userId,
-        is_active: true
+        user_id: userId
       }
 
       // Set price fields based on pricing type to satisfy constraints
       if (serviceData.pricing_type === 'fixed') {
-        insertData.fixed_price = serviceData.fixed_price || null
+        insertData.fixed_price = serviceData.fixed_price
+        // Ensure range prices are null for fixed pricing
+        insertData.price_min = null
+        insertData.price_max = null
       } else if (serviceData.pricing_type === 'range') {
-        insertData.price_min = serviceData.price_min || null
-        insertData.price_max = serviceData.price_max || null
+        insertData.price_min = serviceData.price_min
+        insertData.price_max = serviceData.price_max
+        // Ensure fixed price is null for range pricing
+        insertData.fixed_price = null
       }
-      // consultation type already has all price fields set to null
 
       console.log('Creating service with data:', insertData)
 
@@ -124,10 +125,6 @@ export function useArtistServices(userId?: string) {
           updateData.fixed_price = null
           updateData.price_min = updates.price_min || null
           updateData.price_max = updates.price_max || null
-        } else if (updates.pricing_type === 'consultation') {
-          updateData.fixed_price = null
-          updateData.price_min = null
-          updateData.price_max = null
         }
       } else {
         // Update individual price fields only if pricing_type is not changing
@@ -166,7 +163,7 @@ export function useArtistServices(userId?: string) {
     try {
       const { error } = await supabase
         .from('artist_services')
-        .update({ is_active: false })
+        .delete()
         .eq('id', serviceId)
         .eq('user_id', userId)
 

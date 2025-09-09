@@ -2,6 +2,7 @@
 
 /* Base styles for action buttons */
 .action-btn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -54,7 +55,7 @@
 .action-btn.active:hover {
   background: #171717;
   color: #ffffff;
-  border-color: #ffffff;
+  border-color: #171717;
 }
 
 /* Disabled states */
@@ -78,6 +79,64 @@
 /* Text styles */
 .action-text {
   font-family: var(--font-body);
+}
+
+/* Divider between adjacent active buttons - simple approach */
+.portfolio-actions .action-btn:first-child.active:has(+ .action-btn.active)::after,
+.artist-actions .action-btn:first-child.active:has(+ .action-btn.active)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 60%;
+  background: #ffffff;
+  opacity: 0.4;
+}
+
+/* Modal dividers - Desktop layout (flex) */
+@media (min-width: 768px) {
+  .modal-portfolio-actions .action-btn.active:has(+ .action-btn.active)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 60%;
+    background: #ffffff;
+    opacity: 0.4;
+  }
+}
+
+/* Modal dividers - Mobile layout (grid) */
+@media (max-width: 767px) {
+  /* Row 1: Between buttons 1 and 2 when both active */
+  .modal-portfolio-actions .action-btn:nth-child(1).active:has(+ .action-btn:nth-child(2).active)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 60%;
+    background: #ffffff;
+    opacity: 0.4;
+  }
+  
+  /* Row 2: Between buttons 3 and 4 when both active (for 4-button layout) */
+  .modal-portfolio-actions .action-btn:nth-child(3).active:has(+ .action-btn:nth-child(4).active)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 60%;
+    background: #ffffff;
+    opacity: 0.4;
+  }
 }
 
 /* Secondary button styles */
@@ -107,7 +166,7 @@
 .btn.btn-secondary.active:hover {
   background: #171717;
   color: #ffffff;
-  border-color: #ffffff;
+  border-color: #171717;
 }
 
 /* Mobile responsive */

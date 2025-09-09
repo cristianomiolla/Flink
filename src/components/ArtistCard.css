@@ -16,7 +16,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 1rem;
   margin-bottom: 1rem;
   text-align: center;
 }
@@ -27,13 +27,7 @@
 
 /* Avatar styles now handled by Avatar component */
 
-.artist-info {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.artist-name {
+.artist-card-name {
   font-size: 16px;
   font-weight: 700;
   color: var(--foreground);
@@ -44,7 +38,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 180px;
+  max-width: 100%;
 }
 
 .artist-location {
@@ -167,14 +161,10 @@
   }
   
   
-  .artist-info {
-    align-items: center;
-    text-align: left;
-    gap: 0.5rem;
-  }
-  
-  .artist-name {
+  .artist-card-name {
     font-size: 16px;
+    text-align: left;
+    margin: 0;
   }
   
   .artist-location {
@@ -184,7 +174,6 @@
   .artist-bio {
     font-size: 13px;
     text-align: left;
-    height: 2.1rem;
     min-height: 2.1rem;
     margin-bottom: 1rem;
   }

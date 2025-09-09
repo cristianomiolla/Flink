@@ -6,13 +6,15 @@ import './ServiceCard.css'
 interface ServiceCardProps {
   service: ArtistService
   showEditButton?: boolean
-  onEdit?: (serviceId: string) => void
+  onEdit?: (service: ArtistService) => void
   onDelete?: (serviceId: string) => void
 }
 
 export function ServiceCard({ service, showEditButton = false, onEdit, onDelete }: ServiceCardProps) {
   const [showActionsDropdown, setShowActionsDropdown] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Remove mobile-specific logic - now works the same on all devices
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -31,11 +33,13 @@ export function ServiceCard({ service, showEditButton = false, onEdit, onDelete 
     setShowActionsDropdown(!showActionsDropdown)
   }
 
+  // Remove card click handler - now only button click works like desktop
+
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation()
     setShowActionsDropdown(false)
     if (onEdit) {
-      onEdit(service.id)
+      onEdit(service)
     }
   }
 
@@ -52,17 +56,23 @@ export function ServiceCard({ service, showEditButton = false, onEdit, onDelete 
       return `€${service.price_min} - €${service.price_max}`
     } else if (service.pricing_type === 'fixed' && service.fixed_price !== null) {
       return `€${service.fixed_price}`
-    } else if (service.pricing_type === 'consultation') {
-      return 'Su consultazione'
     }
     return 'Prezzo su richiesta'
   }
 
-  const hasDiscount = service.discount_percentage && service.discount_percentage > 0
+  const getDiscountedPrice = () => {
+    if (service.pricing_type === 'fixed' && service.fixed_price !== null && hasDiscount) {
+      const discountedAmount = service.fixed_price * (1 - service.discount_percentage! / 100)
+      return `€${discountedAmount.toFixed(2)}`
+    }
+    return null
+  }
+
+  const hasDiscount = service.discount_percentage != null && service.discount_percentage > 0
 
   return (
     <article className="service-card-row">
-      {/* Image Section - First for visual impact */}
+      {/* Image Section - Visual impact */}
       <div className="service-image-thumb">
         {service.image_url ? (
           <img 
@@ -81,7 +91,7 @@ export function ServiceCard({ service, showEditButton = false, onEdit, onDelete 
           </div>
         )}
         
-        {/* Discount Badge */}
+        {/* Discount Badge - Back in image area */}
         {hasDiscount && (
           <span className="service-discount-badge">
             -{service.discount_percentage}%
@@ -89,21 +99,21 @@ export function ServiceCard({ service, showEditButton = false, onEdit, onDelete 
         )}
       </div>
 
-      {/* Content Section - Main information */}
+      {/* Content Section - Primary information hierarchy */}
       <div className="service-row-content">
-        {/* Service Name - Most prominent */}
+        {/* 1. Service Name - Most important */}
         <h3 className="service-row-title">
           {service.name}
         </h3>
 
-        {/* Description - Supporting information */}
+        {/* 2. Description - Supporting information */}
         {service.description && (
           <p className="service-row-description">
             {service.description}
           </p>
         )}
 
-        {/* Service Details - Additional context */}
+        {/* 3. Service Details - Context tags */}
         <div className="service-row-details">
           {service.body_area && (
             <span className="service-detail-tag">
@@ -116,11 +126,24 @@ export function ServiceCard({ service, showEditButton = false, onEdit, onDelete 
             </span>
           )}
         </div>
-      </div>
 
-      {/* Price Section - Key information, prominent placement */}
-      <div className="service-row-price">
-        {formatPrice()}
+        {/* 4. Price Section - On mobile, inside content for proper ordering */}
+        <div className="service-price-section">
+          {hasDiscount && getDiscountedPrice() ? (
+            <>
+              <div className="service-row-price service-price-original">
+                {formatPrice()}
+              </div>
+              <div className="service-row-price service-price-discounted">
+                {getDiscountedPrice()}
+              </div>
+            </>
+          ) : (
+            <div className="service-row-price">
+              {formatPrice()}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Actions Dropdown - Secondary action, positioned last */}
@@ -139,22 +162,22 @@ export function ServiceCard({ service, showEditButton = false, onEdit, onDelete 
           </button>
           
           {showActionsDropdown && (
-            <div className="service-actions-menu">
+            <div className="portfolio-actions-menu">
               <button 
-                className="action-btn service-action-item"
+                className="action-btn portfolio-action-item"
                 onClick={handleEdit}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path d="m18,2l4,4l-14,14h-4v-4L18,2z"></path>
                   <path d="m13,7l4,4"></path>
                 </svg>
                 <span>Modifica</span>
               </button>
               <button 
-                className="action-btn service-action-item delete-action"
+                className="action-btn portfolio-action-item delete-action"
                 onClick={handleDelete}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <polyline points="3,6 5,6 21,6"></polyline>
                   <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
                   <line x1="10" y1="11" x2="10" y2="17"></line>

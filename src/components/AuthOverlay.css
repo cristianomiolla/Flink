@@ -28,7 +28,7 @@
 }
 
 .auth-modal-header {
-  padding: 5rem 24px 0 24px;
+  padding: 60px 24px 0 24px;
   position: relative;
 }
 
@@ -289,7 +289,7 @@
   }
   
   .auth-modal-header {
-    padding: 4rem 24px 0 24px;
+    padding: 60px 24px 0 24px;
   }
   
   .auth-close-btn {

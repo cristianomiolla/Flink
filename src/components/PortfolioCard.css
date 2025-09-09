@@ -112,19 +112,17 @@
   min-height: 0;
 }
 
-.artist-info {
+.portfolio-artist-info {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  height: 24px;
-  min-height: 24px;
-  overflow: hidden;
+  min-height: 32px;
 }
 
 /* Avatar styles now handled by Avatar component */
 
-.portfolio-card .artist-name {
-  font-size: 14px;
+.portfolio-card .portfolio-artist-name {
+  font-size: 12px;
   font-weight: 600;
   color: var(--foreground);
   margin: 0;
@@ -132,6 +130,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-transform: uppercase;
   flex: 1;
 }
 
@@ -268,8 +267,8 @@
     margin: 0.75rem 0 12px 0;
   }
   
-  .portfolio-card .artist-name {
-    font-size: 13px;
+  .portfolio-card .portfolio-artist-name {
+    font-size: 11px;
   }
 
   .artist-avatar-placeholder {
@@ -402,7 +401,6 @@
   top: calc(100% + 0.25rem);
   right: 0;
   background: var(--background);
-  border: 1px solid var(--border);
   border-radius: 0;
   min-width: 120px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);

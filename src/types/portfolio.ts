@@ -52,7 +52,7 @@ export interface ArtistService {
   description: string | null
   body_area: string | null
   size_category: string | null
-  pricing_type: 'fixed' | 'range' | 'consultation'
+  pricing_type: 'fixed' | 'range'
   fixed_price: number | null
   price_min: number | null
   price_max: number | null
@@ -68,7 +68,7 @@ export interface CreateServiceData {
   description: string
   body_area: string
   size_category: string
-  pricing_type: 'fixed' | 'range' | 'consultation'
+  pricing_type: 'fixed' | 'range'
   fixed_price: number | null
   price_min: number | null
   price_max: number | null

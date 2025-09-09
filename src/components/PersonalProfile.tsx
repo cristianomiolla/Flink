@@ -512,12 +512,9 @@ export function PersonalProfile() {
     setShowServiceForm(true)
   }
 
-  const handleEditService = (serviceId: string) => {
-    const service = services.find(s => s.id === serviceId)
-    if (service) {
-      setEditingService(service)
-      setShowServiceForm(true)
-    }
+  const handleEditService = (service: ArtistService) => {
+    setEditingService(service)
+    setShowServiceForm(true)
   }
 
   const handleDeleteService = (serviceId: string) => {
@@ -731,7 +728,7 @@ export function PersonalProfile() {
                 {activeTab === 'servizi' && (
                   <div className="tab-panel servizi-panel">
                     <div className="tab-header">
-                      <h3>I MIEI SERVIZI {!servicesLoading && services.length > 0 && `(${services.length})`}</h3>
+                      <h3>Servizi</h3>
                       <button 
                         className="action-btn"
                         onClick={handleCreateService}

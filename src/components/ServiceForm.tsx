@@ -64,7 +64,11 @@ export function ServiceForm({
   const [imageUploading, setImageUploading] = useState(false)
 
   // Check if all required fields are filled
-  const isFormValid = formData.name.trim().length > 0
+  const isFormValid = formData.name.trim().length > 0 &&
+    formData.body_area.length > 0 &&
+    formData.size_category.length > 0 &&
+    ((formData.pricing_type === 'fixed' && formData.fixed_price !== null && formData.fixed_price > 0) ||
+     (formData.pricing_type === 'range' && formData.price_min !== null && formData.price_max !== null && formData.price_min > 0 && formData.price_max > 0))
 
   const uploadImage = async (file: File): Promise<string> => {
     if (!user?.id) throw new Error('User not authenticated')
@@ -125,6 +129,29 @@ export function ServiceForm({
     }
   }
 
+  // Initialize form data when editing service changes
+  useEffect(() => {
+    if (editingService) {
+      setFormData({
+        name: editingService.name || '',
+        description: editingService.description || '',
+        body_area: editingService.body_area || '',
+        size_category: editingService.size_category || '',
+        pricing_type: editingService.pricing_type || 'fixed',
+        fixed_price: editingService.fixed_price || null,
+        price_min: editingService.price_min || null,
+        price_max: editingService.price_max || null,
+        discount_percentage: editingService.discount_percentage || null,
+        image_url: editingService.image_url || ''
+      })
+      
+      // Set image preview if available
+      if (editingService.image_url) {
+        setFilePreview(editingService.image_url)
+      }
+    }
+  }, [editingService])
+
   // Initialize preview for editing service
   useEffect(() => {
     if (isEditing && editingService?.image_url) {
@@ -156,6 +183,31 @@ export function ServiceForm({
       return
     }
 
+    if (!formData.body_area) {
+      alert('L\'area del corpo è obbligatoria')
+      return
+    }
+
+    if (!formData.size_category) {
+      alert('La dimensione è obbligatoria')
+      return
+    }
+
+    if (formData.pricing_type === 'fixed' && (!formData.fixed_price || formData.fixed_price <= 0)) {
+      alert('Il prezzo è obbligatorio per il prezzo fisso')
+      return
+    }
+
+    if (formData.pricing_type === 'range' && (!formData.price_min || !formData.price_max || formData.price_min <= 0 || formData.price_max <= 0)) {
+      alert('I prezzi minimo e massimo sono obbligatori per il range di prezzo')
+      return
+    }
+
+    if (formData.pricing_type === 'range' && formData.price_min && formData.price_max && formData.price_min > formData.price_max) {
+      alert('Il prezzo minimo non può essere maggiore del prezzo massimo')
+      return
+    }
+
     setIsSubmitting(true)
     
     try {
@@ -173,10 +225,6 @@ export function ServiceForm({
         finalFormData.price_max = null
       } else if (finalFormData.pricing_type === 'range') {
         finalFormData.fixed_price = null
-      } else if (finalFormData.pricing_type === 'consultation') {
-        finalFormData.fixed_price = null
-        finalFormData.price_min = null
-        finalFormData.price_max = null
       }
       
       console.log('ServiceForm submitting data:', finalFormData)
@@ -323,7 +371,7 @@ export function ServiceForm({
           {/* Body Area */}
           <div className="form-group">
             <label className="form-label">
-              Area del Corpo
+              Area del Corpo <span className="required-indicator">*</span>
             </label>
             <div className="custom-dropdown">
               <button
@@ -374,7 +422,7 @@ export function ServiceForm({
           {/* Size Category */}
           <div className="form-group">
             <label className="form-label">
-              Dimensione
+              Dimensione <span className="required-indicator">*</span>
             </label>
             <div className="custom-dropdown">
               <button
@@ -448,25 +496,11 @@ export function ServiceForm({
                   onChange={() => setFormData(prev => ({ 
                     ...prev, 
                     pricing_type: 'range',
-                    fixed_price: null 
+                    fixed_price: null,
+                    discount_percentage: null
                   }))}
                 />
                 <span className="radio-text">Range di prezzo</span>
-              </label>
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="priceType"
-                  checked={formData.pricing_type === 'consultation'}
-                  onChange={() => setFormData(prev => ({ 
-                    ...prev, 
-                    pricing_type: 'consultation',
-                    fixed_price: null,
-                    price_min: null,
-                    price_max: null 
-                  }))}
-                />
-                <span className="radio-text">Su consultazione</span>
               </label>
             </div>
           </div>
@@ -476,7 +510,7 @@ export function ServiceForm({
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="priceMin" className="form-label">
-                  Prezzo Minimo (€)
+                  Prezzo Minimo (€) <span className="required-indicator">*</span>
                 </label>
                 <input
                   type="number"
@@ -494,7 +528,7 @@ export function ServiceForm({
               </div>
               <div className="form-group">
                 <label htmlFor="priceMax" className="form-label">
-                  Prezzo Massimo (€)
+                  Prezzo Massimo (€) <span className="required-indicator">*</span>
                 </label>
                 <input
                   type="number"
@@ -514,7 +548,7 @@ export function ServiceForm({
           ) : formData.pricing_type === 'fixed' ? (
             <div className="form-group">
               <label htmlFor="fixedPrice" className="form-label">
-                Prezzo (€)
+                Prezzo (€) <span className="required-indicator">*</span>
               </label>
               <input
                 type="number"
@@ -533,24 +567,26 @@ export function ServiceForm({
           ) : null}
 
           {/* Discount */}
-          <div className="form-group">
-            <label htmlFor="discount" className="form-label">
-              Sconto (%)
-            </label>
-            <input
-              type="number"
-              id="discount"
-              className="form-input"
-              placeholder="0"
-              min="0"
-              max="100"
-              value={formData.discount_percentage || ''}
-              onChange={(e) => setFormData(prev => ({ 
-                ...prev, 
-                discount_percentage: e.target.value ? parseInt(e.target.value) : null 
-              }))}
-            />
-          </div>
+          {formData.pricing_type === 'fixed' && (
+            <div className="form-group">
+              <label htmlFor="discount" className="form-label">
+                Sconto (%)
+              </label>
+              <input
+                type="number"
+                id="discount"
+                className="form-input"
+                placeholder="0"
+                min="0"
+                max="100"
+                value={formData.discount_percentage || ''}
+                onChange={(e) => setFormData(prev => ({ 
+                  ...prev, 
+                  discount_percentage: e.target.value ? parseInt(e.target.value) : null 
+                }))}
+              />
+            </div>
+          )}
 
 
           {/* Form Actions */}

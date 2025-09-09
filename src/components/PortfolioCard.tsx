@@ -212,7 +212,7 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
       {/* Content Section */}
       <div className="content-section">
         {/* Artist Info */}
-        <div className="artist-info">
+        <div className="portfolio-artist-info">
           <Avatar
             src={item.artist_avatar_url}
             name={displayName}
@@ -222,7 +222,7 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
             onClick={handleAvatarClick}
           />
           <span 
-            className="artist-name"
+            className="portfolio-artist-name"
             onClick={handleArtistNameClick}
             style={{ cursor: 'pointer' }}
           >

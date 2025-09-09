@@ -95,7 +95,8 @@ export function usePortfolioSearch() {
           phone,
           location,
           created_at,
-          updated_at
+          updated_at,
+          followers!followers_following_id_fkey(id)
         `)
         .eq('profile_type', 'artist')
         .order('created_at', { ascending: false })
@@ -105,7 +106,14 @@ export function usePortfolioSearch() {
         throw profilesError
       }
 
-      setArtistProfiles((profilesData as ArtistProfile[]) || [])
+      // Transform data to include follower_count
+      const transformedProfiles: ArtistProfile[] = profilesData?.map((profile: any) => ({
+        ...profile,
+        follower_count: profile.followers?.length || 0,
+        followers: undefined // Remove the nested followers array
+      })) || []
+
+      setArtistProfiles(transformedProfiles)
       
     } catch {
       console.warn('Failed to fetch artist profiles')
