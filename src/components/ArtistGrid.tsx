@@ -35,7 +35,7 @@ const ArtistGrid = memo(function ArtistGrid({
   onShowMoreFeatured,
   onShowMoreRecent
 }: ArtistGridProps) {
-  const { fetchFollowerStats, getFollowerStats } = useFollowers()
+  const { fetchFollowerStats } = useFollowers()
   
   // Fetch follower stats for all displayed artists
   useEffect(() => {
