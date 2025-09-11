@@ -6,16 +6,6 @@ import { type Message as DatabaseMessage } from '../hooks/useMessages'
 import { ActionButton, DeleteIcon, SendIcon } from './ActionButton'
 import { BookingRequestCard } from './BookingRequestCard'
 
-// Helper function to check if a message is a booking request
-const isBookingRequestMessage = (content: string): boolean => {
-  try {
-    const parsed = JSON.parse(content)
-    return parsed.type === 'booking_request' && parsed.booking_data
-  } catch {
-    return false
-  }
-}
-
 // Helper function to parse booking request message
 const parseBookingRequestMessage = (content: string) => {
   try {

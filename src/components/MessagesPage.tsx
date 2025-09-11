@@ -27,7 +27,7 @@ interface PinnedActionButtonProps {
   participantName: string
 }
 
-function PinnedActionButton({ participantId, participantName, onOpenBookingRequest }: PinnedActionButtonProps & { onOpenBookingRequest?: (participantId?: string) => void }) {
+function PinnedActionButton({ participantId, onOpenBookingRequest }: PinnedActionButtonProps & { onOpenBookingRequest?: (participantId?: string) => void }) {
   const { user, profile } = useAuth()
   
   if (!user || !profile || !participantId) return null
@@ -66,16 +66,6 @@ const useIsMobile = () => {
   }, [])
 
   return isMobile
-}
-
-// Helper function to check if a message is a booking request
-const isBookingRequestMessage = (content: string): boolean => {
-  try {
-    const parsed = JSON.parse(content)
-    return parsed.type === 'booking_request' && parsed.booking_data
-  } catch {
-    return false
-  }
 }
 
 // Helper function to parse booking request message
@@ -841,7 +831,7 @@ export function MessagesPage() {
                         id="subject" 
                         className="form-input" 
                         placeholder="Es. Rosa con spine, leone, scritta..." 
-                        maxLength="200" 
+                        maxLength={200} 
                         type="text" 
                         value={bookingForm.subject}
                         onChange={(e) => setBookingForm(prev => ({ ...prev, subject: e.target.value }))}
@@ -1034,8 +1024,8 @@ export function MessagesPage() {
                         id="meaning" 
                         className="form-textarea" 
                         placeholder="Racconta il significato del tuo tatuaggio (opzionale)" 
-                        rows="3" 
-                        maxLength="500"
+                        rows={3} 
+                        maxLength={500}
                         value={bookingForm.meaning}
                         onChange={(e) => setBookingForm(prev => ({ ...prev, meaning: e.target.value }))}
                       ></textarea>
@@ -1316,7 +1306,7 @@ export function MessagesPage() {
                     id="subject" 
                     className="form-input" 
                     placeholder="Es. Rosa con spine, leone, scritta..." 
-                    maxLength="200" 
+                    maxLength={200} 
                     type="text" 
                     value={bookingForm.subject}
                     onChange={(e) => setBookingForm(prev => ({ ...prev, subject: e.target.value }))}
@@ -1509,8 +1499,8 @@ export function MessagesPage() {
                     id="meaning" 
                     className="form-textarea" 
                     placeholder="Racconta il significato del tuo tatuaggio (opzionale)" 
-                    rows="3" 
-                    maxLength="500"
+                    rows={3} 
+                    maxLength={500}
                     value={bookingForm.meaning}
                     onChange={(e) => setBookingForm(prev => ({ ...prev, meaning: e.target.value }))}
                   ></textarea>
