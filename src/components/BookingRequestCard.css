@@ -1,0 +1,165 @@
+@import '../styles/tokens.css';
+
+.booking-request-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 0;
+  padding: 1rem;
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 700px;
+  font-family: var(--font-sans);
+}
+
+.message.sent .booking-request-card {
+  background: rgba(239, 67, 67, 0.1);
+  border-color: var(--accent);
+}
+
+.message.received .booking-request-card {
+  background: var(--grey-light);
+  border-color: var(--border);
+}
+
+.booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.booking-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.booking-icon {
+  font-size: 1.2rem;
+}
+
+.booking-title h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid;
+  background: var(--card);
+  border-radius: var(--radius-sm);
+}
+
+.status-badge.pending {
+  color: #d97706;
+  border-color: #d97706;
+  background: rgba(217, 119, 6, 0.1);
+}
+
+.status-badge.accepted {
+  color: #059669;
+  border-color: #059669;
+  background: rgba(5, 150, 105, 0.1);
+}
+
+.status-badge.declined {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(239, 67, 67, 0.1);
+}
+
+.booking-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.booking-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.25rem 0;
+}
+
+.field-label {
+  font-weight: 700;
+  color: var(--grey-dark);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.field-value {
+  color: var(--foreground);
+  font-size: 0.875rem;
+  text-align: right;
+  flex-grow: 1;
+  word-break: break-word;
+}
+
+.field-value.budget {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.booking-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.booking-time {
+  font-size: 0.75rem;
+  color: var(--grey-dark);
+  font-weight: 500;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .booking-field {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+  
+  .field-label {
+    min-width: auto;
+  }
+  
+  .field-value {
+    text-align: left;
+  }
+}
+
+/* Override message bubble styles when inside booking card */
+.message .booking-request-card .message-bubble {
+  all: unset;
+  display: block;
+}
+
+/* Ensure proper spacing within messages list */
+.messages-list .message:has(.booking-request-card) {
+  margin: 0.75rem 0;
+}
+
+.messages-list .message:has(.booking-request-card) .message-bubble {
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}

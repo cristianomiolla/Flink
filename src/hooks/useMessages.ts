@@ -2,6 +2,19 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './useAuth'
 
+// Helper function to format last message for display
+const formatLastMessageForDisplay = (content: string, isFromCurrentUser: boolean): string => {
+  try {
+    const parsed = JSON.parse(content)
+    if (parsed.type === 'booking_request' && parsed.booking_data) {
+      return isFromCurrentUser ? 'Richiesta inviata' : 'Richiesta ricevuta'
+    }
+  } catch {
+    // If it's not JSON, it's a regular message
+  }
+  return content
+}
+
 export interface Message {
   id: string
   sender_id: string
@@ -185,7 +198,7 @@ export function useMessages() {
               username: participantProfile?.username || '',
               avatar: participantProfile?.avatar_url || null
             },
-            lastMessage: message.content,
+            lastMessage: formatLastMessageForDisplay(message.content, isFromCurrentUser),
             timestamp: message.created_at,
             unreadCount,
             isFromCurrentUser
@@ -360,7 +373,7 @@ export function useMessages() {
             conv.id === conversationKey 
               ? { 
                   ...conv, 
-                  lastMessage: content,
+                  lastMessage: formatLastMessageForDisplay(content, true),
                   timestamp: new Date().toISOString(),
                   isFromCurrentUser: true
                 }
@@ -402,7 +415,7 @@ export function useMessages() {
             username: participantProfile?.username || '',
             avatar: participantProfile?.avatar_url || null
           },
-          lastMessage: content,
+          lastMessage: formatLastMessageForDisplay(content, true),
           timestamp: new Date().toISOString(),
           unreadCount: 0,
           isFromCurrentUser: true

@@ -1,6 +1,4 @@
 import { useEffect } from 'react'
-import './ConfirmationModal.css'
-import './PortfolioModal.css'
 import './AuthOverlay.css'
 
 interface ConfirmationModalProps {
@@ -23,10 +21,21 @@ export function ConfirmationModal({
   onCancel
 }: ConfirmationModalProps) {
   
-  // Block scroll when modal is open
+  // Block scroll when modal is open and handle escape key
   useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onCancel()
+      }
+    }
+
     if (isOpen) {
       document.body.style.overflow = 'hidden'
+      document.addEventListener('keydown', handleEscape)
+      return () => {
+        document.body.style.overflow = 'unset'
+        document.removeEventListener('keydown', handleEscape)
+      }
     } else {
       document.body.style.overflow = 'unset'
     }
@@ -35,7 +44,7 @@ export function ConfirmationModal({
     return () => {
       document.body.style.overflow = 'unset'
     }
-  }, [isOpen])
+  }, [isOpen, onCancel])
 
   if (!isOpen) return null
 
@@ -66,7 +75,7 @@ export function ConfirmationModal({
           </div>
 
           <form className="auth-form" onSubmit={(e) => { e.preventDefault(); onConfirm(); }}>
-            <div className="modal-actions">
+            <div className="form-actions">
               <button 
                 type="button"
                 className="action-btn" 

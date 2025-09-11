@@ -4,6 +4,70 @@ import { Avatar } from './Avatar'
 import { useAuth } from '../hooks/useAuth'
 import { type Message as DatabaseMessage } from '../hooks/useMessages'
 import { ActionButton, DeleteIcon, SendIcon } from './ActionButton'
+import { BookingRequestCard } from './BookingRequestCard'
+
+// Helper function to check if a message is a booking request
+const isBookingRequestMessage = (content: string): boolean => {
+  try {
+    const parsed = JSON.parse(content)
+    return parsed.type === 'booking_request' && parsed.booking_data
+  } catch {
+    return false
+  }
+}
+
+// Helper function to parse booking request message
+const parseBookingRequestMessage = (content: string) => {
+  try {
+    const parsed = JSON.parse(content)
+    if (parsed.type === 'booking_request' && parsed.booking_data) {
+      return {
+        booking_id: parsed.booking_id,
+        booking_data: parsed.booking_data
+      }
+    }
+  } catch {
+    return null
+  }
+  return null
+}
+
+// PinnedActionButton component
+interface PinnedActionButtonProps {
+  participantId: string | null
+  participantName: string
+}
+
+function PinnedActionButton({ participantId, participantName, onOpenBookingRequest }: PinnedActionButtonProps & { onOpenBookingRequest?: (participantId?: string) => void }) {
+  const { user, profile } = useAuth()
+  
+  if (!user || !profile || !participantId) return null
+
+  const isArtist = profile.profile_type === 'artist'
+  const buttonText = isArtist ? '📅 FISSA APPUNTAMENTO' : '📝 INVIA UNA RICHIESTA'
+
+  const handleClick = () => {
+    console.log('PinnedActionButton ChatConversation clicked', { participantId, isArtist })
+    // Per ora, disabilitiamo il pulsante "FISSA APPUNTAMENTO" per gli artisti
+    if (isArtist) {
+      console.log('Funzionalità "FISSA APPUNTAMENTO" temporaneamente disabilitata')
+      return
+    }
+    
+    if (onOpenBookingRequest) {
+      onOpenBookingRequest(participantId)
+    } else {
+      // Placeholder for now - will implement booking logic later
+      console.log(`Sending request to ${participantName}`)
+    }
+  }
+
+  return (
+    <button className="pinned-action-btn" onClick={handleClick}>
+      {buttonText}
+    </button>
+  )
+}
 
 interface Message {
   id: string
@@ -27,9 +91,10 @@ interface ChatConversationProps {
   sendMessage?: (receiverId: string, content: string) => Promise<boolean>
   fetchConversationMessages?: (participantId: string) => Promise<DatabaseMessage[]>
   hideHeaderAndInput?: boolean
+  onOpenBookingRequest?: (participantId?: string) => void
 }
 
-export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages, hideHeaderAndInput = false }: ChatConversationProps) {
+export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages, hideHeaderAndInput = false, onOpenBookingRequest }: ChatConversationProps) {
   const { user } = useAuth()
   const [newMessage, setNewMessage] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
@@ -233,6 +298,17 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
       {/* Messages */}
       <div className="messages-container">
         <div className="messages-list" ref={messagesListRef}>
+          {/* Pinned Action Button - Show on both desktop and mobile when we have a participant */}
+          {chat && (
+            <div className="pinned-action-container">
+              <PinnedActionButton 
+                participantId={getParticipantId(chat.id)}
+                participantName={chat.participant.name}
+                onOpenBookingRequest={onOpenBookingRequest}
+              />
+            </div>
+          )}
+
           {loading ? (
             <div className="loading-messages">
               <p>Caricamento messaggi...</p>
@@ -242,19 +318,39 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
               <p>Nessun messaggio ancora. Inizia la conversazione!</p>
             </div>
           ) : (
-            messages.map((message) => (
-              <div
-                key={message.id}
-                className={`message ${message.isFromCurrentUser ? 'sent' : 'received'}`}
-              >
-                <div className="message-bubble">
-                  <p className="message-content">{message.content}</p>
-                  <span className="message-time">
-                    {formatMessageTime(message.timestamp)}
-                  </span>
-                </div>
-              </div>
-            ))
+            messages.map((message) => {
+              const bookingData = parseBookingRequestMessage(message.content)
+              
+              if (bookingData) {
+                // Render BookingRequestCard for booking request messages
+                return (
+                  <BookingRequestCard
+                    key={message.id}
+                    bookingData={{
+                      ...bookingData.booking_data,
+                      created_at: message.timestamp
+                    }}
+                    isFromCurrentUser={message.isFromCurrentUser}
+                    timestamp={message.timestamp}
+                  />
+                )
+              } else {
+                // Render normal message
+                return (
+                  <div
+                    key={message.id}
+                    className={`message ${message.isFromCurrentUser ? 'sent' : 'received'}`}
+                  >
+                    <div className="message-bubble">
+                      <p className="message-content">{message.content}</p>
+                      <span className="message-time">
+                        {formatMessageTime(message.timestamp)}
+                      </span>
+                    </div>
+                  </div>
+                )
+              }
+            })
           )}
         </div>
       </div>

@@ -1,6 +1,11 @@
 import { useState, useEffect, lazy, Suspense, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import './MessagesPage.css'
+import './Dropdown.css'
+import './AuthOverlay.css'
+import './ImageUpload.css'
+import './ChatConversation.css'
+import '../styles/tokens.css'
 import { SearchBar } from './SearchBar'
 import { ChatList } from './ChatList'
 import { ChatConversation } from './ChatConversation'
@@ -10,10 +15,40 @@ import { useAuth } from '../hooks/useAuth'
 import { generateConversationId } from '../lib/messageUtils'
 import { supabase } from '../lib/supabase'
 import LoadingSpinner from './LoadingSpinner'
-import { ConfirmationOverlay } from './ConfirmationOverlay'
+import { ConfirmationModal } from './ConfirmationModal'
+import { BookingRequestCard } from './BookingRequestCard'
 
 // Lazy load AuthOverlay component
 const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
+
+// PinnedActionButton component for mobile
+interface PinnedActionButtonProps {
+  participantId: string | null
+  participantName: string
+}
+
+function PinnedActionButton({ participantId, participantName, onOpenBookingRequest }: PinnedActionButtonProps & { onOpenBookingRequest?: (participantId?: string) => void }) {
+  const { user, profile } = useAuth()
+  
+  if (!user || !profile || !participantId) return null
+
+  const isArtist = profile.profile_type === 'artist'
+  const buttonText = isArtist ? '📅 FISSA APPUNTAMENTO' : '📝 INVIA UNA RICHIESTA'
+
+  const handleClick = () => {
+    if (isArtist) return
+    
+    if (onOpenBookingRequest) {
+      onOpenBookingRequest(participantId)
+    }
+  }
+
+  return (
+    <button className="pinned-action-btn" onClick={handleClick}>
+      {buttonText}
+    </button>
+  )
+}
 
 // Hook to detect if we're on mobile
 const useIsMobile = () => {
@@ -33,6 +68,32 @@ const useIsMobile = () => {
   return isMobile
 }
 
+// Helper function to check if a message is a booking request
+const isBookingRequestMessage = (content: string): boolean => {
+  try {
+    const parsed = JSON.parse(content)
+    return parsed.type === 'booking_request' && parsed.booking_data
+  } catch {
+    return false
+  }
+}
+
+// Helper function to parse booking request message
+const parseBookingRequestMessage = (content: string) => {
+  try {
+    const parsed = JSON.parse(content)
+    if (parsed.type === 'booking_request' && parsed.booking_data) {
+      return {
+        booking_id: parsed.booking_id,
+        booking_data: parsed.booking_data
+      }
+    }
+  } catch {
+    return null
+  }
+  return null
+}
+
 
 interface Chat {
   id: string
@@ -48,11 +109,149 @@ interface Chat {
 export function MessagesPage() {
   const { artistId } = useParams()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const isMobile = useIsMobile()
   
   const handleLogoClick = () => navigate('/')
   const [showAuthOverlay, setShowAuthOverlay] = useState(false)
+  const [showBookingRequest, setShowBookingRequest] = useState(false)
+  const [currentArtistId, setCurrentArtistId] = useState<string | null>(null)
+  
+  
+  
+  // Booking form state
+  const [bookingForm, setBookingForm] = useState({
+    subject: '',
+    tattoo_style: '',
+    body_area: '',
+    size_category: '',
+    color_preferences: '',
+    meaning: '',
+    budget_min: '',
+    budget_max: ''
+  })
+  
+  // Dropdown states
+  const [tattooStyleDropdownOpen, setTattooStyleDropdownOpen] = useState(false)
+  const [bodyAreaDropdownOpen, setBodyAreaDropdownOpen] = useState(false)
+  const [sizeDropdownOpen, setSizeDropdownOpen] = useState(false)
+  
+  // Funzione per salvare la prenotazione nel database
+  const handleBookingSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!user || !currentArtistId) {
+      console.error('Impossibile inviare richiesta: dati mancanti', { 
+        hasUser: !!user, 
+        hasCurrentArtistId: !!currentArtistId,
+        currentUrl: window.location.pathname 
+      })
+      alert('Errore: impossibile inviare richiesta')
+      return
+    }
+    
+    // Validazione campi obbligatori
+    if (!bookingForm.subject || !bookingForm.tattoo_style || !bookingForm.body_area || !bookingForm.size_category || !bookingForm.color_preferences) {
+      alert('Compila tutti i campi obbligatori')
+      return
+    }
+    
+    try {
+      const bookingData = {
+        client_id: user.id,
+        artist_id: currentArtistId,
+        subject: bookingForm.subject,
+        tattoo_style: bookingForm.tattoo_style,
+        body_area: bookingForm.body_area,
+        size_category: bookingForm.size_category,
+        color_preferences: bookingForm.color_preferences,
+        meaning: bookingForm.meaning || null,
+        budget_min: bookingForm.budget_min ? parseFloat(bookingForm.budget_min) : null,
+        budget_max: bookingForm.budget_max ? parseFloat(bookingForm.budget_max) : null,
+        status: 'pending'
+      }
+      
+      const { data, error } = await supabase
+        .from('bookings')
+        .insert([bookingData])
+        .select()
+      
+      if (error) {
+        console.error('Errore nel salvare la prenotazione:', error)
+        alert('Errore nell\'invio della richiesta. Riprova.')
+        return
+      }
+      
+      
+      // Crea un messaggio nella conversazione con i dati della prenotazione
+      const bookingMessage = JSON.stringify({
+        type: 'booking_request',
+        booking_id: data[0].id,
+        booking_data: bookingData
+      })
+      
+      // Invia il messaggio di prenotazione nella conversazione
+      if (sendMessage) {
+        await sendMessage(currentArtistId, bookingMessage)
+      }
+      
+      // Chiudi il modal e resetta il form
+      setShowBookingRequest(false)
+      setBookingForm({
+        subject: '',
+        tattoo_style: '',
+        body_area: '',
+        size_category: '',
+        color_preferences: '',
+        meaning: '',
+        budget_min: '',
+        budget_max: ''
+      })
+      
+    } catch (error) {
+      console.error('Errore nel salvare la prenotazione:', error)
+      alert('Errore nell\'invio della richiesta. Riprova.')
+    }
+  }
+  
+  // Dropdown options
+  const tattooStyleOptions = [
+    { value: 'Tradizionale', label: 'Tradizionale' },
+    { value: 'Realismo', label: 'Realismo' },
+    { value: 'Neo-tradizionale', label: 'Neo-tradizionale' },
+    { value: 'Blackwork', label: 'Blackwork' },
+    { value: 'Dotwork', label: 'Dotwork' },
+    { value: 'Geometrico', label: 'Geometrico' },
+    { value: 'Minimalista', label: 'Minimalista' },
+    { value: 'Watercolor', label: 'Watercolor' },
+    { value: 'Biomeccanico', label: 'Biomeccanico' },
+    { value: 'Tribale', label: 'Tribale' },
+    { value: 'Giapponese', label: 'Giapponese' },
+    { value: 'Chicano', label: 'Chicano' },
+    { value: 'New School', label: 'New School' },
+    { value: 'Fine Line', label: 'Fine Line' },
+    { value: 'Lettering', label: 'Lettering' },
+    { value: 'Altro', label: 'Altro' }
+  ]
+  
+  const bodyAreaOptions = [
+    { value: 'braccio', label: 'Braccio' },
+    { value: 'gamba', label: 'Gamba' },
+    { value: 'schiena', label: 'Schiena' },
+    { value: 'petto', label: 'Petto' },
+    { value: 'mano', label: 'Mano' },
+    { value: 'piede', label: 'Piede' },
+    { value: 'collo', label: 'Collo' },
+    { value: 'viso', label: 'Viso' },
+    { value: 'altro', label: 'Altro' }
+  ]
+  
+  const sizeOptions = [
+    { value: 'piccolo', label: 'Piccolo (2-5cm)' },
+    { value: 'medio', label: 'Medio (5-15cm)' },
+    { value: 'grande', label: 'Grande (15-30cm)' },
+    { value: 'extra-grande', label: 'Extra Grande (>30cm)' }
+  ]
 
   // Same timestamp formatting as desktop ChatList
   const formatTimestamp = (timestamp: string) => {
@@ -507,6 +706,19 @@ export function MessagesPage() {
               </button>
             </div>
 
+            {/* Pinned Action Button - Positioned between header and messages */}
+            <div className="pinned-action-container">
+              <PinnedActionButton 
+                participantId={artistId}
+                participantName={selectedChat.participant.name}
+                onOpenBookingRequest={(participantId?: string) => {
+                  if (!participantId) return
+                  setCurrentArtistId(participantId)
+                  setShowBookingRequest(true)
+                }}
+              />
+            </div>
+
             {/* Scrollable Messages List */}
             <div className="messages-list" ref={mobileMessagesListRef}>
               {loadingMessages ? (
@@ -519,19 +731,39 @@ export function MessagesPage() {
                   </div>
                 ) : (
                   <>
-                    {conversationMessages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`message ${message.isFromCurrentUser ? 'sent' : 'received'}`}
-                      >
-                        <div className="message-bubble">
-                          <p className="message-content">{message.content}</p>
-                          <span className="message-time">
-                            {formatMessageTime(message.timestamp)}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
+                    {conversationMessages.map((message) => {
+                      const bookingData = parseBookingRequestMessage(message.content)
+                      
+                      if (bookingData) {
+                        // Render BookingRequestCard for booking request messages
+                        return (
+                          <BookingRequestCard
+                            key={message.id}
+                            bookingData={{
+                              ...bookingData.booking_data,
+                              created_at: message.timestamp
+                            }}
+                            isFromCurrentUser={message.isFromCurrentUser}
+                            timestamp={message.timestamp}
+                          />
+                        )
+                      } else {
+                        // Render normal message
+                        return (
+                          <div
+                            key={message.id}
+                            className={`message ${message.isFromCurrentUser ? 'sent' : 'received'}`}
+                          >
+                            <div className="message-bubble">
+                              <p className="message-content">{message.content}</p>
+                              <span className="message-time">
+                                {formatMessageTime(message.timestamp)}
+                              </span>
+                            </div>
+                          </div>
+                        )
+                      }
+                    })}
                     {/* Invisible element at the bottom for scrolling */}
                     <div id="messages-bottom" style={{ height: '1px', minHeight: '1px' }} />
                   </>
@@ -565,7 +797,7 @@ export function MessagesPage() {
           </div>
 
           {/* Delete Confirmation Overlay */}
-          <ConfirmationOverlay
+          <ConfirmationModal
             isOpen={chatToDelete !== null}
             title="Elimina Conversazione"
             message={chatToDelete ? `Vuoi davvero eliminare la conversazione con ${chatToDelete.participantName}? Questa azione non può essere annullata.` : ''}
@@ -584,6 +816,306 @@ export function MessagesPage() {
               />
             </Suspense>
           )}
+
+          {/* Booking Request Overlay - Mobile version */}
+          {showBookingRequest && profile?.profile_type === 'client' && (
+            <div className="auth-overlay" onClick={() => setShowBookingRequest(false)}>
+              <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="auth-header-sticky">
+                  <button className="auth-close-btn" onClick={() => setShowBookingRequest(false)}>
+                    ×
+                  </button>
+                </div>
+                <div className="auth-modal-header"></div>
+                <div className="auth-content">
+                  <div className="header-card">
+                    <h2>RICHIESTA TATUAGGIO</h2>
+                    <p>Invia una richiesta personalizzata all'artista</p>
+                  </div>
+                  <form className="auth-form" onSubmit={handleBookingSubmit}>
+                    <div className="form-group">
+                      <label htmlFor="subject" className="form-label">
+                        SOGGETTO DEL TATUAGGIO <span className="required-indicator">*</span>
+                      </label>
+                      <input 
+                        id="subject" 
+                        className="form-input" 
+                        placeholder="Es. Rosa con spine, leone, scritta..." 
+                        maxLength="200" 
+                        type="text" 
+                        value={bookingForm.subject}
+                        onChange={(e) => setBookingForm(prev => ({ ...prev, subject: e.target.value }))}
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">
+                        STILE TATTOO <span className="required-indicator">*</span>
+                      </label>
+                      <div className="custom-dropdown">
+                        <button
+                          type="button"
+                          className="dropdown-trigger"
+                          onClick={() => setTattooStyleDropdownOpen(!tattooStyleDropdownOpen)}
+                        >
+                          <span className="dropdown-text">
+                            {bookingForm.tattoo_style 
+                              ? tattooStyleOptions.find(opt => opt.value === bookingForm.tattoo_style)?.label || 'Seleziona uno stile'
+                              : 'Seleziona uno stile'
+                            }
+                          </span>
+                          <svg className="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                          </svg>
+                        </button>
+                        {tattooStyleDropdownOpen && (
+                          <div className="dropdown-menu select-dropdown-menu">
+                            <button
+                              type="button"
+                              className="dropdown-item"
+                              onClick={() => {
+                                setBookingForm(prev => ({ ...prev, tattoo_style: '' }))
+                                setTattooStyleDropdownOpen(false)
+                              }}
+                            >
+                              Seleziona uno stile
+                            </button>
+                            {tattooStyleOptions.map((option) => (
+                              <button
+                                key={option.value}
+                                type="button"
+                                className={`dropdown-item ${bookingForm.tattoo_style === option.value ? 'active' : ''}`}
+                                onClick={() => {
+                                  setBookingForm(prev => ({ ...prev, tattoo_style: option.value }))
+                                  setTattooStyleDropdownOpen(false)
+                                }}
+                              >
+                                {option.label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">
+                        ZONA DEL CORPO <span className="required-indicator">*</span>
+                      </label>
+                      <div className="custom-dropdown">
+                        <button
+                          type="button"
+                          className="dropdown-trigger"
+                          onClick={() => setBodyAreaDropdownOpen(!bodyAreaDropdownOpen)}
+                        >
+                          <span className="dropdown-text">
+                            {bookingForm.body_area 
+                              ? bodyAreaOptions.find(opt => opt.value === bookingForm.body_area)?.label || 'Seleziona una zona'
+                              : 'Seleziona una zona'
+                            }
+                          </span>
+                          <svg className="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                          </svg>
+                        </button>
+                        {bodyAreaDropdownOpen && (
+                          <div className="dropdown-menu select-dropdown-menu">
+                            <button
+                              type="button"
+                              className="dropdown-item"
+                              onClick={() => {
+                                setBookingForm(prev => ({ ...prev, body_area: '' }))
+                                setBodyAreaDropdownOpen(false)
+                              }}
+                            >
+                              Seleziona una zona
+                            </button>
+                            {bodyAreaOptions.map((option) => (
+                              <button
+                                key={option.value}
+                                type="button"
+                                className={`dropdown-item ${bookingForm.body_area === option.value ? 'active' : ''}`}
+                                onClick={() => {
+                                  setBookingForm(prev => ({ ...prev, body_area: option.value }))
+                                  setBodyAreaDropdownOpen(false)
+                                }}
+                              >
+                                {option.label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">
+                        DIMENSIONI <span className="required-indicator">*</span>
+                      </label>
+                      <div className="custom-dropdown">
+                        <button
+                          type="button"
+                          className="dropdown-trigger"
+                          onClick={() => setSizeDropdownOpen(!sizeDropdownOpen)}
+                        >
+                          <span className="dropdown-text">
+                            {bookingForm.size_category 
+                              ? sizeOptions.find(opt => opt.value === bookingForm.size_category)?.label || 'Seleziona una dimensione'
+                              : 'Seleziona una dimensione'
+                            }
+                          </span>
+                          <svg className="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                          </svg>
+                        </button>
+                        {sizeDropdownOpen && (
+                          <div className="dropdown-menu select-dropdown-menu">
+                            <button
+                              type="button"
+                              className="dropdown-item"
+                              onClick={() => {
+                                setBookingForm(prev => ({ ...prev, size_category: '' }))
+                                setSizeDropdownOpen(false)
+                              }}
+                            >
+                              Seleziona una dimensione
+                            </button>
+                            {sizeOptions.map((option) => (
+                              <button
+                                key={option.value}
+                                type="button"
+                                className={`dropdown-item ${bookingForm.size_category === option.value ? 'active' : ''}`}
+                                onClick={() => {
+                                  setBookingForm(prev => ({ ...prev, size_category: option.value }))
+                                  setSizeDropdownOpen(false)
+                                }}
+                              >
+                                {option.label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">
+                        COLORE <span className="required-indicator">*</span>
+                      </label>
+                      <div className="radio-group">
+                        <label className="radio-option">
+                          <input
+                            type="radio"
+                            name="color_preferences"
+                            value="Bianco e nero"
+                            checked={bookingForm.color_preferences === 'Bianco e nero'}
+                            onChange={(e) => setBookingForm(prev => ({ ...prev, color_preferences: e.target.value }))}
+                          />
+                          <span className="radio-label">Bianco e nero</span>
+                        </label>
+                        <label className="radio-option">
+                          <input
+                            type="radio"
+                            name="color_preferences"
+                            value="Colori"
+                            checked={bookingForm.color_preferences === 'Colori'}
+                            onChange={(e) => setBookingForm(prev => ({ ...prev, color_preferences: e.target.value }))}
+                          />
+                          <span className="radio-label">Colori</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="meaning" className="form-label">
+                        SIGNIFICATO EVENTUALE
+                      </label>
+                      <textarea 
+                        id="meaning" 
+                        className="form-textarea" 
+                        placeholder="Racconta il significato del tuo tatuaggio (opzionale)" 
+                        rows="3" 
+                        maxLength="500"
+                        value={bookingForm.meaning}
+                        onChange={(e) => setBookingForm(prev => ({ ...prev, meaning: e.target.value }))}
+                      ></textarea>
+                      <div className="char-count">{bookingForm.meaning.length}/500 caratteri</div>
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="reference_images" className="form-label">
+                        IMMAGINI DI RIFERIMENTO
+                      </label>
+                      <div className="image-upload-section">
+                        <div className="file-upload-container">
+                          <input 
+                            id="reference_images" 
+                            className="file-input" 
+                            accept="image/jpeg,image/jpg,image/png,image/webp" 
+                            type="file" 
+                            multiple 
+                          />
+                          <label htmlFor="reference_images" className="file-upload-btn">
+                            <svg className="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"></path>
+                            </svg>
+                            <span>Carica Immagini</span>
+                          </label>
+                        </div>
+                        <p className="file-info">JPG, PNG o WebP. Max 5MB per immagine.</p>
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="budget_min" className="form-label">
+                        BUDGET (€)
+                      </label>
+                      <div className="form-row">
+                        <input 
+                          id="budget_min" 
+                          className="form-input" 
+                          placeholder="Min" 
+                          type="number" 
+                          min="0"
+                          step="10"
+                          value={bookingForm.budget_min}
+                          onChange={(e) => setBookingForm(prev => ({ ...prev, budget_min: e.target.value }))}
+                        />
+                        <span className="budget-separator">-</span>
+                        <input 
+                          id="budget_max" 
+                          className="form-input" 
+                          placeholder="Max" 
+                          type="number" 
+                          min="0"
+                          step="10"
+                          value={bookingForm.budget_max}
+                          onChange={(e) => setBookingForm(prev => ({ ...prev, budget_max: e.target.value }))}
+                        />
+                      </div>
+                      <div className="form-help">Indica il range di budget che hai in mente</div>
+                    </div>
+
+                    <div className="form-actions">
+                      <button type="button" className="action-btn" onClick={() => setShowBookingRequest(false)}>
+                        <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path d="M18 6L6 18M6 6l12 12"></path>
+                        </svg>
+                        <span className="action-text">Annulla</span>
+                      </button>
+                      <button type="submit" className="action-btn">
+                        <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path d="M12 5v14m7-7l-7-7-7 7"></path>
+                        </svg>
+                        <span className="action-text">Invia Richiesta</span>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       )
     }
@@ -668,7 +1200,7 @@ export function MessagesPage() {
         </div>
 
         {/* Delete Confirmation Overlay */}
-        <ConfirmationOverlay
+        <ConfirmationModal
           isOpen={chatToDelete !== null}
           title="Elimina Conversazione"
           message={chatToDelete ? `Vuoi davvero eliminare la conversazione con ${chatToDelete.participantName}? Questa azione non può essere annullata.` : ''}
@@ -716,6 +1248,14 @@ export function MessagesPage() {
               onRequestDeleteChat={handleRequestDeleteChat}
               sendMessage={sendMessage}
               fetchConversationMessages={fetchConversationMessages}
+              onOpenBookingRequest={(participantId?: string) => {
+                if (!participantId) {
+                  console.error('Non posso aprire richiesta senza participantId')
+                  return
+                }
+                setCurrentArtistId(participantId)
+                setShowBookingRequest(true)
+              }}
             />
           ) : (
             <div className="chat-conversation empty">
@@ -732,7 +1272,7 @@ export function MessagesPage() {
       </div>
 
       {/* Delete Confirmation Overlay */}
-      <ConfirmationOverlay
+      <ConfirmationModal
         isOpen={chatToDelete !== null}
         title="Elimina Conversazione"
         message={chatToDelete ? `Vuoi davvero eliminare la conversazione con ${chatToDelete.participantName}? Questa azione non può essere annullata.` : ''}
@@ -750,6 +1290,305 @@ export function MessagesPage() {
             onClose={() => setShowAuthOverlay(false)}
           />
         </Suspense>
+      )}
+
+      {/* Booking Request Overlay - Solo per profili client */}
+      {showBookingRequest && profile?.profile_type === 'client' && (
+        <div className="auth-overlay" onClick={() => setShowBookingRequest(false)}>
+          <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="auth-header-sticky">
+              <button className="auth-close-btn" onClick={() => setShowBookingRequest(false)}>
+                ×
+              </button>
+            </div>
+            <div className="auth-modal-header"></div>
+            <div className="auth-content">
+              <div className="header-card">
+                <h2>RICHIESTA TATUAGGIO</h2>
+                <p>Invia una richiesta personalizzata all'artista</p>
+              </div>
+              <form className="auth-form" onSubmit={handleBookingSubmit}>
+                <div className="form-group">
+                  <label htmlFor="subject" className="form-label">
+                    SOGGETTO DEL TATUAGGIO <span className="required-indicator">*</span>
+                  </label>
+                  <input 
+                    id="subject" 
+                    className="form-input" 
+                    placeholder="Es. Rosa con spine, leone, scritta..." 
+                    maxLength="200" 
+                    type="text" 
+                    value={bookingForm.subject}
+                    onChange={(e) => setBookingForm(prev => ({ ...prev, subject: e.target.value }))}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    STILE TATTOO <span className="required-indicator">*</span>
+                  </label>
+                  <div className="custom-dropdown">
+                    <button
+                      type="button"
+                      className="dropdown-trigger"
+                      onClick={() => setTattooStyleDropdownOpen(!tattooStyleDropdownOpen)}
+                    >
+                      <span className="dropdown-text">
+                        {bookingForm.tattoo_style 
+                          ? tattooStyleOptions.find(opt => opt.value === bookingForm.tattoo_style)?.label || 'Seleziona uno stile'
+                          : 'Seleziona uno stile'
+                        }
+                      </span>
+                      <svg className="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="6,9 12,15 18,9"></polyline>
+                      </svg>
+                    </button>
+                    {tattooStyleDropdownOpen && (
+                      <div className="dropdown-menu select-dropdown-menu">
+                        <button
+                          type="button"
+                          className="dropdown-item"
+                          onClick={() => {
+                            setBookingForm(prev => ({ ...prev, tattoo_style: '' }))
+                            setTattooStyleDropdownOpen(false)
+                          }}
+                        >
+                          Seleziona uno stile
+                        </button>
+                        {tattooStyleOptions.map((option) => (
+                          <button
+                            key={option.value}
+                            type="button"
+                            className={`dropdown-item ${bookingForm.tattoo_style === option.value ? 'active' : ''}`}
+                            onClick={() => {
+                              setBookingForm(prev => ({ ...prev, tattoo_style: option.value }))
+                              setTattooStyleDropdownOpen(false)
+                            }}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    ZONA DEL CORPO <span className="required-indicator">*</span>
+                  </label>
+                  <div className="custom-dropdown">
+                    <button
+                      type="button"
+                      className="dropdown-trigger"
+                      onClick={() => setBodyAreaDropdownOpen(!bodyAreaDropdownOpen)}
+                    >
+                      <span className="dropdown-text">
+                        {bookingForm.body_area 
+                          ? bodyAreaOptions.find(opt => opt.value === bookingForm.body_area)?.label || 'Seleziona una zona'
+                          : 'Seleziona una zona'
+                        }
+                      </span>
+                      <svg className="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="6,9 12,15 18,9"></polyline>
+                      </svg>
+                    </button>
+                    {bodyAreaDropdownOpen && (
+                      <div className="dropdown-menu select-dropdown-menu">
+                        <button
+                          type="button"
+                          className="dropdown-item"
+                          onClick={() => {
+                            setBookingForm(prev => ({ ...prev, body_area: '' }))
+                            setBodyAreaDropdownOpen(false)
+                          }}
+                        >
+                          Seleziona una zona
+                        </button>
+                        {bodyAreaOptions.map((option) => (
+                          <button
+                            key={option.value}
+                            type="button"
+                            className={`dropdown-item ${bookingForm.body_area === option.value ? 'active' : ''}`}
+                            onClick={() => {
+                              setBookingForm(prev => ({ ...prev, body_area: option.value }))
+                              setBodyAreaDropdownOpen(false)
+                            }}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    DIMENSIONI <span className="required-indicator">*</span>
+                  </label>
+                  <div className="custom-dropdown">
+                    <button
+                      type="button"
+                      className="dropdown-trigger"
+                      onClick={() => setSizeDropdownOpen(!sizeDropdownOpen)}
+                    >
+                      <span className="dropdown-text">
+                        {bookingForm.size_category 
+                          ? sizeOptions.find(opt => opt.value === bookingForm.size_category)?.label || 'Seleziona una dimensione'
+                          : 'Seleziona una dimensione'
+                        }
+                      </span>
+                      <svg className="dropdown-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="6,9 12,15 18,9"></polyline>
+                      </svg>
+                    </button>
+                    {sizeDropdownOpen && (
+                      <div className="dropdown-menu select-dropdown-menu">
+                        <button
+                          type="button"
+                          className="dropdown-item"
+                          onClick={() => {
+                            setBookingForm(prev => ({ ...prev, size_category: '' }))
+                            setSizeDropdownOpen(false)
+                          }}
+                        >
+                          Seleziona una dimensione
+                        </button>
+                        {sizeOptions.map((option) => (
+                          <button
+                            key={option.value}
+                            type="button"
+                            className={`dropdown-item ${bookingForm.size_category === option.value ? 'active' : ''}`}
+                            onClick={() => {
+                              setBookingForm(prev => ({ ...prev, size_category: option.value }))
+                              setSizeDropdownOpen(false)
+                            }}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    COLORE <span className="required-indicator">*</span>
+                  </label>
+                  <div className="radio-group">
+                    <label className="radio-option">
+                      <input
+                        type="radio"
+                        name="color_preferences"
+                        value="Bianco e nero"
+                        checked={bookingForm.color_preferences === 'Bianco e nero'}
+                        onChange={(e) => setBookingForm(prev => ({ ...prev, color_preferences: e.target.value }))}
+                      />
+                      <span className="radio-label">Bianco e nero</span>
+                    </label>
+                    <label className="radio-option">
+                      <input
+                        type="radio"
+                        name="color_preferences"
+                        value="Colori"
+                        checked={bookingForm.color_preferences === 'Colori'}
+                        onChange={(e) => setBookingForm(prev => ({ ...prev, color_preferences: e.target.value }))}
+                      />
+                      <span className="radio-label">Colori</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="meaning" className="form-label">
+                    SIGNIFICATO EVENTUALE
+                  </label>
+                  <textarea 
+                    id="meaning" 
+                    className="form-textarea" 
+                    placeholder="Racconta il significato del tuo tatuaggio (opzionale)" 
+                    rows="3" 
+                    maxLength="500"
+                    value={bookingForm.meaning}
+                    onChange={(e) => setBookingForm(prev => ({ ...prev, meaning: e.target.value }))}
+                  ></textarea>
+                  <div className="char-count">{bookingForm.meaning.length}/500 caratteri</div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="reference_images" className="form-label">
+                    IMMAGINI DI RIFERIMENTO
+                  </label>
+                  <div className="image-upload-section">
+                    <div className="file-upload-container">
+                      <input 
+                        id="reference_images" 
+                        className="file-input" 
+                        accept="image/jpeg,image/jpg,image/png,image/webp" 
+                        type="file" 
+                        multiple 
+                      />
+                      <label htmlFor="reference_images" className="file-upload-btn">
+                        <svg className="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"></path>
+                        </svg>
+                        <span>Carica Immagini</span>
+                      </label>
+                    </div>
+                    <p className="file-info">JPG, PNG o WebP. Max 5MB per immagine.</p>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="budget_min" className="form-label">
+                    BUDGET (€)
+                  </label>
+                  <div className="form-row">
+                    <input 
+                      id="budget_min" 
+                      className="form-input" 
+                      placeholder="Min" 
+                      type="number" 
+                      min="0"
+                      step="10"
+                      value={bookingForm.budget_min}
+                      onChange={(e) => setBookingForm(prev => ({ ...prev, budget_min: e.target.value }))}
+                    />
+                    <span className="budget-separator">-</span>
+                    <input 
+                      id="budget_max" 
+                      className="form-input" 
+                      placeholder="Max" 
+                      type="number" 
+                      min="0"
+                      step="10"
+                      value={bookingForm.budget_max}
+                      onChange={(e) => setBookingForm(prev => ({ ...prev, budget_max: e.target.value }))}
+                    />
+                  </div>
+                  <div className="form-help">Indica il range di budget che hai in mente</div>
+                </div>
+
+                <div className="form-actions">
+                  <button type="button" className="action-btn" onClick={() => setShowBookingRequest(false)}>
+                    <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                    <span className="action-text">Annulla</span>
+                  </button>
+                  <button type="submit" className="action-btn">
+                    <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M12 5v14m7-7l-7-7-7 7"></path>
+                    </svg>
+                    <span className="action-text">Invia Richiesta</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
