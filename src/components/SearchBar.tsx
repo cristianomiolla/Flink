@@ -1,7 +1,6 @@
 import { useState, memo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './SearchBar.css'
-import { LocationSelect } from './LocationSelect'
 import { AuthOverlay } from './AuthOverlay'
 import { Header } from './Header'
 
@@ -69,9 +68,12 @@ export const SearchBar = memo(function SearchBar({ onSearch, onLogoClick, hideOn
           </div>
           <div className="location-input-container">
             <span className="location-icon">📍</span>
-            <LocationSelect
+            <input
+              type="text"
+              className="location-input"
+              placeholder="Città"
               value={location}
-              onChange={setLocation}
+              onChange={(e) => setLocation(e.target.value)}
               onKeyPress={handleKeyPress}
             />
           </div>
@@ -105,9 +107,12 @@ export const SearchBar = memo(function SearchBar({ onSearch, onLogoClick, hideOn
             {showMobileLocationInput && (
               <div className="location-input-container">
                 <span className="location-icon">📍</span>
-                <LocationSelect
+                <input
+                  type="text"
+                  className="location-input"
+                  placeholder="Città"
                   value={location}
-                  onChange={setLocation}
+                  onChange={(e) => setLocation(e.target.value)}
                   onKeyPress={handleKeyPress}
                 />
               </div>
