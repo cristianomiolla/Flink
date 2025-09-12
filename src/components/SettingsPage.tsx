@@ -4,7 +4,6 @@ import { useAuth } from '../hooks/useAuth'
 import { SearchBar } from './SearchBar'
 import { PageHeader } from './PageHeader'
 import { supabase } from '../lib/supabase'
-import { PasswordChangeOverlay } from './PasswordChangeOverlay'
 import './SettingsPage.css'
 import './AuthOverlay.css'
 
@@ -19,7 +18,6 @@ interface SettingsPageProps {
 export function SettingsPage({ onLogoClick }: SettingsPageProps) {
   const { profile, refreshProfile } = useAuth()
   const navigate = useNavigate()
-  const [showPasswordOverlay, setShowPasswordOverlay] = useState(false)
   const [showEmailOverlay, setShowEmailOverlay] = useState(false)
   const [showFullNameOverlay, setShowFullNameOverlay] = useState(false)
   const [showProfileTypeOverlay, setShowProfileTypeOverlay] = useState(false)
@@ -31,7 +29,8 @@ export function SettingsPage({ onLogoClick }: SettingsPageProps) {
   }, [])
 
   const handlePasswordChangeClick = () => {
-    setShowPasswordOverlay(true)
+    // Password change functionality removed - component was deleted
+    alert('Funzionalità temporaneamente non disponibile')
   }
 
   const handleEmailChangeClick = () => {
@@ -197,13 +196,6 @@ export function SettingsPage({ onLogoClick }: SettingsPageProps) {
         </div>
       </div>
 
-      {/* Password Change Overlay */}
-      {showPasswordOverlay && (
-        <PasswordChangeOverlay
-          isOpen={showPasswordOverlay}
-          onClose={() => setShowPasswordOverlay(false)}
-        />
-      )}
 
       {/* Email Change Overlay */}
       {showEmailOverlay && (

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { useOverlay } from '../hooks/useOverlay'
 import './AuthOverlay.css'
 

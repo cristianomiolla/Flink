@@ -1,4 +1,3 @@
-import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppointments } from '../hooks/useAppointments'
 import { useAuth } from '../hooks/useAuth'
@@ -107,7 +106,7 @@ export function AppointmentsPage() {
                       budget_max: appointment.budget_max,
                       reference_images: appointment.reference_images,
                       created_at: appointment.created_at,
-                      appointment_date: appointment.appointment_date
+                      appointment_date: appointment.appointment_date || undefined
                     }}
                     bookingId={appointment.id}
                     timestamp={appointment.created_at}
