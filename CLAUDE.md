@@ -104,6 +104,12 @@ CREATE INDEX idx_profiles_full_name ON profiles(full_name);
 CREATE INDEX idx_followers_follower_id ON followers(follower_id);
 CREATE INDEX idx_followers_following_id ON followers(following_id);
 CREATE INDEX idx_followers_created_at ON followers(created_at DESC);
+
+-- Artist services indexes
+CREATE INDEX idx_artist_services_user_id ON artist_services(user_id);
+CREATE INDEX idx_artist_services_active ON artist_services(is_active) WHERE is_active = true;
+CREATE INDEX idx_artist_services_body_area ON artist_services(body_area);
+CREATE INDEX idx_artist_services_pricing_type ON artist_services(pricing_type);
 ```
 
 #### RLS Policies
@@ -120,6 +126,12 @@ CREATE POLICY "Authenticated users can insert portfolio items" ON portfolio_item
 CREATE POLICY "Public can view all follower relationships" ON followers FOR SELECT TO public USING (true);
 CREATE POLICY "Users can create their own follows" ON followers FOR INSERT TO authenticated WITH CHECK (auth.uid() = follower_id);
 CREATE POLICY "Users can delete their own follows" ON followers FOR DELETE TO authenticated USING (auth.uid() = follower_id);
+
+-- Artist services
+CREATE POLICY "Public can view active services" ON artist_services FOR SELECT TO public USING (is_active = true);
+CREATE POLICY "Authenticated users can view all services" ON artist_services FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Artists can create their own services" ON artist_services FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Artists can update their own services" ON artist_services FOR UPDATE TO authenticated USING (auth.uid() = user_id);
 ```
 
 #### Table: `saved_tattoos`
@@ -157,6 +169,27 @@ CREATE TABLE messages (
 );
 ```
 
+#### Table: `artist_services`
+```sql
+CREATE TABLE artist_services (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL CHECK (length(trim(name)) > 0),
+    description TEXT,
+    body_area TEXT CHECK (body_area IN ('braccio', 'gamba', 'schiena', 'petto', 'mano', 'piede', 'collo', 'viso', 'altro')),
+    size_category TEXT CHECK (size_category IN ('piccolo', 'medio', 'grande', 'extra-grande')),
+    pricing_type TEXT NOT NULL DEFAULT 'fixed' CHECK (pricing_type IN ('fixed', 'range', 'consultation')),
+    fixed_price DECIMAL(8,2) CHECK (fixed_price >= 0),
+    price_min DECIMAL(8,2) CHECK (price_min >= 0),
+    price_max DECIMAL(8,2) CHECK (price_max >= price_min),
+    discount_percentage INTEGER DEFAULT 0 CHECK (discount_percentage >= 0 AND discount_percentage <= 100),
+    image_url TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
 #### Relationships
 - `portfolio_items.user_id` → `profiles.user_id` (Foreign Key)
 - `saved_tattoos.user_id` → `auth.users.id` (Foreign Key)
@@ -165,11 +198,13 @@ CREATE TABLE messages (
 - `followers.following_id` → `profiles.user_id` (Foreign Key)
 - `messages.sender_id` → `auth.users.id` (Foreign Key)
 - `messages.receiver_id` → `auth.users.id` (Foreign Key)
+- `artist_services.user_id` → `auth.users.id` (Foreign Key)
 - Both portfolio and profile tables have RLS enabled with public read access
 - Artists are identified by `profiles.profile_type = 'artist'`
 - Saved items are ordered by `saved_tattoos.created_at` for chronological display
 - Follow relationships enable dynamic artist following functionality
 - Messages are ordered by `created_at` and support soft deletion via `deleted_at`
+- Services support flexible pricing (fixed, range, consultation) and body area categorization
 
 ### Supabase Client Usage
 ```typescript

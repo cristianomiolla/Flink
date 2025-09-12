@@ -367,14 +367,8 @@
   
   .modal-portfolio-title {
     font-size: 20px;
-    padding: 0 16px;
   }
   
-  /* Override avatar medium to use small size on mobile */
-  .portfolio-modal-overlay .avatar-md {
-    width: 36px !important;
-    height: 36px !important;
-  }
   
   
   .modal-artist-info {

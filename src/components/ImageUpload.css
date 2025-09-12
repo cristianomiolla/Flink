@@ -24,25 +24,23 @@
 
 .remove-image-btn {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  top: -8px;
+  right: -8px;
   width: 24px;
   height: 24px;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--accent);
   color: white;
-  border: none;
-  border-radius: 50%;
+  border: 1px solid var(--foreground);
+  border-radius: 0;
   font-size: 16px;
+  font-weight: 900;
   line-height: 1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s ease;
-}
-
-.remove-image-btn:hover {
-  background: var(--destructive);
+  box-shadow: var(--shadow-heavy);
+  z-index: 10;
 }
 
 .file-upload-container {

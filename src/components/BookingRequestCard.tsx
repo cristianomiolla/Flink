@@ -9,6 +9,7 @@ interface BookingRequestData {
   meaning?: string
   budget_min?: number
   budget_max?: number
+  reference_images?: string[] | null
   status: string
   created_at: string
 }
@@ -93,6 +94,24 @@ export function BookingRequestCard({ bookingData, isFromCurrentUser, timestamp }
             <div className="booking-field">
               <span className="field-label">Significato:</span>
               <span className="field-value">{bookingData.meaning}</span>
+            </div>
+          )}
+          
+          {bookingData.reference_images && bookingData.reference_images.length > 0 && (
+            <div className="booking-field reference-images">
+              <span className="field-label">Riferimenti:</span>
+              <div className="reference-images-container">
+                {bookingData.reference_images.map((imageUrl, index) => (
+                  <div key={index} className="reference-image">
+                    <img 
+                      src={imageUrl} 
+                      alt={`Riferimento ${index + 1}`}
+                      className="reference-image-preview"
+                      onClick={() => window.open(imageUrl, '_blank')}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           

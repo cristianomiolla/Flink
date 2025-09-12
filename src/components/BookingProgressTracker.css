@@ -1,0 +1,80 @@
+/* Booking Progress Tracker Styles */
+
+.booking-progress-tracker {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: transparent;
+  width: 100%;
+  display: block;
+}
+
+/* Mobile specific adjustments */
+@media (max-width: 768px) {
+  .messages-page.mobile.conversation .booking-progress-tracker {
+    position: fixed;
+    top: 70px; /* Right after the 70px conversation-header */
+    left: 0;
+    right: 0;
+    z-index: 998; /* Same as pinned-action-container */
+    padding: 12px 16px;
+    margin: 0;
+    background: transparent;
+    min-height: auto;
+  }
+}
+
+.progress-content {
+  width: 100%;
+  padding: 0.75rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border: 2px solid var(--foreground);
+  background: var(--background); /* Solid background to prevent flickering */
+  color: var(--foreground);
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem; /* Match pinned-action-btn gap */
+  border-radius: 4px;
+}
+
+.progress-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.progress-text {
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Status color variants */
+.booking-progress-tracker.warning .progress-content {
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+.booking-progress-tracker.info .progress-content {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.booking-progress-tracker.success .progress-content {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+.booking-progress-tracker.error .progress-content {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.booking-progress-tracker.muted .progress-content {
+  border-color: var(--muted-foreground);
+  color: var(--muted-foreground);
+}

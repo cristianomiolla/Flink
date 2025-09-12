@@ -267,7 +267,7 @@ export function ServiceForm({
 
   return (
     <div className="auth-overlay" onClick={handleBackdropClick}>
-      <div className="auth-modal upload-portfolio-modal">
+      <div className="auth-modal">
         {/* Sticky Header with Close Button */}
         <div className="auth-header-sticky">
           <button className="auth-close-btn" onClick={onClose}>
@@ -278,7 +278,7 @@ export function ServiceForm({
         <div className="auth-modal-header">
         </div>
         
-        <div className="upload-portfolio-content">
+        <div className="auth-content">
           <div className="header-card">
             <h2>{isEditing ? 'MODIFICA SERVIZIO' : 'AGGIUNGI SERVIZIO'}</h2>
             <p>{isEditing ? 'Modifica i dettagli del tuo servizio' : 'Aggiungi un nuovo servizio alla tua offerta'}</p>

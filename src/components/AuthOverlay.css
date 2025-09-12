@@ -196,10 +196,6 @@
 }
 
 /* Auth overlay specific form adjustments */
-.auth-modal .form-input {
-  padding: 0.75rem 1rem;
-  font-size: 15px;
-}
 
 .auth-modal .form-input:focus {
   border-color: var(--accent);
@@ -301,7 +297,7 @@
   }
   
   .auth-content {
-    padding: 0 24px 1.5rem 24px;
+    padding: 0 16px 1.5rem 16px;
   }
   
   .auth-tabs {
@@ -430,4 +426,95 @@
   font-weight: 600;
   text-align: center;
   font-size: 0.875rem;
+}
+
+/* Required Indicator */
+.required-indicator {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Form Actions - Centralized for all auth modals */
+.auth-modal .form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.auth-modal .form-actions .action-btn {
+  flex: 1;
+  min-width: 120px;
+}
+
+.auth-modal .form-actions .action-btn:disabled {
+  background: var(--grey-medium);
+  color: var(--grey-dark);
+  border-color: var(--grey-medium);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Radio Group Styles */
+.radio-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--background);
+  transition: all 0.2s;
+}
+
+.radio-option:hover {
+  border-color: var(--accent);
+  background: rgba(239, 67, 67, 0.05);
+}
+
+.radio-option input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+
+.radio-label {
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.radio-text {
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: var(--foreground);
+}
+
+/* Mobile responsive adjustments for new elements */
+@media (max-width: 767px) {
+  .auth-modal .form-actions {
+    flex-direction: row;
+    gap: 0.75rem;
+  }
+  
+  .auth-modal .form-actions .action-btn {
+    flex: 1;
+    min-width: auto;
+  }
+  
+  .radio-group {
+    gap: 0.75rem;
+  }
+  
+  .radio-option {
+    padding: 0.4rem;
+  }
 }

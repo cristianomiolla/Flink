@@ -160,7 +160,7 @@
   overflow-y: auto;
 }
 
-.upload-portfolio-content {
+.auth-content {
   padding: 0 2rem 2rem 2rem;
 }
 
@@ -207,27 +207,6 @@
   border-radius: 0;
 }
 
-.remove-image-btn {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s;
-}
-
-.remove-image-btn:hover {
-  background: #d63838;
-}
 
 /* Checkbox Styles */
 .checkbox-label {
@@ -338,7 +317,7 @@
     max-height: 95vh;
   }
   
-  .upload-portfolio-content {
+  .auth-content {
     padding: 0 1rem 1rem 1rem;
   }
   

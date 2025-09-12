@@ -5,6 +5,8 @@ import { useAuth } from '../hooks/useAuth'
 import { type Message as DatabaseMessage } from '../hooks/useMessages'
 import { ActionButton, DeleteIcon, SendIcon } from './ActionButton'
 import { BookingRequestCard } from './BookingRequestCard'
+import { BookingProgressTracker } from './BookingProgressTracker'
+import { useBookingStatus } from '../hooks/useBookingStatus'
 
 // Helper function to parse booking request message
 const parseBookingRequestMessage = (content: string) => {
@@ -28,7 +30,7 @@ interface PinnedActionButtonProps {
   participantName: string
 }
 
-function PinnedActionButton({ participantId, participantName, onOpenBookingRequest }: PinnedActionButtonProps & { onOpenBookingRequest?: (participantId?: string) => void }) {
+function PinnedActionButton({ participantId, participantName, onOpenBookingRequest, onBookingRequestSent }: PinnedActionButtonProps & { onOpenBookingRequest?: (participantId?: string) => void; onBookingRequestSent?: () => void }) {
   const { user, profile } = useAuth()
   
   if (!user || !profile || !participantId) return null
@@ -81,23 +83,18 @@ interface ChatConversationProps {
   sendMessage?: (receiverId: string, content: string) => Promise<boolean>
   fetchConversationMessages?: (participantId: string) => Promise<DatabaseMessage[]>
   hideHeaderAndInput?: boolean
+  isModalOpen?: boolean
   onOpenBookingRequest?: (participantId?: string) => void
+  onBookingRequestSent?: () => void
+  onBookingStatusRefresh?: (refreshFn: () => Promise<void>) => void
 }
 
-export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages, hideHeaderAndInput = false, onOpenBookingRequest }: ChatConversationProps) {
-  const { user } = useAuth()
+export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages, hideHeaderAndInput = false, isModalOpen = false, onOpenBookingRequest, onBookingRequestSent, onBookingStatusRefresh }: ChatConversationProps) {
+  const { user, profile } = useAuth()
   const [newMessage, setNewMessage] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(false)
-  const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(null)
   const messagesListRef = useRef<HTMLDivElement>(null)
-
-  // Scroll to bottom of messages list
-  const scrollToBottom = useCallback(() => {
-    if (messagesListRef.current) {
-      messagesListRef.current.scrollTop = messagesListRef.current.scrollHeight
-    }
-  }, [])
 
   // Extract participant ID from chat ID (format: "userId1__userId2")
   const getParticipantId = useCallback((chatId: string): string | null => {
@@ -105,6 +102,24 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
     const [userId1, userId2] = chatId.split('__')
     return userId1 === user.id ? userId2 : userId1
   }, [user])
+
+  // Get participant ID for booking status
+  const participantId = chat ? getParticipantId(chat.id) : null
+  const { bookingData, showProgressTracker, showPinnedAction, refreshBookingStatus, isPendingExpired } = useBookingStatus(participantId)
+
+  // Pass refresh function to parent component
+  useEffect(() => {
+    if (onBookingStatusRefresh) {
+      onBookingStatusRefresh(refreshBookingStatus)
+    }
+  }, [refreshBookingStatus, onBookingStatusRefresh])
+
+  // Scroll to bottom of messages list
+  const scrollToBottom = useCallback(() => {
+    if (messagesListRef.current) {
+      messagesListRef.current.scrollTop = messagesListRef.current.scrollHeight
+    }
+  }, [])
 
   // Load messages function
   const loadMessages = useCallback(async (showLoading = true) => {
@@ -157,28 +172,9 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
     // Scroll to bottom when conversation first loads
     setTimeout(() => scrollToBottom(), 200)
 
-    // Set up polling for new messages every 3 seconds
-    const interval = setInterval(() => {
-      loadMessages(false) // Don't show loading spinner for polling
-    }, 3000)
-
-    setPollingInterval(interval)
-
-    // Cleanup on unmount or chat change
-    return () => {
-      clearInterval(interval)
-      setPollingInterval(null)
-    }
+    // No automatic polling - messages update only when manually sent/received
   }, [chat, user?.id, loadMessages])
 
-  // Cleanup polling interval on component unmount
-  useEffect(() => {
-    return () => {
-      if (pollingInterval) {
-        clearInterval(pollingInterval)
-      }
-    }
-  }, [pollingInterval])
 
   const formatMessageTime = (timestamp: string) => {
     const date = new Date(timestamp)
@@ -288,15 +284,26 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
       {/* Messages */}
       <div className="messages-container">
         <div className="messages-list" ref={messagesListRef}>
-          {/* Pinned Action Button - Show on both desktop and mobile when we have a participant */}
-          {chat && (
+          {/* Conditional rendering: Pinned Action Button OR Progress Tracker */}
+          {chat && showPinnedAction && (
             <div className="pinned-action-container">
               <PinnedActionButton 
                 participantId={getParticipantId(chat.id)}
                 participantName={chat.participant.name}
                 onOpenBookingRequest={onOpenBookingRequest}
+                onBookingRequestSent={() => {
+                  refreshBookingStatus()
+                  if (onBookingRequestSent) onBookingRequestSent()
+                }}
               />
             </div>
+          )}
+          
+          {chat && showProgressTracker && bookingData && profile && (
+            <BookingProgressTracker
+              status={bookingData.status}
+              userType={profile.profile_type}
+            />
           )}
 
           {loading ? (

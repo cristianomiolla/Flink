@@ -29,6 +29,13 @@
   overflow: hidden;
 }
 
+/* Reduce visual distraction when booking modal is open on desktop */
+.messages-page:not(.mobile).modal-open .messages-layout {
+  filter: blur(1px);
+  pointer-events: none;
+  opacity: 0.7;
+}
+
 /* Loading State */
 .messages-loading {
   display: flex;
@@ -210,10 +217,20 @@
     stroke-width: 2;
   }
 
+  /* Pinned Action Container - positioned after fixed header */
+  .messages-page.mobile.conversation .pinned-action-container {
+    position: fixed;
+    top: 70px; /* Right after the 70px conversation-header */
+    left: 0;
+    right: 0;
+    z-index: 998; /* Below header but above messages */
+    padding: 12px 16px;
+  }
+
   /* Scrollable Messages List */
   .messages-list {
     flex: 1;
-    margin-top: 70px; /* Account for fixed header */
+    margin-top: 122px; /* Account for fixed header (70px) + pinned button container (52px with padding) */
     padding: 16px;
     padding-bottom: 100px; /* Account for fixed input */
     overflow-y: scroll !important; /* Force scroll */
@@ -388,7 +405,41 @@
     height: 18px;
     stroke-width: 2;
   }
+
+  /* Booking form styles */
+  .form-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .budget-separator {
+    color: var(--muted-foreground);
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .form-row .form-input {
+    flex: 1;
+  }
 }
+
+  /* Booking form styles */
+  .form-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .budget-separator {
+    color: var(--muted-foreground);
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .form-row .form-input {
+    flex: 1;
+  }
 
 
 

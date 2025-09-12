@@ -17,6 +17,8 @@ import { supabase } from '../lib/supabase'
 import LoadingSpinner from './LoadingSpinner'
 import { ConfirmationModal } from './ConfirmationModal'
 import { BookingRequestCard } from './BookingRequestCard'
+import { BookingProgressTracker } from './BookingProgressTracker'
+import { useBookingStatus } from '../hooks/useBookingStatus'
 
 // Lazy load AuthOverlay component
 const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
@@ -106,8 +108,22 @@ export function MessagesPage() {
   const [showAuthOverlay, setShowAuthOverlay] = useState(false)
   const [showBookingRequest, setShowBookingRequest] = useState(false)
   const [currentArtistId, setCurrentArtistId] = useState<string | null>(null)
+  const [refreshBookingStatusFn, setRefreshBookingStatusFn] = useState<(() => Promise<void>) | null>(null)
+  const [mobileRefreshBookingStatusFn, setMobileRefreshBookingStatusFn] = useState<(() => Promise<void>) | null>(null)
   
+  // Hook for mobile booking status - must be before any early returns
+  // Use artistId directly for mobile since it's available from useParams
+  const mobileParticipantId = (isMobile && artistId) ? artistId : null
+  const { bookingData: mobileBookingData, showProgressTracker: mobileShowProgressTracker, showPinnedAction: mobileShowPinnedAction, refreshBookingStatus: mobileRefreshBookingStatus, isPendingExpired: mobileIsPendingExpired } = useBookingStatus(mobileParticipantId)
   
+  // Store mobile refresh function
+  useEffect(() => {
+    if (isMobile && artistId) {
+      setMobileRefreshBookingStatusFn(() => mobileRefreshBookingStatus)
+    } else {
+      setMobileRefreshBookingStatusFn(null)
+    }
+  }, [mobileRefreshBookingStatus, isMobile, artistId])
   
   // Booking form state
   const [bookingForm, setBookingForm] = useState({
@@ -121,10 +137,96 @@ export function MessagesPage() {
     budget_max: ''
   })
   
+  // State for reference image (single image like ServiceForm)
+  const [selectedReferenceFile, setSelectedReferenceFile] = useState<File | null>(null)
+  const [referenceFilePreview, setReferenceFilePreview] = useState<string | null>(null)
+  const [imageUploading, setImageUploading] = useState(false)
+
+  // Upload image function (same as ServiceForm)
+  const uploadReferenceImage = async (file: File): Promise<string> => {
+    if (!user?.id) throw new Error('User not authenticated')
+    
+    try {
+      setImageUploading(true)
+      // Genera un nome file unico
+      const fileExt = file.name.split('.').pop()
+      const fileName = `booking-ref-${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+      const filePath = `${user.id}/${fileName}`
+
+      // Carica il file su Supabase Storage
+      const { error } = await supabase.storage
+        .from('portfolio')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+
+      if (error) throw error
+
+      // Ottieni l'URL pubblico
+      const { data } = supabase.storage
+        .from('portfolio')
+        .getPublicUrl(filePath)
+
+      return data.publicUrl
+    } catch (error) {
+      console.error('Error uploading reference image:', error)
+      throw new Error('Errore durante il caricamento dell\'immagine di riferimento')
+    } finally {
+      setImageUploading(false)
+    }
+  }
+  
   // Dropdown states
   const [tattooStyleDropdownOpen, setTattooStyleDropdownOpen] = useState(false)
   const [bodyAreaDropdownOpen, setBodyAreaDropdownOpen] = useState(false)
   const [sizeDropdownOpen, setSizeDropdownOpen] = useState(false)
+  
+  // Handler for reference image upload (single file like ServiceForm)
+  const handleReferenceFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+      if (!validTypes.includes(file.type)) {
+        alert('Formato file non supportato. Usa JPG, PNG o WebP.')
+        return
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Il file è troppo grande. Dimensione massima: 5MB.')
+        return
+      }
+
+      setSelectedReferenceFile(file)
+      
+      // Create preview
+      const reader = new FileReader()
+      reader.onload = (e) => setReferenceFilePreview(e.target?.result as string)
+      reader.readAsDataURL(file)
+    }
+  }
+  
+  // Helper function to close booking modal and reset form
+  const handleCloseBookingModal = () => {
+    setShowBookingRequest(false)
+    setBookingForm({
+      subject: '',
+      tattoo_style: '',
+      body_area: '',
+      size_category: '',
+      color_preferences: '',
+      meaning: '',
+      budget_min: '',
+      budget_max: ''
+    })
+    setSelectedReferenceFile(null)
+    setReferenceFilePreview(null)
+    setTattooStyleDropdownOpen(false)
+    setBodyAreaDropdownOpen(false)
+    setSizeDropdownOpen(false)
+  }
   
   // Funzione per salvare la prenotazione nel database
   const handleBookingSubmit = async (e: React.FormEvent) => {
@@ -147,6 +249,17 @@ export function MessagesPage() {
     }
     
     try {
+      // Upload reference image if selected
+      let referenceImageUrl: string | null = null
+      if (selectedReferenceFile) {
+        try {
+          referenceImageUrl = await uploadReferenceImage(selectedReferenceFile)
+        } catch (uploadError) {
+          console.error('Error uploading reference image:', uploadError)
+          alert('Errore nel caricamento dell\'immagine di riferimento. La richiesta sarà inviata senza immagine.')
+        }
+      }
+
       const bookingData = {
         client_id: user.id,
         artist_id: currentArtistId,
@@ -158,7 +271,8 @@ export function MessagesPage() {
         meaning: bookingForm.meaning || null,
         budget_min: bookingForm.budget_min ? parseFloat(bookingForm.budget_min) : null,
         budget_max: bookingForm.budget_max ? parseFloat(bookingForm.budget_max) : null,
-        status: 'pending'
+        status: 'pending',
+        reference_images: referenceImageUrl ? [referenceImageUrl] : null
       }
       
       const { data, error } = await supabase
@@ -186,17 +300,16 @@ export function MessagesPage() {
       }
       
       // Chiudi il modal e resetta il form
-      setShowBookingRequest(false)
-      setBookingForm({
-        subject: '',
-        tattoo_style: '',
-        body_area: '',
-        size_category: '',
-        color_preferences: '',
-        meaning: '',
-        budget_min: '',
-        budget_max: ''
-      })
+      handleCloseBookingModal()
+      
+      // Aggiorna lo stato del booking in tempo reale
+      if (refreshBookingStatusFn) {
+        await refreshBookingStatusFn()
+      }
+      // Aggiorna anche la versione mobile se attiva
+      if (mobileRefreshBookingStatusFn) {
+        await mobileRefreshBookingStatusFn()
+      }
       
     } catch (error) {
       console.error('Errore nel salvare la prenotazione:', error)
@@ -268,15 +381,14 @@ export function MessagesPage() {
     setShowAuthOverlay(true)
   }, [])
 
-  // Scroll to top when component mounts
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
-  
-  const { conversations, loading, error, deleteConversation, markConversationAsRead, sendMessage, fetchConversationMessages } = useMessages()
+  // All state declarations first
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
   const [newChatArtist, setNewChatArtist] = useState<{id: string, name: string, avatar?: string} | null>(null)
   const [chatToDelete, setChatToDelete] = useState<{id: string, participantName: string} | null>(null)
+  
+  
+  // Note: Body scroll blocking is handled by individual modal components (ConfirmationModal, AuthOverlay)
+  
   const [newMessage, setNewMessage] = useState('')
   const [conversationMessages, setConversationMessages] = useState<Array<{
     id: string
@@ -285,6 +397,8 @@ export function MessagesPage() {
     isFromCurrentUser: boolean
   }>>([])
   const [loadingMessages, setLoadingMessages] = useState(false)
+  
+  const { conversations, loading, error, deleteConversation, markConversationAsRead, sendMessage, fetchConversationMessages } = useMessages()
   const mobileMessagesListRef = useRef<HTMLDivElement>(null)
   
   // Scroll to bottom of mobile messages list
@@ -426,14 +540,7 @@ export function MessagesPage() {
       setTimeout(() => scrollToBottom(), 100)
     })
 
-    // Set up polling for new messages every 3 seconds (without loading spinner)
-    const interval = setInterval(() => {
-      loadConversationMessages(false)
-    }, 3000)
-
-    return () => {
-      clearInterval(interval)
-    }
+    // No automatic polling - messages update only when manually sent/received
   }, [isMobile, artistId, user?.id, scrollToBottom]) // Rimossa fetchConversationMessages dalle dipendenze
 
   // Format message timestamp
@@ -654,6 +761,7 @@ export function MessagesPage() {
     )
   }
 
+
   // Mobile Layout
   if (isMobile) {
     // If we have artistId in URL, show conversation view
@@ -696,18 +804,28 @@ export function MessagesPage() {
               </button>
             </div>
 
-            {/* Pinned Action Button - Positioned between header and messages */}
-            <div className="pinned-action-container">
-              <PinnedActionButton 
-                participantId={artistId}
-                participantName={selectedChat.participant.name}
-                onOpenBookingRequest={(participantId?: string) => {
-                  if (!participantId) return
-                  setCurrentArtistId(participantId)
-                  setShowBookingRequest(true)
-                }}
+            {/* Conditional rendering: Pinned Action Button OR Progress Tracker */}
+            {mobileShowPinnedAction && (
+              <div className="pinned-action-container">
+                <PinnedActionButton 
+                  participantId={artistId}
+                  participantName={selectedChat.participant.name}
+                  onOpenBookingRequest={(participantId?: string) => {
+                    if (!participantId) return
+                    setCurrentArtistId(participantId)
+                    setShowBookingRequest(true)
+                  }}
+                />
+              </div>
+            )}
+            
+            {mobileShowProgressTracker && mobileBookingData && profile && (
+              <BookingProgressTracker
+                status={mobileBookingData.status}
+                userType={profile.profile_type}
               />
-            </div>
+            )}
+            
 
             {/* Scrollable Messages List */}
             <div className="messages-list" ref={mobileMessagesListRef}>
@@ -809,10 +927,10 @@ export function MessagesPage() {
 
           {/* Booking Request Overlay - Mobile version */}
           {showBookingRequest && profile?.profile_type === 'client' && (
-            <div className="auth-overlay" onClick={() => setShowBookingRequest(false)}>
+            <div className="auth-overlay" onClick={handleCloseBookingModal}>
               <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="auth-header-sticky">
-                  <button className="auth-close-btn" onClick={() => setShowBookingRequest(false)}>
+                  <button className="auth-close-btn" onClick={handleCloseBookingModal}>
                     ×
                   </button>
                 </div>
@@ -1037,22 +1155,41 @@ export function MessagesPage() {
                         IMMAGINI DI RIFERIMENTO
                       </label>
                       <div className="image-upload-section">
+                        {referenceFilePreview && (
+                          <div className="image-preview-container">
+                            <img 
+                              src={referenceFilePreview} 
+                              alt="Preview" 
+                              className="image-preview"
+                            />
+                            <button
+                              type="button"
+                              className="remove-image-btn"
+                              onClick={() => {
+                                setSelectedReferenceFile(null)
+                                setReferenceFilePreview(null)
+                              }}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        )}
                         <div className="file-upload-container">
                           <input 
                             id="reference_images" 
                             className="file-input" 
                             accept="image/jpeg,image/jpg,image/png,image/webp" 
                             type="file" 
-                            multiple 
+                            onChange={handleReferenceFileSelect}
                           />
                           <label htmlFor="reference_images" className="file-upload-btn">
                             <svg className="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                               <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"></path>
                             </svg>
-                            <span>Carica Immagini</span>
+                            <span>{selectedReferenceFile ? 'Cambia Immagine' : 'Carica Immagine'}</span>
                           </label>
                         </div>
-                        <p className="file-info">JPG, PNG o WebP. Max 5MB per immagine.</p>
+                        <p className="file-info">JPG, PNG o WebP. Max 5MB.</p>
                       </div>
                     </div>
 
@@ -1087,17 +1224,21 @@ export function MessagesPage() {
                     </div>
 
                     <div className="form-actions">
-                      <button type="button" className="action-btn" onClick={() => setShowBookingRequest(false)}>
+                      <button type="button" className="action-btn" onClick={handleCloseBookingModal}>
                         <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                           <path d="M18 6L6 18M6 6l12 12"></path>
                         </svg>
                         <span className="action-text">Annulla</span>
                       </button>
-                      <button type="submit" className="action-btn">
+                      <button 
+                        type="submit" 
+                        className={`action-btn ${imageUploading ? 'disabled' : ''}`}
+                        disabled={imageUploading}
+                      >
                         <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                           <path d="M12 5v14m7-7l-7-7-7 7"></path>
                         </svg>
-                        <span className="action-text">Invia Richiesta</span>
+                        <span className="action-text">{imageUploading ? 'Caricamento...' : 'Invia'}</span>
                       </button>
                     </div>
                   </form>
@@ -1215,7 +1356,7 @@ export function MessagesPage() {
 
   // Desktop Layout
   return (
-    <div className="messages-page">
+    <div className={`messages-page ${showBookingRequest ? 'modal-open' : ''}`}>
       <SearchBar onLogoClick={handleLogoClick} hideOnMobile={true} />
       
       
@@ -1238,6 +1379,7 @@ export function MessagesPage() {
               onRequestDeleteChat={handleRequestDeleteChat}
               sendMessage={sendMessage}
               fetchConversationMessages={fetchConversationMessages}
+              isModalOpen={showBookingRequest}
               onOpenBookingRequest={(participantId?: string) => {
                 if (!participantId) {
                   console.error('Non posso aprire richiesta senza participantId')
@@ -1245,6 +1387,14 @@ export function MessagesPage() {
                 }
                 setCurrentArtistId(participantId)
                 setShowBookingRequest(true)
+              }}
+              onBookingRequestSent={() => {
+                // Callback eseguito quando il booking request è stato inviato con successo
+                console.log('Booking request sent successfully')
+                // Il refresh dello stato booking sarà gestito dal hook useBookingStatus
+              }}
+              onBookingStatusRefresh={(refreshFn) => {
+                setRefreshBookingStatusFn(() => refreshFn)
               }}
             />
           ) : (
@@ -1284,10 +1434,10 @@ export function MessagesPage() {
 
       {/* Booking Request Overlay - Solo per profili client */}
       {showBookingRequest && profile?.profile_type === 'client' && (
-        <div className="auth-overlay" onClick={() => setShowBookingRequest(false)}>
+        <div className="auth-overlay" onClick={handleCloseBookingModal}>
           <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
             <div className="auth-header-sticky">
-              <button className="auth-close-btn" onClick={() => setShowBookingRequest(false)}>
+              <button className="auth-close-btn" onClick={handleCloseBookingModal}>
                 ×
               </button>
             </div>
@@ -1512,22 +1662,41 @@ export function MessagesPage() {
                     IMMAGINI DI RIFERIMENTO
                   </label>
                   <div className="image-upload-section">
+                    {referenceFilePreview && (
+                      <div className="image-preview-container">
+                        <img 
+                          src={referenceFilePreview} 
+                          alt="Preview" 
+                          className="image-preview"
+                        />
+                        <button
+                          type="button"
+                          className="remove-image-btn"
+                          onClick={() => {
+                            setSelectedReferenceFile(null)
+                            setReferenceFilePreview(null)
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
                     <div className="file-upload-container">
                       <input 
                         id="reference_images" 
                         className="file-input" 
                         accept="image/jpeg,image/jpg,image/png,image/webp" 
                         type="file" 
-                        multiple 
+                        onChange={handleReferenceFileSelect}
                       />
                       <label htmlFor="reference_images" className="file-upload-btn">
                         <svg className="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                           <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"></path>
                         </svg>
-                        <span>Carica Immagini</span>
+                        <span>{selectedReferenceFile ? 'Cambia Immagine' : 'Carica Immagine'}</span>
                       </label>
                     </div>
-                    <p className="file-info">JPG, PNG o WebP. Max 5MB per immagine.</p>
+                    <p className="file-info">JPG, PNG o WebP. Max 5MB.</p>
                   </div>
                 </div>
 
@@ -1562,7 +1731,7 @@ export function MessagesPage() {
                 </div>
 
                 <div className="form-actions">
-                  <button type="button" className="action-btn" onClick={() => setShowBookingRequest(false)}>
+                  <button type="button" className="action-btn" onClick={handleCloseBookingModal}>
                     <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                       <path d="M18 6L6 18M6 6l12 12"></path>
                     </svg>
@@ -1572,7 +1741,7 @@ export function MessagesPage() {
                     <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                       <path d="M12 5v14m7-7l-7-7-7 7"></path>
                     </svg>
-                    <span className="action-text">Invia Richiesta</span>
+                    <span className="action-text">Invia</span>
                   </button>
                 </div>
               </form>

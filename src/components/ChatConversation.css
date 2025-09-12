@@ -183,7 +183,44 @@
   min-height: 0;
   user-select: text;
   -webkit-user-select: text;
+  position: relative;
 }
+
+/* Pinned Action Button */
+.pinned-action-container {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: transparent;
+}
+
+.pinned-action-btn {
+  width: 100%;
+  padding: 0.75rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border: 2px solid var(--foreground);
+  background: var(--foreground);  /* Sfondo nero */
+  color: var(--background);  /* Testo bianco */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 4px;
+}
+
+.pinned-action-btn:hover {
+  background: var(--background) !important;  /* Sfondo bianco in hover */
+  background-color: var(--background) !important;
+  color: var(--foreground);  /* Testo nero in hover */
+  border-color: var(--foreground);
+}
+
+/* Pinned action button is now shown on both desktop and mobile */
 
 /* Message Styles */
 .message {

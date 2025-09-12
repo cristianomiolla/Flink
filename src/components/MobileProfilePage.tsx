@@ -137,6 +137,16 @@ export function MobileProfilePage() {
 
           <button 
             className="mobile-profile-item" 
+            onClick={() => navigate('/appointments')}
+          >
+            <span className="mobile-profile-item-text">Appuntamenti</span>
+            <svg className="mobile-profile-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polyline points="9,18 15,12 9,6"/>
+            </svg>
+          </button>
+
+          <button 
+            className="mobile-profile-item" 
             onClick={() => navigate('/settings')}
           >
             <span className="mobile-profile-item-text">Impostazioni</span>

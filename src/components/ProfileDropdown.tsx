@@ -168,6 +168,12 @@ export function ProfileDropdown() {
             </button>
           )}
           <button className="dropdown-item profile-dropdown-item" onClick={() => {
+            navigate('/appointments')
+            setIsOpen(false)
+          }}>
+            Appuntamenti
+          </button>
+          <button className="dropdown-item profile-dropdown-item" onClick={() => {
             navigate('/settings')
             setIsOpen(false)
           }}>

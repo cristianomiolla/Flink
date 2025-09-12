@@ -4,6 +4,8 @@ import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import { useNavigate } from 'react-router-dom'
 import './BecomeArtistPage.css'
+import './AuthOverlay.css'
+import '../styles/tokens.css'
 
 interface BecomeArtistPageProps {
   onLogoClick?: () => void
@@ -176,7 +178,7 @@ export function BecomeArtistPage({ onLogoClick }: BecomeArtistPageProps) {
               </div>
               
               <form className="auth-form" onSubmit={(e) => { e.preventDefault(); setShowConfirmation(false); handleUpgradeToArtist(); }}>
-                <div className="modal-actions">
+                <div className="form-actions">
                   <button 
                     type="button"
                     className="action-btn"

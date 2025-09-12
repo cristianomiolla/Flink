@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import './PortfolioModal.css'
 import { Avatar } from './Avatar'
 import { useSavedTattoos } from '../hooks/useSavedTattoos'
@@ -26,6 +26,20 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
   
   // Check if current user owns this post
   const isOwnPost = profile?.user_id === item.user_id
+  
+  // Hook to detect mobile screen size
+  const [isMobile, setIsMobile] = useState(false)
+  
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth <= 767)
+    }
+    
+    checkIsMobile()
+    window.addEventListener('resize', checkIsMobile)
+    
+    return () => window.removeEventListener('resize', checkIsMobile)
+  }, [])
   // Block scroll when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -206,7 +220,7 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
               src={item.artist_avatar_url}
               name={displayName}
               alt={`Avatar di ${displayName}`}
-              size="md"
+              size={isMobile ? "sm" : "md"}
               variant="default"
               onClick={handleArtistNameClick}
             />

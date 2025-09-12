@@ -163,3 +163,57 @@
   border: none;
   box-shadow: none;
 }
+
+/* Reference Images Styles */
+.booking-field.reference-images {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.reference-images-container {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.reference-image {
+  position: relative;
+  border: 2px solid var(--border);
+  border-radius: 0;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+}
+
+.reference-image:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.15);
+}
+
+.reference-image-preview {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Mobile responsive adjustments for reference images */
+@media (max-width: 768px) {
+  .reference-image-preview {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .booking-field.reference-images {
+    gap: 0.375rem;
+  }
+  
+  .reference-images-container {
+    gap: 0.375rem;
+  }
+}

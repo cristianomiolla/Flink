@@ -16,6 +16,7 @@ import './PersonalProfile.css'
 import './ImageUpload.css'
 import './TabHeader.css'
 import './TabsNavigation.css'
+import './AuthOverlay.css'
 import type { TabType, PortfolioItem, ArtistService, CreateServiceData } from '../types/portfolio'
 
 export function PersonalProfile() {
@@ -840,7 +841,7 @@ export function PersonalProfile() {
       {/* Profile Completion Overlay */}
       {showEditOverlay && (
         <div className="auth-overlay" onClick={(e) => e.target === e.currentTarget && setShowEditOverlay(false)}>
-          <div className="auth-modal complete-profile-modal">
+          <div className="auth-modal">
             {/* Sticky Header with Close Button */}
             <div className="auth-header-sticky">
               <button className="auth-close-btn" onClick={() => setShowEditOverlay(false)}>
@@ -916,7 +917,7 @@ export function PersonalProfile() {
                 {/* Bio Field */}
                 <div className="form-group">
                   <label htmlFor="bio" className="form-label">
-                    BIO {!profile?.bio && <span className="required-indicator">*</span>}
+                    BIO <span className="required-indicator">*</span>
                   </label>
                   <textarea
                     id="bio"
@@ -943,7 +944,7 @@ export function PersonalProfile() {
                 {/* Location Field */}
                 <div className="form-group">
                   <label htmlFor="location" className="form-label">
-                    LOCALITÀ {!profile?.location && <span className="required-indicator">*</span>}
+                    LOCALITÀ <span className="required-indicator">*</span>
                   </label>
                   <input
                     type="text"
@@ -992,7 +993,7 @@ export function PersonalProfile() {
       {/* Portfolio Upload Overlay */}
       {showUploadOverlay && (
         <div className="auth-overlay" onClick={(e) => e.target === e.currentTarget && (setShowUploadOverlay(false), resetUploadForm())}>
-          <div className="auth-modal upload-portfolio-modal">
+          <div className="auth-modal">
             {/* Sticky Header with Close Button */}
             <div className="auth-header-sticky">
               <button className="auth-close-btn" onClick={() => {setShowUploadOverlay(false); resetUploadForm()}}>
@@ -1003,7 +1004,7 @@ export function PersonalProfile() {
             <div className="auth-modal-header">
             </div>
             
-            <div className="upload-portfolio-content">
+            <div className="auth-content">
               <div className="header-card">
                 <h2>{isEditMode ? 'MODIFICA LAVORO' : 'AGGIUNGI LAVORO'}</h2>
                 <p>{isEditMode ? 'Modifica i dettagli del tuo lavoro' : 'Carica un nuovo lavoro nel tuo portfolio'}</p>
