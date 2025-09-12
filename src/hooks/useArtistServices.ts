@@ -86,7 +86,6 @@ export function useArtistServices(userId?: string) {
         insertData.fixed_price = null
       }
 
-      console.log('Creating service with data:', insertData)
 
       const { data, error } = await supabase
         .from('artist_services')
@@ -135,7 +134,6 @@ export function useArtistServices(userId?: string) {
       if (updates.discount_percentage !== undefined) updateData.discount_percentage = updates.discount_percentage || 0
       if (updates.image_url !== undefined) updateData.image_url = updates.image_url || null
 
-      console.log('Updating service with data:', updateData)
 
       const { data, error } = await supabase
         .from('artist_services')

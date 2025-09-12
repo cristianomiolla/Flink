@@ -28,9 +28,10 @@ const parseBookingRequestMessage = (content: string) => {
 interface PinnedActionButtonProps {
   participantId: string | null
   participantName: string
+  onOpenArtistAppointment?: (participantId: string, participantName: string) => void
 }
 
-function PinnedActionButton({ participantId, participantName, onOpenBookingRequest }: PinnedActionButtonProps & { onOpenBookingRequest?: (participantId?: string) => void }) {
+function PinnedActionButton({ participantId, participantName, onOpenBookingRequest, onOpenArtistAppointment }: PinnedActionButtonProps & { onOpenBookingRequest?: (participantId?: string) => void; onOpenArtistAppointment?: (participantId: string, participantName: string) => void }) {
   const { user, profile } = useAuth()
   
   if (!user || !profile || !participantId) return null
@@ -39,10 +40,12 @@ function PinnedActionButton({ participantId, participantName, onOpenBookingReque
   const buttonText = isArtist ? '📅 FISSA APPUNTAMENTO' : '📝 INVIA UNA RICHIESTA'
 
   const handleClick = () => {
-    console.log('PinnedActionButton ChatConversation clicked', { participantId, isArtist })
-    // Per ora, disabilitiamo il pulsante "FISSA APPUNTAMENTO" per gli artisti
+    
     if (isArtist) {
-      console.log('Funzionalità "FISSA APPUNTAMENTO" temporaneamente disabilitata')
+      // Artist wants to set an appointment
+      if (onOpenArtistAppointment) {
+        onOpenArtistAppointment(participantId, participantName)
+      }
       return
     }
     
@@ -50,7 +53,6 @@ function PinnedActionButton({ participantId, participantName, onOpenBookingReque
       onOpenBookingRequest(participantId)
     } else {
       // Placeholder for now - will implement booking logic later
-      console.log(`Sending request to ${participantName}`)
     }
   }
 
@@ -85,11 +87,12 @@ interface ChatConversationProps {
   hideHeaderAndInput?: boolean
   isModalOpen?: boolean
   onOpenBookingRequest?: (participantId?: string) => void
+  onOpenArtistAppointment?: (participantId: string, participantName: string) => void
   onBookingRequestSent?: () => void
   onBookingStatusRefresh?: (refreshFn: () => Promise<void>) => void
 }
 
-export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages, hideHeaderAndInput = false, onOpenBookingRequest, onBookingStatusRefresh }: ChatConversationProps) {
+export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages, hideHeaderAndInput = false, onOpenBookingRequest, onOpenArtistAppointment, onBookingStatusRefresh }: ChatConversationProps) {
   const { user, profile } = useAuth()
   const [newMessage, setNewMessage] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
@@ -236,6 +239,12 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
     }
   }
 
+  const handleOpenArtistAppointment = (participantId: string, participantName: string) => {
+    if (onOpenArtistAppointment) {
+      onOpenArtistAppointment(participantId, participantName)
+    }
+  }
+
   if (!chat) {
     return (
       <div className="chat-conversation empty">
@@ -291,6 +300,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
                 participantId={getParticipantId(chat.id)}
                 participantName={chat.participant.name}
                 onOpenBookingRequest={onOpenBookingRequest}
+                onOpenArtistAppointment={handleOpenArtistAppointment}
               />
             </div>
           )}
@@ -323,6 +333,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
                       ...bookingData.booking_data,
                       created_at: message.timestamp
                     }}
+                    bookingId={bookingData.booking_id}
                     isFromCurrentUser={message.isFromCurrentUser}
                     timestamp={message.timestamp}
                   />
@@ -371,6 +382,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
           </div>
         </div>
       )}
+
     </div>
   )
 }

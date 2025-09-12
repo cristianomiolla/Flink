@@ -114,3 +114,35 @@ export interface AuthRequiredProps {
   onAuthRequired: () => void
 }
 
+// Booking request message types
+export interface BookingRequestData {
+  subject: string
+  tattoo_style: string
+  body_area: string
+  size_category: string
+  color_preferences: string
+  meaning?: string
+  budget_min?: number
+  budget_max?: number
+  reference_images?: string[] | null
+  created_at: string
+}
+
+export interface BookingRequestMessage {
+  type: 'booking_request'
+  booking_id: string
+  booking_data: BookingRequestData
+}
+
+export type MessageType = 'text' | 'booking_request'
+
+export interface DatabaseMessage {
+  id: string
+  sender_id: string
+  receiver_id: string
+  content: string
+  created_at: string
+  is_read: boolean
+  deleted_at: string | null
+}
+

@@ -44,13 +44,9 @@ Artista
 
 In alto nella chat vede “Fissa appuntamento”.
 
-Dopo ricezione richiesta:
 
-Componente pinnato scompare.
 
-Stato di avanzamento → “Richiesta ricevuta”.
-
-Può accettare la richiesta:
+Se riceve una richiesta Può accettare la richiesta cliccando su "fissa appuntamento":
 
 Compila un appuntamento con:
 

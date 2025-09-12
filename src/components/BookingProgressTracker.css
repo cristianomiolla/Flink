@@ -40,7 +40,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.4rem; /* Match pinned-action-btn gap */
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 .progress-icon {

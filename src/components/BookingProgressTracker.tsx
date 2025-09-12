@@ -45,6 +45,12 @@ const getStatusDisplay = (status: BookingStatus, userType: 'client' | 'artist') 
 export function BookingProgressTracker({ status, userType }: BookingProgressTrackerProps) {
   const statusDisplay = getStatusDisplay(status, userType)
 
+  // Artists with pending status should not show progress tracker at all
+  // They should see the pinned action button instead
+  if (status === 'pending' && userType === 'artist') {
+    return null
+  }
+
   return (
     <div className={`booking-progress-tracker ${statusDisplay.color}`}>
       <div className="progress-content">

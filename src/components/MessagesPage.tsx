@@ -19,6 +19,7 @@ import { ConfirmationModal } from './ConfirmationModal'
 import { BookingRequestCard } from './BookingRequestCard'
 import { BookingProgressTracker } from './BookingProgressTracker'
 import { useBookingStatus } from '../hooks/useBookingStatus'
+import { ArtistAppointmentForm } from './ArtistAppointmentForm'
 
 // Lazy load AuthOverlay component
 const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
@@ -27,9 +28,10 @@ const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default
 interface PinnedActionButtonProps {
   participantId: string | null
   participantName: string
+  onOpenArtistAppointment?: (participantId: string, participantName: string) => void
 }
 
-function PinnedActionButton({ participantId, onOpenBookingRequest }: PinnedActionButtonProps & { onOpenBookingRequest?: (participantId?: string) => void }) {
+function PinnedActionButton({ participantId, participantName, onOpenBookingRequest, onOpenArtistAppointment }: PinnedActionButtonProps & { onOpenBookingRequest?: (participantId?: string) => void; onOpenArtistAppointment?: (participantId: string, participantName: string) => void }) {
   const { user, profile } = useAuth()
   
   if (!user || !profile || !participantId) return null
@@ -38,7 +40,13 @@ function PinnedActionButton({ participantId, onOpenBookingRequest }: PinnedActio
   const buttonText = isArtist ? '📅 FISSA APPUNTAMENTO' : '📝 INVIA UNA RICHIESTA'
 
   const handleClick = () => {
-    if (isArtist) return
+    if (isArtist) {
+      // Artist wants to set an appointment
+      if (onOpenArtistAppointment) {
+        onOpenArtistAppointment(participantId, participantName)
+      }
+      return
+    }
     
     if (onOpenBookingRequest) {
       onOpenBookingRequest(participantId)
@@ -107,7 +115,9 @@ export function MessagesPage() {
   const handleLogoClick = () => navigate('/')
   const [showAuthOverlay, setShowAuthOverlay] = useState(false)
   const [showBookingRequest, setShowBookingRequest] = useState(false)
+  const [showArtistAppointmentForm, setShowArtistAppointmentForm] = useState(false)
   const [currentArtistId, setCurrentArtistId] = useState<string | null>(null)
+  const [appointmentClientData, setAppointmentClientData] = useState<{ id: string; name: string } | null>(null)
   const [refreshBookingStatusFn, setRefreshBookingStatusFn] = useState<(() => Promise<void>) | null>(null)
   const [mobileRefreshBookingStatusFn, setMobileRefreshBookingStatusFn] = useState<(() => Promise<void>) | null>(null)
   
@@ -226,6 +236,27 @@ export function MessagesPage() {
     setTattooStyleDropdownOpen(false)
     setBodyAreaDropdownOpen(false)
     setSizeDropdownOpen(false)
+  }
+
+  // Helper functions for artist appointment form
+  const handleOpenArtistAppointment = (participantId: string, participantName: string) => {
+    setAppointmentClientData({ id: participantId, name: participantName })
+    setShowArtistAppointmentForm(true)
+  }
+
+  const handleCloseArtistAppointment = () => {
+    setShowArtistAppointmentForm(false)
+    setAppointmentClientData(null)
+  }
+
+  const handleAppointmentCreated = async () => {
+    // Refresh booking status to update UI
+    if (refreshBookingStatusFn) {
+      await refreshBookingStatusFn()
+    }
+    if (mobileRefreshBookingStatusFn) {
+      await mobileRefreshBookingStatusFn()
+    }
   }
   
   // Funzione per salvare la prenotazione nel database
@@ -815,6 +846,7 @@ export function MessagesPage() {
                     setCurrentArtistId(participantId)
                     setShowBookingRequest(true)
                   }}
+                  onOpenArtistAppointment={handleOpenArtistAppointment}
                 />
               </div>
             )}
@@ -851,6 +883,7 @@ export function MessagesPage() {
                               ...bookingData.booking_data,
                               created_at: message.timestamp
                             }}
+                            bookingId={bookingData.booking_id}
                             isFromCurrentUser={message.isFromCurrentUser}
                             timestamp={message.timestamp}
                           />
@@ -1247,6 +1280,16 @@ export function MessagesPage() {
             </div>
           )}
 
+          {/* Artist Appointment Form - Mobile version */}
+          {showArtistAppointmentForm && appointmentClientData && (
+            <ArtistAppointmentForm
+              clientId={appointmentClientData.id}
+              clientName={appointmentClientData.name}
+              onClose={handleCloseArtistAppointment}
+              onAppointmentCreated={handleAppointmentCreated}
+            />
+          )}
+
         </div>
       )
     }
@@ -1390,9 +1433,9 @@ export function MessagesPage() {
               }}
               onBookingRequestSent={() => {
                 // Callback eseguito quando il booking request è stato inviato con successo
-                console.log('Booking request sent successfully')
                 // Il refresh dello stato booking sarà gestito dal hook useBookingStatus
               }}
+              onOpenArtistAppointment={handleOpenArtistAppointment}
               onBookingStatusRefresh={(refreshFn) => {
                 setRefreshBookingStatusFn(() => refreshFn)
               }}
@@ -1748,6 +1791,17 @@ export function MessagesPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Artist Appointment Form */}
+      {showArtistAppointmentForm && appointmentClientData && (
+        <ArtistAppointmentForm
+          clientId={appointmentClientData.id}
+          clientName={appointmentClientData.name}
+          onClose={handleCloseArtistAppointment}
+          onAppointmentCreated={handleAppointmentCreated}
+          sendMessage={sendMessage}
+        />
       )}
     </div>
   )

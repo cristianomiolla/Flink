@@ -77,12 +77,13 @@ export function useBookingStatus(participantId: string | null): UseBookingStatus
     await fetchBookingStatus()
   }, [fetchBookingStatus])
 
-  // Determina se una richiesta pending è scaduta (7 giorni)
-  const EXPIRY_TIME = 7 * 24 * 60 * 60 * 1000 // 7 giorni in millisecondi
+  // Determina se una richiesta pending è scaduta (15 giorni) SE non c'è appointment_date
+  const EXPIRY_TIME = 15 * 24 * 60 * 60 * 1000 // 15 giorni in millisecondi
   const isPendingExpired = Boolean(
     bookingData && 
     bookingData.status === 'pending' && 
-    new Date(bookingData.created_at).getTime() < Date.now() - EXPIRY_TIME
+    (Date.now() - new Date(bookingData.created_at).getTime()) > EXPIRY_TIME &&
+    !bookingData.appointment_date
   )
 
   // Determina se c'è una prenotazione attiva
@@ -109,8 +110,10 @@ export function useBookingStatus(participantId: string | null): UseBookingStatus
   // Determina se mostrare il pinned action button
   // Mostra se:
   // 1. Non c'è booking attivo, O
-  // 2. Non c'è progress tracker da mostrare (incluso pending scaduto)
-  const showPinnedAction = !hasActiveBooking || !showProgressTracker
+  // 2. Non c'è progress tracker da mostrare (incluso pending scaduto), O
+  // 3. È un artista con booking pending (deve sempre vedere "Fissa appuntamento")
+  const showPinnedAction = !hasActiveBooking || !showProgressTracker || 
+    (profile?.profile_type === 'artist' && bookingData?.status === 'pending')
 
   return {
     bookingData,

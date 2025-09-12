@@ -2,23 +2,22 @@
 
 .booking-request-card {
   background: var(--card);
-  border: 2px solid var(--border);
+  border: none;
   border-radius: 0;
   padding: 1rem;
-  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 700px;
+  box-shadow: none;
+  width: 450px;
   font-family: var(--font-sans);
 }
 
 .message.sent .booking-request-card {
   background: rgba(239, 67, 67, 0.1);
-  border-color: var(--accent);
+  border: 1px solid var(--accent);
 }
 
 .message.received .booking-request-card {
   background: var(--grey-light);
-  border-color: var(--border);
+  border: 1px solid var(--border);
 }
 
 .booking-header {
@@ -78,6 +77,12 @@
   background: rgba(239, 67, 67, 0.1);
 }
 
+.status-badge.expired {
+  color: #6b7280;
+  border-color: #6b7280;
+  background: rgba(107, 114, 128, 0.1);
+}
+
 .booking-content {
   display: flex;
   flex-direction: column;
@@ -131,6 +136,9 @@
 
 /* Mobile responsive adjustments */
 @media (max-width: 768px) {
+  .booking-request-card {
+    width: 250px;
+  }
   .booking-field {
     flex-direction: column;
     align-items: flex-start;
@@ -152,10 +160,6 @@
   display: block;
 }
 
-/* Ensure proper spacing within messages list */
-.messages-list .message:has(.booking-request-card) {
-  margin: 0.75rem 0;
-}
 
 .messages-list .message:has(.booking-request-card) .message-bubble {
   padding: 0;

@@ -41,9 +41,6 @@
 }
 
 
-.read-the-docs {
-  color: var(--grey-dark);
-}
 
 /* Mobile Design - Under 768px */
 @media (max-width: 767px) {

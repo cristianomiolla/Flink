@@ -227,7 +227,6 @@ export function ServiceForm({
         finalFormData.fixed_price = null
       }
       
-      console.log('ServiceForm submitting data:', finalFormData)
       
       const success = await onSubmit(finalFormData)
       
