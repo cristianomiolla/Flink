@@ -30,7 +30,7 @@ interface PinnedActionButtonProps {
   participantName: string
 }
 
-function PinnedActionButton({ participantId, participantName, onOpenBookingRequest, onBookingRequestSent }: PinnedActionButtonProps & { onOpenBookingRequest?: (participantId?: string) => void; onBookingRequestSent?: () => void }) {
+function PinnedActionButton({ participantId, participantName, onOpenBookingRequest }: PinnedActionButtonProps & { onOpenBookingRequest?: (participantId?: string) => void }) {
   const { user, profile } = useAuth()
   
   if (!user || !profile || !participantId) return null
@@ -89,7 +89,7 @@ interface ChatConversationProps {
   onBookingStatusRefresh?: (refreshFn: () => Promise<void>) => void
 }
 
-export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages, hideHeaderAndInput = false, isModalOpen = false, onOpenBookingRequest, onBookingRequestSent, onBookingStatusRefresh }: ChatConversationProps) {
+export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages, hideHeaderAndInput = false, onOpenBookingRequest, onBookingStatusRefresh }: ChatConversationProps) {
   const { user, profile } = useAuth()
   const [newMessage, setNewMessage] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
@@ -105,7 +105,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
 
   // Get participant ID for booking status
   const participantId = chat ? getParticipantId(chat.id) : null
-  const { bookingData, showProgressTracker, showPinnedAction, refreshBookingStatus, isPendingExpired } = useBookingStatus(participantId)
+  const { bookingData, showProgressTracker, showPinnedAction, refreshBookingStatus } = useBookingStatus(participantId)
 
   // Pass refresh function to parent component
   useEffect(() => {
@@ -291,10 +291,6 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
                 participantId={getParticipantId(chat.id)}
                 participantName={chat.participant.name}
                 onOpenBookingRequest={onOpenBookingRequest}
-                onBookingRequestSent={() => {
-                  refreshBookingStatus()
-                  if (onBookingRequestSent) onBookingRequestSent()
-                }}
               />
             </div>
           )}

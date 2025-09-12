@@ -114,7 +114,7 @@ export function MessagesPage() {
   // Hook for mobile booking status - must be before any early returns
   // Use artistId directly for mobile since it's available from useParams
   const mobileParticipantId = (isMobile && artistId) ? artistId : null
-  const { bookingData: mobileBookingData, showProgressTracker: mobileShowProgressTracker, showPinnedAction: mobileShowPinnedAction, refreshBookingStatus: mobileRefreshBookingStatus, isPendingExpired: mobileIsPendingExpired } = useBookingStatus(mobileParticipantId)
+  const { bookingData: mobileBookingData, showProgressTracker: mobileShowProgressTracker, showPinnedAction: mobileShowPinnedAction, refreshBookingStatus: mobileRefreshBookingStatus } = useBookingStatus(mobileParticipantId)
   
   // Store mobile refresh function
   useEffect(() => {
