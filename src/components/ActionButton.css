@@ -1,4 +1,68 @@
-/* ActionButton unified styles */
+/* ActionButton unified styles - All button styles consolidated */
+
+/* === BASE BUTTON STYLES === */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  padding: 0.625rem 1rem;
+  text-transform: uppercase;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.btn-primary:hover {
+  background: var(--grey-dark);
+}
+
+.btn-secondary {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--grey-medium);
+}
+
+/* Base styles from components.css */
+.btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  font-weight: 600;
+  text-decoration: none;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.retry-btn {
+  composes: btn-base;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--accent);
+}
+
+.retry-btn:hover {
+  background: var(--accent);
+  opacity: 0.9;
+}
 
 /* Base styles for action buttons */
 .action-btn {
@@ -139,31 +203,9 @@
   }
 }
 
-/* Secondary button styles */
-.btn.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius);
-  font-size: 13px;
-  font-weight: 600;
-  transition: all 0.2s;
-  cursor: pointer;
-  text-decoration: none;
-  border: none;
-  padding: 0.625rem 1rem;
-  text-transform: uppercase;
-  background: var(--secondary);
-  color: var(--secondary-foreground);
-  border: 1px solid var(--border);
-}
-
-.btn.btn-secondary:hover {
-  background: var(--grey-medium);
-}
-
-.btn.btn-secondary.active,
-.btn.btn-secondary.active:hover {
+/* Active state for secondary buttons */
+.btn-secondary.active,
+.btn-secondary.active:hover {
   background: #171717;
   color: #ffffff;
   border-color: #171717;

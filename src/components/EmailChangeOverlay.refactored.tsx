@@ -4,6 +4,7 @@ import { validateEmail } from '../lib/passwordValidation'
 import { useFormOverlay } from '../hooks/useFormOverlay'
 import { OverlayWrapper } from './OverlayWrapper'
 import { FormField } from './FormField'
+import './AuthOverlay.css'
 import './ActionButton.css'
 
 interface EmailChangeOverlayProps {
@@ -15,8 +16,13 @@ interface FormData {
   newEmail: string
 }
 
+/**
+ * Refactored EmailChangeOverlay using the new overlay utilities
+ * This demonstrates how much code duplication can be reduced
+ */
 export function EmailChangeOverlay({ isOpen, onClose }: EmailChangeOverlayProps) {
   const { user } = useAuth()
+  
   const {
     formData,
     errors,
@@ -32,9 +38,8 @@ export function EmailChangeOverlay({ isOpen, onClose }: EmailChangeOverlayProps)
   })
 
   const validateForm = (): boolean => {
-    const newErrors: { [key: string]: string } = {}
+    const newErrors: Record<string, string> = {}
 
-    // New email validation
     if (!formData.newEmail) {
       newErrors.newEmail = 'Nuova email richiesta'
     } else if (!validateEmail(formData.newEmail)) {
@@ -54,9 +59,9 @@ export function EmailChangeOverlay({ isOpen, onClose }: EmailChangeOverlayProps)
     if (isSubmitting || !user) return
 
     setIsSubmitting(true)
+    setFormErrors({})
 
     try {
-      // Update email in auth with proper redirect URL
       const { error } = await supabase.auth.updateUser(
         { email: formData.newEmail },
         {
@@ -86,8 +91,8 @@ export function EmailChangeOverlay({ isOpen, onClose }: EmailChangeOverlayProps)
   }
 
   return (
-    <OverlayWrapper 
-      isOpen={isOpen} 
+    <OverlayWrapper
+      isOpen={isOpen}
       onClose={onClose}
       title="CAMBIA EMAIL"
       subtitle="Aggiorna l'indirizzo email del tuo account"
@@ -114,20 +119,17 @@ export function EmailChangeOverlay({ isOpen, onClose }: EmailChangeOverlayProps)
 
       <form className="auth-form" onSubmit={handleSubmit}>
         {/* Current Email Display */}
-        <div className="form-group">
-          <label className="form-label">
-            Email attuale
-          </label>
+        <FormField label="Email attuale">
           <div className="current-email-display">
             {user?.email || 'N/A'}
           </div>
-        </div>
+        </FormField>
 
         {/* New Email */}
         <FormField 
           label="Nuova email" 
           htmlFor="newEmail" 
-          required={true}
+          required 
           error={errors.newEmail}
         >
           <input

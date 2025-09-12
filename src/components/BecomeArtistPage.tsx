@@ -155,10 +155,10 @@ export function BecomeArtistPage({ onLogoClick }: BecomeArtistPageProps) {
       
       {/* Confirmation Overlay */}
       {showConfirmation && (
-        <div className="auth-overlay" onClick={(e) => e.target === e.currentTarget && setShowConfirmation(false)}>
-          <div className="auth-modal">
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowConfirmation(false)}>
+          <div className="modal-content auth-modal">
             <div className="auth-header-sticky">
-              <button className="auth-close-btn" onClick={() => setShowConfirmation(false)}>
+              <button className="modal-close-btn" onClick={() => setShowConfirmation(false)}>
                 ×
               </button>
             </div>

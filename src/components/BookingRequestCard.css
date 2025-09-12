@@ -29,6 +29,20 @@
   border-bottom: 1px solid var(--border);
 }
 
+.booking-title-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.status-badge-mobile {
+  display: none;
+}
+
+.status-badge-desktop {
+  display: block;
+}
+
 .booking-title {
   display: flex;
   align-items: center;
@@ -139,6 +153,20 @@
   .booking-request-card {
     width: 250px;
   }
+  
+  .booking-header {
+    align-items: flex-start;
+  }
+  
+  .status-badge-mobile {
+    display: block;
+    align-self: flex-start;
+  }
+  
+  .status-badge-desktop {
+    display: none;
+  }
+  
   .booking-field {
     flex-direction: column;
     align-items: flex-start;

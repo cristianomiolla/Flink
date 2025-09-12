@@ -111,8 +111,8 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
   }
 
   return (
-    <div className="portfolio-modal-overlay" onClick={handleBackdropClick}>
-      <div className="portfolio-modal-content">
+    <div className="modal-overlay" onClick={handleBackdropClick}>
+      <div className="modal-content">
         {/* Sticky Header with Close Button */}
         <div className="modal-header">
           <button className="modal-close-btn" onClick={onClose}>

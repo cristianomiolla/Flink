@@ -183,8 +183,8 @@ export function MainPage() {
               onDelete={handleDeletePortfolioItem}
             />
             
-            {/* Following Artists Section - Only for authenticated users */}
-            {user && (
+            {/* Following Artists Section - Only for authenticated users with followed artists */}
+            {user && followedArtistsItems.length > 0 && (
               <HorizontalPortfolioSection
                 title="Seguiti"
                 items={followedArtistsItems}

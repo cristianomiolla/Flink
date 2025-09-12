@@ -148,11 +148,11 @@ export function ResetPasswordPage() {
       </div>
 
       {/* Reset Password Overlay */}
-      <div className="auth-overlay">
-        <div className="auth-modal">
+      <div className="modal-overlay">
+        <div className="modal-content auth-modal">
           {/* Sticky Header with Close Button */}
           <div className="auth-header-sticky">
-            <button className="auth-close-btn" onClick={handleClose}>
+            <button className="modal-close-btn" onClick={handleClose}>
               ×
             </button>
           </div>

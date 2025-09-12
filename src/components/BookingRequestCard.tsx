@@ -23,11 +23,13 @@ interface BookingRequestData {
 interface BookingRequestCardProps {
   bookingData: BookingRequestData
   bookingId?: string  // booking_id viene passato separatamente
-  isFromCurrentUser: boolean
+  isFromCurrentUser?: boolean
   timestamp: string
+  mode?: 'message' | 'appointment' // New prop to control rendering mode
+  participantName?: string // For appointment mode
 }
 
-export function BookingRequestCard({ bookingData, bookingId, isFromCurrentUser, timestamp }: BookingRequestCardProps) {
+export function BookingRequestCard({ bookingData, bookingId, isFromCurrentUser, timestamp, mode = 'message', participantName }: BookingRequestCardProps) {
   const [currentStatus, setCurrentStatus] = useState<string>('pending')
   const [loading, setLoading] = useState(true)
 
@@ -59,7 +61,10 @@ export function BookingRequestCard({ bookingData, bookingId, isFromCurrentUser, 
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp)
-    return date.toLocaleTimeString('it-IT', { 
+    return date.toLocaleString('it-IT', { 
+      year: 'numeric',
+      month: 'long', 
+      day: 'numeric',
       hour: '2-digit', 
       minute: '2-digit' 
     })
@@ -122,7 +127,7 @@ export function BookingRequestCard({ bookingData, bookingId, isFromCurrentUser, 
       case 'declined':
         return <span className="status-badge declined">Rifiutata</span>
       case 'scheduled':
-        return <span className="status-badge accepted">Appuntamento fissato</span>
+        return <span className="status-badge accepted">Programmato</span>
       case 'completed':
         return <span className="status-badge accepted">Completato</span>
       default:
@@ -130,22 +135,35 @@ export function BookingRequestCard({ bookingData, bookingId, isFromCurrentUser, 
     }
   }
 
-  return (
-    <div className={`message ${isFromCurrentUser ? 'sent' : 'received'}`}>
-      <div className="booking-request-card">
-        <div className="booking-header">
+  const cardContent = (
+    <div className="booking-request-card">
+      <div className="booking-header">
+        <div className="booking-title-container">
           <div className="booking-title">
             <span className="booking-icon">{isArtistAppointment ? '📅' : '📝'}</span>
             <h4>{isArtistAppointment ? 'Appuntamento Fissato' : 'Richiesta Tatuaggio'}</h4>
           </div>
+          <div className="status-badge-mobile">
+            {getStatusBadge()}
+          </div>
+        </div>
+        <div className="status-badge-desktop">
           {getStatusBadge()}
         </div>
-        
-        <div className="booking-content">
+      </div>
+      
+      <div className="booking-content">
+        {mode === 'appointment' && participantName && (
           <div className="booking-field">
-            <span className="field-label">Soggetto:</span>
-            <span className="field-value">{bookingData.subject}</span>
+            <span className="field-label">{isArtistAppointment ? 'Cliente' : 'Artista'}:</span>
+            <span className="field-value">{participantName}</span>
           </div>
+        )}
+        
+        <div className="booking-field">
+          <span className="field-label">Soggetto:</span>
+          <span className="field-value">{bookingData.subject}</span>
+        </div>
           
           {isArtistAppointment ? (
             // Artist appointment specific fields
@@ -240,12 +258,22 @@ export function BookingRequestCard({ bookingData, bookingId, isFromCurrentUser, 
               </div>
             </>
           )}
-        </div>
-        
-        <div className="booking-footer">
-          <span className="booking-time">{formatTime(timestamp)}</span>
-        </div>
       </div>
+      
+      <div className="booking-footer">
+        <span className="booking-time">{formatTime(timestamp)}</span>
+      </div>
+    </div>
+  )
+
+  // Return with or without message wrapper based on mode
+  if (mode === 'appointment') {
+    return cardContent
+  }
+
+  return (
+    <div className={`message ${isFromCurrentUser ? 'sent' : 'received'}`}>
+      {cardContent}
     </div>
   )
 }

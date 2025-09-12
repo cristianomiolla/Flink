@@ -110,6 +110,12 @@ CREATE INDEX idx_artist_services_user_id ON artist_services(user_id);
 CREATE INDEX idx_artist_services_active ON artist_services(is_active) WHERE is_active = true;
 CREATE INDEX idx_artist_services_body_area ON artist_services(body_area);
 CREATE INDEX idx_artist_services_pricing_type ON artist_services(pricing_type);
+
+-- Bookings indexes
+CREATE INDEX idx_bookings_client_id ON bookings(client_id);
+CREATE INDEX idx_bookings_artist_id ON bookings(artist_id);
+CREATE INDEX idx_bookings_status ON bookings(status);
+CREATE INDEX idx_bookings_expires_at ON bookings(expires_at);
 ```
 
 #### RLS Policies
@@ -132,6 +138,12 @@ CREATE POLICY "Public can view active services" ON artist_services FOR SELECT TO
 CREATE POLICY "Authenticated users can view all services" ON artist_services FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Artists can create their own services" ON artist_services FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Artists can update their own services" ON artist_services FOR UPDATE TO authenticated USING (auth.uid() = user_id);
+
+-- Bookings
+CREATE POLICY "Users can view their own bookings" ON bookings FOR SELECT USING (auth.uid() = client_id OR auth.uid() = artist_id);
+CREATE POLICY "Clients can create bookings" ON bookings FOR INSERT WITH CHECK (auth.uid() = client_id);
+CREATE POLICY "Artists can create appointments" ON bookings FOR INSERT WITH CHECK (auth.uid() = artist_id);
+CREATE POLICY "Users can update their own bookings" ON bookings FOR UPDATE USING (auth.uid() = client_id OR auth.uid() = artist_id);
 ```
 
 #### Table: `saved_tattoos`
@@ -190,6 +202,32 @@ CREATE TABLE artist_services (
 );
 ```
 
+#### Table: `bookings`
+```sql
+CREATE TABLE bookings (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    client_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    artist_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    subject TEXT NOT NULL,
+    tattoo_style TEXT,
+    body_area TEXT,
+    size_category TEXT,
+    color_preferences TEXT,
+    reference_images TEXT[],
+    meaning TEXT,
+    budget_min DECIMAL(8,2),
+    budget_max DECIMAL(8,2),
+    appointment_date TIMESTAMPTZ,
+    appointment_duration INTEGER,
+    deposit_amount DECIMAL(8,2),
+    artist_notes TEXT,
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'expired', 'rejected', 'scheduled', 'rescheduled', 'cancelled', 'completed')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    expires_at TIMESTAMPTZ DEFAULT (now() + INTERVAL '15 days')
+);
+```
+
 #### Relationships
 - `portfolio_items.user_id` → `profiles.user_id` (Foreign Key)
 - `saved_tattoos.user_id` → `auth.users.id` (Foreign Key)
@@ -199,12 +237,16 @@ CREATE TABLE artist_services (
 - `messages.sender_id` → `auth.users.id` (Foreign Key)
 - `messages.receiver_id` → `auth.users.id` (Foreign Key)
 - `artist_services.user_id` → `auth.users.id` (Foreign Key)
+- `bookings.client_id` → `auth.users.id` (Foreign Key)
+- `bookings.artist_id` → `auth.users.id` (Foreign Key)
 - Both portfolio and profile tables have RLS enabled with public read access
 - Artists are identified by `profiles.profile_type = 'artist'`
 - Saved items are ordered by `saved_tattoos.created_at` for chronological display
 - Follow relationships enable dynamic artist following functionality
 - Messages are ordered by `created_at` and support soft deletion via `deleted_at`
 - Services support flexible pricing (fixed, range, consultation) and body area categorization
+- Bookings support full appointment lifecycle: pending → expired/rejected/scheduled → completed/cancelled
+- Bookings automatically expire after 15 days if not responded to by artist
 
 ### Supabase Client Usage
 ```typescript
@@ -310,6 +352,17 @@ The app follows a modular React architecture with authentication and state manag
   - Implements optimized local state management for better performance
   - Supports conversation deletion and message read status tracking
 
+#### Booking & Appointment System
+- `AppointmentsPage.tsx` - Displays user appointments (excludes pending booking requests)
+- `BookingRequestCard.tsx` - Reusable card component for displaying booking/appointment details
+- `BookingProgressTracker.tsx` - Visual status tracker for booking progress
+- `ArtistAppointmentForm.tsx` - Form for artists to create appointments
+- `useAppointments.ts` - Hook for managing appointment data (filters out pending status)
+- `useBookingStatus.ts` - Hook for tracking and updating booking status
+  - Booking lifecycle: `pending` → `expired`/`rejected`/`scheduled` → `completed`/`cancelled`
+  - Automatic expiration after 15 days for pending requests
+  - Status-based filtering for different user views
+
 ### Component Hierarchy & Props Flow
 - Action buttons (ActionButton) check authentication and trigger `onAuthRequired` 
 - `onAuthRequired` callbacks flow from MainPage → Grid components → Card components → ActionButton
@@ -357,10 +410,19 @@ The application is configured for GitHub Pages deployment:
 - **Message Threading**: Messages are grouped by conversation participants, not by threads
 - **Authentication Required**: All messaging features require user authentication
 
+### Booking & Appointment Guidelines
+- **Status Filtering**: AppointmentsPage shows all bookings except those with `status = 'pending'`
+- **Card Display**: BookingRequestCard has responsive layout with mobile status badge repositioning
+- **Time Display**: Footer shows booking creation time (`created_at`), not appointment date
+- **Dual Purpose Cards**: Same component handles both booking requests and confirmed appointments
+- **Edge Functions**: Automatic booking expiration handled via Supabase Edge Functions
+- **Progress Tracking**: Visual progress tracker shows current booking status and next steps
+
 ### Recent Optimizations
 - **Mobile Components Removed**: All mobile-specific message components have been eliminated
 - **Unified Responsive Design**: Single MessagesPage component handles all screen sizes
 - **Infinite Loop Prevention**: Fixed useEffect dependency issues in ChatConversation and useMessages
 - **SQL Scripts Removed**: No local SQL migration files - use Supabase Dashboard directly
+- **Booking System Added**: Complete appointment management system with status lifecycle
 
 

@@ -11,13 +11,11 @@
 .search-term,
 .location-term {
   padding: 0.25rem 0.5rem;
-  background: var(--grey-light);
-  border: 1px solid var(--border);
+  border: 1px solid;
   font-size: 0.8125rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--foreground);
   border-radius: 0;
 }
 

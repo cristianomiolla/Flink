@@ -227,10 +227,10 @@ export function SettingsPage({ onLogoClick }: SettingsPageProps) {
 
       {/* Profile Type Change Overlay */}
       {showProfileTypeOverlay && (
-        <div className="auth-overlay" onClick={(e) => e.target === e.currentTarget && setShowProfileTypeOverlay(false)}>
-          <div className="auth-modal">
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowProfileTypeOverlay(false)}>
+          <div className="modal-content auth-modal">
             <div className="auth-header-sticky">
-              <button className="auth-close-btn" onClick={() => setShowProfileTypeOverlay(false)}>
+              <button className="modal-close-btn" onClick={() => setShowProfileTypeOverlay(false)}>
                 ×
               </button>
             </div>

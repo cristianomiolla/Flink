@@ -194,10 +194,10 @@ export function ArtistAppointmentForm({
   }
 
   return (
-    <div className="auth-overlay" onClick={handleOverlayClick}>
-      <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={handleOverlayClick}>
+      <div className="modal-content auth-modal" onClick={(e) => e.stopPropagation()}>
         <div className="auth-header-sticky">
-          <button className="auth-close-btn" onClick={onClose}>
+          <button className="modal-close-btn" onClick={onClose}>
             ×
           </button>
         </div>

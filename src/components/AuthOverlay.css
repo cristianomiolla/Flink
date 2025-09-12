@@ -1,31 +1,4 @@
-/* Authentication Overlay Styles */
-
-.auth-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.8);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  backdrop-filter: blur(4px);
-}
-
-.auth-modal {
-  background: var(--background);
-  border: 1px solid var(--border-red);
-  max-width: 480px;
-  width: 100%;
-  max-height: 85vh;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: var(--shadow-lg);
-  margin: auto;
-}
+/* Authentication Overlay Styles - Using Unified Modal System */
 
 .auth-modal-header {
   padding: 60px 24px 0 24px;
@@ -42,33 +15,7 @@
   pointer-events: none;
 }
 
-.auth-close-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 40px;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid var(--border);
-  border-radius: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  font-weight: 300;
-  color: var(--foreground);
-  cursor: pointer;
-  z-index: 10;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  box-sizing: border-box;
-  pointer-events: all;
-}
-
-.auth-close-btn:hover {
-  background: #EF4343;
-  color: #ffffff;
-}
+/* Close button styles now handled by unified modal system */
 
 .auth-tabs,
 .auth-modal .view-toggle {
@@ -272,30 +219,12 @@
   margin-bottom: 1rem;
 }
 
-/* Mobile responsive */
+/* Mobile responsive - Auth specific (overlay/modal handled by unified system) */
 @media (max-width: 767px) {
-  .auth-overlay {
-    padding: 16px;
-    align-items: flex-start;
-  }
-  
-  .auth-modal {
-    max-height: 90vh;
-    width: calc(100vw - 1rem);
-    max-width: none;
-  }
-  
   .auth-modal-header {
     padding: 60px 24px 0 24px;
   }
   
-  .auth-close-btn {
-    top: 0.75rem;
-    right: 0.75rem;
-    width: 35px;
-    height: 35px;
-    font-size: 20px;
-  }
   
   .auth-content {
     padding: 0 16px 1.5rem 16px;
@@ -329,7 +258,7 @@
 }
 
 /* Header Card Styles - Overlay specific */
-.auth-modal .header-card {
+.modal-content .header-card {
   background: var(--background);
   border: none;
   border-radius: var(--radius);
@@ -338,7 +267,7 @@
   margin-bottom: 32px;
 }
 
-.auth-modal .header-card h2 {
+.modal-content .header-card h2 {
   font-size: 1.5rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -346,7 +275,7 @@
   margin-bottom: 0.5rem;
 }
 
-.auth-modal .header-card p {
+.modal-content .header-card p {
   font-size: 14px;
   color: var(--grey-dark);
   margin-top: 0 !important;
@@ -372,11 +301,11 @@
 }
 
 @media (max-width: 767px) {
-  .auth-modal .header-card h2 {
+  .modal-content .header-card h2 {
     font-size: 1.25rem;
   }
 
-  .auth-modal .header-card p {
+  .modal-content .header-card p {
     font-size: 0.8125rem;
   }
 
@@ -436,18 +365,18 @@
 }
 
 /* Form Actions - Centralized for all auth modals */
-.auth-modal .form-actions {
+.modal-content .form-actions {
   display: flex;
   gap: 1rem;
   justify-content: center;
 }
 
-.auth-modal .form-actions .action-btn {
+.modal-content .form-actions .action-btn {
   flex: 1;
   min-width: 120px;
 }
 
-.auth-modal .form-actions .action-btn:disabled {
+.modal-content .form-actions .action-btn:disabled {
   background: var(--grey-medium);
   color: var(--grey-dark);
   border-color: var(--grey-medium);
@@ -501,12 +430,12 @@
 
 /* Mobile responsive adjustments for new elements */
 @media (max-width: 767px) {
-  .auth-modal .form-actions {
+  .modal-content .form-actions {
     flex-direction: row;
     gap: 0.75rem;
   }
   
-  .auth-modal .form-actions .action-btn {
+  .modal-content .form-actions .action-btn {
     flex: 1;
     min-width: auto;
   }

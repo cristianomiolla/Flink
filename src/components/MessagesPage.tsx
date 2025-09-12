@@ -960,10 +960,10 @@ export function MessagesPage() {
 
           {/* Booking Request Overlay - Mobile version */}
           {showBookingRequest && profile?.profile_type === 'client' && (
-            <div className="auth-overlay" onClick={handleCloseBookingModal}>
-              <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-overlay" onClick={handleCloseBookingModal}>
+              <div className="modal-content auth-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="auth-header-sticky">
-                  <button className="auth-close-btn" onClick={handleCloseBookingModal}>
+                  <button className="modal-close-btn" onClick={handleCloseBookingModal}>
                     ×
                   </button>
                 </div>
@@ -1477,10 +1477,10 @@ export function MessagesPage() {
 
       {/* Booking Request Overlay - Solo per profili client */}
       {showBookingRequest && profile?.profile_type === 'client' && (
-        <div className="auth-overlay" onClick={handleCloseBookingModal}>
-          <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay" onClick={handleCloseBookingModal}>
+          <div className="modal-content auth-modal" onClick={(e) => e.stopPropagation()}>
             <div className="auth-header-sticky">
-              <button className="auth-close-btn" onClick={handleCloseBookingModal}>
+              <button className="modal-close-btn" onClick={handleCloseBookingModal}>
                 ×
               </button>
             </div>

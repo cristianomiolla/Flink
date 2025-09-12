@@ -840,11 +840,11 @@ export function PersonalProfile() {
 
       {/* Profile Completion Overlay */}
       {showEditOverlay && (
-        <div className="auth-overlay" onClick={(e) => e.target === e.currentTarget && setShowEditOverlay(false)}>
-          <div className="auth-modal">
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setShowEditOverlay(false)}>
+          <div className="modal-content auth-modal">
             {/* Sticky Header with Close Button */}
             <div className="auth-header-sticky">
-              <button className="auth-close-btn" onClick={() => setShowEditOverlay(false)}>
+              <button className="modal-close-btn" onClick={() => setShowEditOverlay(false)}>
                 ×
               </button>
             </div>
@@ -992,11 +992,11 @@ export function PersonalProfile() {
 
       {/* Portfolio Upload Overlay */}
       {showUploadOverlay && (
-        <div className="auth-overlay" onClick={(e) => e.target === e.currentTarget && (setShowUploadOverlay(false), resetUploadForm())}>
-          <div className="auth-modal">
+        <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && (setShowUploadOverlay(false), resetUploadForm())}>
+          <div className="modal-content auth-modal">
             {/* Sticky Header with Close Button */}
             <div className="auth-header-sticky">
-              <button className="auth-close-btn" onClick={() => {setShowUploadOverlay(false); resetUploadForm()}}>
+              <button className="modal-close-btn" onClick={() => {setShowUploadOverlay(false); resetUploadForm()}}>
                 ×
               </button>
             </div>

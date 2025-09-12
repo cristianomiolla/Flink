@@ -152,13 +152,6 @@
   font-size: 0.9rem;
 }
 
-/* Upload Portfolio Modal */
-.upload-portfolio-modal {
-  max-width: 700px;
-  width: 95%;
-  max-height: 90vh;
-  overflow-y: auto;
-}
 
 .auth-content {
   padding: 0 2rem 2rem 2rem;

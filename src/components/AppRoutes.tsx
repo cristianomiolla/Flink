@@ -17,6 +17,7 @@ const BecomeArtistPage = lazy(() => import('./BecomeArtistPage').then(m => ({ de
 const MobileProfilePage = lazy(() => import('./MobileProfilePage').then(m => ({ default: m.MobileProfilePage })))
 const SettingsPage = lazy(() => import('./SettingsPage').then(m => ({ default: m.SettingsPage })))
 const ResetPasswordPage = lazy(() => import('./ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })))
+const AppointmentsPage = lazy(() => import('./AppointmentsPage').then(m => ({ default: m.AppointmentsPage })))
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
@@ -63,6 +64,9 @@ export function AppRoutes() {
         {/* Messages Routes */}
         <Route path="/messages" element={<MessagesPage />} />
         <Route path="/messages/:artistId" element={<MessagesPage />} />
+        
+        {/* Appointments Route */}
+        <Route path="/appointments" element={<AppointmentsPage />} />
         
         <Route path="/settings" element={<SettingsPage onLogoClick={handleLogoClick} />} />
         <Route path="/become-artist" element={<BecomeArtistPage onLogoClick={handleLogoClick} />} />

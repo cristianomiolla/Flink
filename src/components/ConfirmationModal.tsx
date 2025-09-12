@@ -55,18 +55,12 @@ export function ConfirmationModal({
   }
 
   return (
-    <div className="auth-overlay" onClick={handleBackdropClick}>
-      <div className="auth-modal">
-        {/* Sticky Header with Close Button */}
-        <div className="auth-header-sticky">
-          <button className="auth-close-btn" onClick={onCancel}>
-            ×
-          </button>
-        </div>
-        
-        <div className="auth-modal-header">
-          {/* Empty header section to maintain layout consistency */}
-        </div>
+    <div className="modal-overlay" onClick={handleBackdropClick}>
+      <div className="modal-content confirmation-modal">
+        {/* Close Button */}
+        <button className="modal-close-btn" onClick={onCancel}>
+          ×
+        </button>
 
         <div className="auth-content">
           <div className="header-card">

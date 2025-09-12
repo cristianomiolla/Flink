@@ -265,11 +265,11 @@ export function ServiceForm({
   }
 
   return (
-    <div className="auth-overlay" onClick={handleBackdropClick}>
-      <div className="auth-modal">
+    <div className="modal-overlay" onClick={handleBackdropClick}>
+      <div className="modal-content auth-modal">
         {/* Sticky Header with Close Button */}
         <div className="auth-header-sticky">
-          <button className="auth-close-btn" onClick={onClose}>
+          <button className="modal-close-btn" onClick={onClose}>
             ×
           </button>
         </div>

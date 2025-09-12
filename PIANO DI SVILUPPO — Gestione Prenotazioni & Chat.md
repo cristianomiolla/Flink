@@ -36,7 +36,7 @@ Se la richiesta non viene accettata entro 15 giorni:
 
 Stato → scompare.
 
-Card indica “Richiesta senza risposta”.
+Card indica “Scaduta”.
 
 Torna disponibile il pulsante “Invia una richiesta”.
 

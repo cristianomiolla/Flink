@@ -7,7 +7,12 @@ const formatLastMessageForDisplay = (content: string, isFromCurrentUser: boolean
   try {
     const parsed = JSON.parse(content)
     if (parsed.type === 'booking_request' && parsed.booking_data) {
-      return isFromCurrentUser ? 'Richiesta inviata' : 'Richiesta ricevuta'
+      // Check if it's an appointment (has appointment_date) or just a booking request
+      if (parsed.booking_data.appointment_date) {
+        return isFromCurrentUser ? 'Appuntamento creato' : 'Appuntamento fissato'
+      } else {
+        return isFromCurrentUser ? 'Richiesta inviata' : 'Richiesta ricevuta'
+      }
     }
   } catch {
     // If it's not JSON, it's a regular message
