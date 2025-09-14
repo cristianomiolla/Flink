@@ -13,10 +13,10 @@ interface ArtistAppointmentFormProps {
   sendMessage?: (receiverId: string, content: string) => Promise<boolean>
 }
 
-export function ArtistAppointmentForm({ 
-  clientId, 
-  clientName, 
-  onClose, 
+export function ArtistAppointmentForm({
+  clientId,
+  clientName,
+  onClose,
   onAppointmentCreated,
   existingSubject = '',
   sendMessage
@@ -204,7 +204,7 @@ export function ArtistAppointmentForm({
         <div className="auth-modal-header"></div>
         <div className="auth-content">
           <div className="header-card">
-            <h2>Fissa Appuntamento</h2>
+            <h2>Crea Appuntamento</h2>
             <p>Crea un nuovo appuntamento con {clientName}</p>
           </div>
 
@@ -379,7 +379,7 @@ export function ArtistAppointmentForm({
                   <path d="M20 6L9 17l-5-5"></path>
                 </svg>
                 <span className="action-text">
-                  {loading ? 'Invio...' : 'Fissa Appuntamento'}
+                  {loading ? 'Invio...' : 'Crea'}
                 </span>
               </button>
             </div>

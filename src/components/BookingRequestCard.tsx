@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../hooks/useAuth'
 import './BookingRequestCard.css'
 
 interface BookingRequestData {
@@ -30,34 +31,42 @@ interface BookingRequestCardProps {
 }
 
 export function BookingRequestCard({ bookingData, bookingId, isFromCurrentUser, timestamp, mode = 'message', participantName }: BookingRequestCardProps) {
+  const { user } = useAuth()
   const [currentStatus, setCurrentStatus] = useState<string>('pending')
   const [loading, setLoading] = useState(true)
 
   // Fetch status dinamicamente dal database
   useEffect(() => {
     const fetchStatus = async () => {
+      // Skip fetching if user is not authenticated or no bookingId
+      if (!user || !bookingId) {
+        setLoading(false)
+        return
+      }
+
       try {
         const { data, error } = await supabase
           .from('bookings')
           .select('status')
           .eq('id', bookingId)
-          .single()
+          .maybeSingle()
 
-        if (error) throw error
-        setCurrentStatus(data?.status || 'pending')
+        if (error) {
+          console.warn('Error fetching booking status:', error)
+          setCurrentStatus('pending')
+        } else {
+          setCurrentStatus(data?.status || 'pending')
+        }
       } catch (error) {
+        console.warn('Error fetching booking status:', error)
         setCurrentStatus('pending')
       } finally {
         setLoading(false)
       }
     }
 
-    if (bookingId) {
-      fetchStatus()
-    } else {
-      setLoading(false)
-    }
-  }, [bookingId])
+    fetchStatus()
+  }, [bookingId, user])
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp)

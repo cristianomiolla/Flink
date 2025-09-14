@@ -49,9 +49,9 @@ export function useBookingStatus(participantId: string | null): UseBookingStatus
         .or(`and(client_id.eq.${user.id},artist_id.eq.${participantId}),and(client_id.eq.${participantId},artist_id.eq.${user.id})`)
         .order('created_at', { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
 
-      if (queryError && queryError.code !== 'PGRST116') {
+      if (queryError) {
         throw queryError
       }
 

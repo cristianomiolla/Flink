@@ -7,6 +7,7 @@ import { ActionButton, DeleteIcon, SendIcon } from './ActionButton'
 import { BookingRequestCard } from './BookingRequestCard'
 import { BookingProgressTracker } from './BookingProgressTracker'
 import { useBookingStatus } from '../hooks/useBookingStatus'
+import { supabase } from '../lib/supabase'
 
 // Helper function to parse booking request message
 const parseBookingRequestMessage = (content: string) => {
@@ -117,6 +118,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
     }
   }, [refreshBookingStatus, onBookingStatusRefresh])
 
+
   // Scroll to bottom of messages list
   const scrollToBottom = useCallback(() => {
     if (messagesListRef.current) {
@@ -124,41 +126,6 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
     }
   }, [])
 
-  // Load messages function
-  const loadMessages = useCallback(async (showLoading = true) => {
-    if (!chat || !propFetchConversationMessages) return
-
-    const participantId = getParticipantId(chat.id)
-    if (!participantId) return
-
-    if (showLoading) setLoading(true)
-    try {
-      const conversationMessages = await propFetchConversationMessages(participantId)
-      
-      // Convert to local Message format
-      const formattedMessages: Message[] = conversationMessages.map((msg: DatabaseMessage) => ({
-        id: msg.id,
-        content: msg.content,
-        timestamp: msg.created_at,
-        isFromCurrentUser: msg.sender_id === user?.id
-      }))
-      
-      // Only update if messages have actually changed
-      setMessages(prevMessages => {
-        if (JSON.stringify(prevMessages) !== JSON.stringify(formattedMessages)) {
-          // Schedule scroll to bottom after state update
-          setTimeout(() => scrollToBottom(), 100)
-          return formattedMessages
-        }
-        return prevMessages
-      })
-    } catch (error) {
-      console.error('Error loading conversation messages:', error)
-      setMessages([])
-    } finally {
-      if (showLoading) setLoading(false)
-    }
-  }, [chat, propFetchConversationMessages, user?.id, getParticipantId, scrollToBottom])
 
   // Reset messages when chat becomes null or changes
   useEffect(() => {
@@ -169,14 +136,107 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
       return
     }
 
-    // Load initial messages
-    loadMessages(true)
-    
-    // Scroll to bottom when conversation first loads
-    setTimeout(() => scrollToBottom(), 200)
+    // Local function to get participant ID
+    const getLocalParticipantId = (chatId: string): string | null => {
+      if (!user) return null
+      const [userId1, userId2] = chatId.split('__')
+      return userId1 === user.id ? userId2 : userId1
+    }
 
-    // No automatic polling - messages update only when manually sent/received
-  }, [chat, user?.id, loadMessages])
+    // Local function to scroll to bottom
+    const localScrollToBottom = () => {
+      if (messagesListRef.current) {
+        messagesListRef.current.scrollTop = messagesListRef.current.scrollHeight
+      }
+    }
+
+    // Local function to load messages
+    const localLoadMessages = async (showLoading = true) => {
+      if (!chat || !propFetchConversationMessages) return
+
+      const participantId = getLocalParticipantId(chat.id)
+      if (!participantId) return
+
+      if (showLoading) setLoading(true)
+      try {
+        const conversationMessages = await propFetchConversationMessages(participantId)
+
+        // Convert to local Message format
+        const formattedMessages: Message[] = conversationMessages.map((msg: DatabaseMessage) => ({
+          id: msg.id,
+          content: msg.content,
+          timestamp: msg.created_at,
+          isFromCurrentUser: msg.sender_id === user?.id
+        }))
+
+        // Only update if messages have actually changed
+        setMessages(prevMessages => {
+          if (JSON.stringify(prevMessages) !== JSON.stringify(formattedMessages)) {
+            // Schedule scroll to bottom after state update
+            setTimeout(() => localScrollToBottom(), 100)
+            return formattedMessages
+          }
+          return prevMessages
+        })
+      } catch (error) {
+        console.error('Error loading conversation messages:', error)
+        setMessages([])
+      } finally {
+        if (showLoading) setLoading(false)
+      }
+    }
+
+    // Load initial messages
+    localLoadMessages(true)
+
+    // Scroll to bottom when conversation first loads
+    setTimeout(() => localScrollToBottom(), 200)
+
+    // Setup real-time subscription for this specific conversation
+    const participantId = getLocalParticipantId(chat.id)
+    if (!user || !participantId) return
+
+    const channel = supabase
+      .channel('global-messages')
+      .on('broadcast', { event: 'new_message' }, (payload) => {
+        const messageData = payload.payload
+
+        if (!messageData) return
+
+        // Check if message is relevant to this conversation
+        const isRelevant = (messageData.sender_id === user.id && messageData.receiver_id === participantId) ||
+                          (messageData.sender_id === participantId && messageData.receiver_id === user.id)
+
+        if (!isRelevant) return
+
+        // Convert to local Message format
+        const formattedMessage: Message = {
+          id: messageData.id,
+          content: messageData.content,
+          timestamp: messageData.created_at,
+          isFromCurrentUser: messageData.sender_id === user.id
+        }
+
+        // Add message to the current conversation
+        setMessages(prev => {
+          // Avoid duplicates
+          if (prev.some(msg => msg.id === formattedMessage.id)) {
+            return prev
+          }
+
+          const newMessages = [...prev, formattedMessage]
+          // Schedule scroll to bottom after state update
+          setTimeout(() => localScrollToBottom(), 100)
+          return newMessages
+        })
+      })
+      .subscribe()
+
+    // Cleanup subscription when chat changes
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [chat?.id, user?.id])
 
 
   const formatMessageTime = (timestamp: string) => {

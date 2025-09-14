@@ -8,4 +8,10 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error('Missing Supabase environment variables. Please check your .env file.')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey)
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  realtime: {
+    params: {
+      eventsPerSecond: 10
+    }
+  }
+})

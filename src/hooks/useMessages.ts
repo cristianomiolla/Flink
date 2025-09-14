@@ -438,21 +438,31 @@ export function useMessages() {
     if (!user || !content.trim()) return false
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('messages')
         .insert([{
           sender_id: user.id,
           receiver_id: receiverId,
           content: content.trim()
         }])
+        .select()
 
       if (error) {
         throw error
       }
 
-      // Instead of full refresh, just add/update the conversation locally
+      // Broadcast message to other clients
+      if (data && data.length > 0) {
+        await supabase.channel('global-messages').send({
+          type: 'broadcast',
+          event: 'new_message',
+          payload: data[0]
+        })
+      }
+
+      // Update local conversation
       await updateConversationAfterSend(receiverId, content.trim())
-      
+
       return true
     } catch (err) {
       console.error('Error sending message:', err)
@@ -521,9 +531,135 @@ export function useMessages() {
     return conversations.reduce((total, conv) => total + conv.unreadCount, 0)
   }
 
+  // Setup realtime subscription for new messages
+  useEffect(() => {
+    if (!user) return
+
+    const channel = supabase
+      .channel('global-messages')
+      .on('broadcast', { event: 'new_message' }, async (payload) => {
+        const messageData = payload.payload
+
+        // Check if message is for current user
+        if (!messageData || messageData.receiver_id !== user.id) {
+          return
+        }
+
+        try {
+          // Fetch sender profile data
+          let senderProfile = null
+          try {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('user_id, full_name, username, avatar_url')
+              .eq('user_id', messageData.sender_id)
+              .single()
+
+            if (!profileError && profileData) {
+              senderProfile = profileData
+            }
+          } catch (err) {
+            console.warn('Could not fetch sender profile via broadcast:', err)
+          }
+
+          // Get current user profile for receiver
+          let currentUserProfile = null
+          try {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('user_id, full_name, username, avatar_url')
+              .eq('user_id', user.id)
+              .single()
+
+            if (!profileError && profileData) {
+              currentUserProfile = profileData
+            }
+          } catch (err) {
+            console.warn('Could not fetch current user profile via broadcast:', err)
+          }
+
+          // Create MessageWithProfiles object
+          const messageWithProfiles: MessageWithProfiles = {
+            id: messageData.id,
+            sender_id: messageData.sender_id,
+            receiver_id: messageData.receiver_id,
+            content: messageData.content,
+            created_at: messageData.created_at,
+            is_read: false,
+            deleted_at: null,
+            sender: {
+              user_id: messageData.sender_id,
+              full_name: senderProfile?.full_name || senderProfile?.username || `User ${messageData.sender_id.slice(0, 8)}`,
+              username: senderProfile?.username || '',
+              avatar_url: senderProfile?.avatar_url || null
+            },
+            receiver: {
+              user_id: messageData.receiver_id,
+              full_name: currentUserProfile?.full_name || currentUserProfile?.username || `User ${messageData.receiver_id.slice(0, 8)}`,
+              username: currentUserProfile?.username || '',
+              avatar_url: currentUserProfile?.avatar_url || null
+            }
+          }
+
+          // Add to messages state
+          setMessages(prev => [...prev, messageWithProfiles])
+
+          // Update conversations list
+          const participants = [user.id, messageData.sender_id].sort()
+          const conversationKey = `${participants[0]}__${participants[1]}`
+
+          setConversations(prev => {
+            const existingConv = prev.find(conv => conv.id === conversationKey)
+
+            if (existingConv) {
+              // Update existing conversation
+              return prev.map(conv =>
+                conv.id === conversationKey
+                  ? {
+                      ...conv,
+                      lastMessage: formatLastMessageForDisplay(messageData.content, false),
+                      timestamp: messageData.created_at,
+                      isFromCurrentUser: false,
+                      unreadCount: conv.unreadCount + 1
+                    }
+                  : conv
+              ).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+            } else {
+              // Create new conversation
+              const newConversation: ConversationThread = {
+                id: conversationKey,
+                participant: {
+                  user_id: messageData.sender_id,
+                  name: senderProfile?.full_name ||
+                        senderProfile?.username ||
+                        `User ${messageData.sender_id.slice(0, 8)}`,
+                  username: senderProfile?.username || '',
+                  avatar: senderProfile?.avatar_url || null
+                },
+                lastMessage: formatLastMessageForDisplay(messageData.content, false),
+                timestamp: messageData.created_at,
+                unreadCount: 1,
+                isFromCurrentUser: false
+              }
+
+              return [newConversation, ...prev].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+            }
+          })
+
+        } catch (error) {
+          console.error('Error processing realtime message:', error)
+        }
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [user])
+
   useEffect(() => {
     fetchConversations()
-  }, [user, fetchConversations])
+  }, [fetchConversations])
 
   return {
     conversations,

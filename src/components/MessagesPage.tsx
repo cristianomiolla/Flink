@@ -543,7 +543,7 @@ export function MessagesPage() {
           timestamp: msg.created_at,
           isFromCurrentUser: msg.sender_id === user.id
         }))
-        
+
         // Only update if messages have actually changed
         setConversationMessages(prevMessages => {
           if (JSON.stringify(prevMessages) !== JSON.stringify(formattedMessages)) {
@@ -565,13 +565,52 @@ export function MessagesPage() {
 
     // Load initial messages
     loadConversationMessages(true)
-    
+
     // Scroll to bottom when conversation first loads
     requestAnimationFrame(() => {
       setTimeout(() => scrollToBottom(), 100)
     })
 
-    // No automatic polling - messages update only when manually sent/received
+    // Setup real-time subscription for mobile conversation
+    const channel = supabase
+      .channel('global-messages')
+      .on('broadcast', { event: 'new_message' }, (payload) => {
+        const messageData = payload.payload
+
+        if (!messageData) return
+
+        // Only process messages received from the current conversation partner
+        if (messageData.receiver_id !== user.id || messageData.sender_id !== artistId) return
+
+        // Convert to local message format
+        const formattedMessage = {
+          id: messageData.id,
+          content: messageData.content,
+          timestamp: messageData.created_at,
+          isFromCurrentUser: messageData.sender_id === user.id
+        }
+
+        // Add message to the current conversation
+        setConversationMessages(prev => {
+          // Avoid duplicates
+          if (prev.some(msg => msg.id === formattedMessage.id)) {
+            return prev
+          }
+
+          const newMessages = [...prev, formattedMessage]
+          // Schedule scroll to bottom after state update
+          requestAnimationFrame(() => {
+            setTimeout(() => scrollToBottom(), 50)
+          })
+          return newMessages
+        })
+      })
+      .subscribe()
+
+    // Cleanup subscription when component unmounts or conversation changes
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [isMobile, artistId, user?.id, scrollToBottom]) // Rimossa fetchConversationMessages dalle dipendenze
 
   // Format message timestamp
@@ -688,28 +727,23 @@ export function MessagesPage() {
       const success = await sendMessage(participantId, messageContent)
       
       if (success) {
-        if (isMobile && fetchConversationMessages) {
-          // Wait a moment for the message to be saved in the database
-          setTimeout(async () => {
-            try {
-              const messages = await fetchConversationMessages(participantId)
-              const formattedMessages = messages.map(msg => ({
-                id: msg.id,
-                content: msg.content,
-                timestamp: msg.created_at,
-                isFromCurrentUser: msg.sender_id === user.id
-              }))
-              
-              // Always update after sending a message
-              setConversationMessages(formattedMessages)
-              // Ensure scroll to bottom after sending message
-              requestAnimationFrame(() => {
-                setTimeout(() => scrollToBottom(), 50)
-              })
-            } catch (error) {
-              console.error('Error reloading messages:', error)
-            }
-          }, 100)
+        if (isMobile) {
+          // Add message optimistically for immediate feedback
+          const optimisticMessage = {
+            id: `temp_${Date.now()}`,
+            content: messageContent,
+            timestamp: new Date().toISOString(),
+            isFromCurrentUser: true
+          }
+
+          setConversationMessages(prev => {
+            const newMessages = [...prev, optimisticMessage]
+            // Ensure scroll to bottom after sending message
+            requestAnimationFrame(() => {
+              setTimeout(() => scrollToBottom(), 50)
+            })
+            return newMessages
+          })
         }
       } else {
         // If send failed, restore the message to input
@@ -1287,6 +1321,7 @@ export function MessagesPage() {
               clientName={appointmentClientData.name}
               onClose={handleCloseArtistAppointment}
               onAppointmentCreated={handleAppointmentCreated}
+              sendMessage={sendMessage}
             />
           )}
 

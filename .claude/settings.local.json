@@ -52,7 +52,11 @@
       "Bash(cat:*)",
       "Bash(git rm:*)",
       "Bash(sed:*)",
-      "mcp__supabase__apply_migration"
+      "mcp__supabase__apply_migration",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "mcp__supabase__search_docs",
+      "Bash(code:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
