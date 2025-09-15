@@ -148,7 +148,7 @@ export function EmailChangeOverlay({ isOpen, onClose }: EmailChangeOverlayProps)
         <button
           type="submit"
           className="action-btn"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !formData.newEmail.trim()}
         >
           {isSubmitting ? 'Invio in corso...' : 'Aggiorna Email'}
         </button>

@@ -321,19 +321,7 @@
     height: 16px;
   }
   
-  /* Portfolio actions menu positioned like desktop */
-  .portfolio-actions-menu {
-    position: absolute;
-    top: calc(100% + 0.25rem);
-    right: 0;
-    background: var(--background);
-    border-radius: 0;
-    min-width: 120px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 100;
-  }
-  
-  /* Menu shows/hides based on component state, not CSS selector */
+  /* Portfolio actions menu and items inherit from PortfolioCard.css */
   .portfolio-action-item {
     font-size: 11px;
     padding: 0.5rem;

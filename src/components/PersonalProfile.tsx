@@ -1048,7 +1048,9 @@ export function PersonalProfile() {
 
                 {/* Image Upload Field */}
                 <div className="form-group">
-                  <label htmlFor="image_file" className="form-label">IMMAGINE</label>
+                  <label htmlFor="image_file" className="form-label">
+                    IMMAGINE <span className="required-indicator">*</span>
+                  </label>
                   <div className="image-upload-section">
                     {filePreview && (
                       <div className="image-preview-container">
@@ -1139,7 +1141,7 @@ export function PersonalProfile() {
                 {uploadData.is_flash && (
                   <div className="form-group">
                     <label htmlFor="price" className="form-label">
-                      PREZZO (€)
+                      PREZZO (€) <span className="required-indicator">*</span>
                     </label>
                     <input
                       type="number"
@@ -1171,7 +1173,7 @@ export function PersonalProfile() {
                     type="button"
                     className="action-btn"
                     onClick={handleUploadPortfolio}
-                    disabled={isSubmitting || !uploadData.title.trim()}
+                    disabled={isSubmitting || !uploadData.title.trim() || !selectedFile || (uploadData.is_flash && (!uploadData.price || uploadData.price <= 0))}
                   >
                     <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                       <path d="M12 5v14m7-7l-7-7-7 7"/>

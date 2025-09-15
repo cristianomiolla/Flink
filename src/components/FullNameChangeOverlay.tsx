@@ -227,7 +227,7 @@ export function FullNameChangeOverlay({ isOpen, onClose }: FullNameChangeOverlay
             <button
               type="submit"
               className="action-btn"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !formData.newFullName.trim()}
             >
               {isSubmitting ? 'Salvataggio...' : 'Aggiorna Nome'}
             </button>

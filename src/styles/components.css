@@ -179,7 +179,7 @@
 }
 
 .modal-close-btn:hover {
-  background: #EF4343;
+  background: var(--accent);
   color: #ffffff;
 }
 

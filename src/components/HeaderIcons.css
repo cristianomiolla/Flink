@@ -22,17 +22,17 @@
 }
 
 .header-icon-btn:hover {
-  border-color: #ef4343;
-  background: #ef4343;
+  border-color: var(--border-red);
+  background: var(--accent);
   color: #ffffff;
 }
 
 
 .header-icon-btn.active,
 .header-icon-btn.active:hover {
-  background: #171717;
+  background: var(--primary);
   color: #ffffff;
-  border-color: #171717;
+  border-color: var(--primary);
 }
 
 .header-icon-btn.disabled,

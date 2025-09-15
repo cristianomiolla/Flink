@@ -1,10 +1,18 @@
+import { useState } from 'react'
 import './BookingProgressTracker.css'
+import { AppointmentDetailsOverlay } from './AppointmentDetailsOverlay'
 
 type BookingStatus = 'pending' | 'expired' | 'rejected' | 'scheduled' | 'rescheduled' | 'cancelled' | 'completed'
 
 interface BookingProgressTrackerProps {
   status: BookingStatus
   userType: 'client' | 'artist'
+  appointmentDate?: string
+  artistName?: string
+  clientName?: string
+  artistId?: string
+  currentUserId?: string
+  bookingId?: string
 }
 
 const getStatusDisplay = (status: BookingStatus, userType: 'client' | 'artist') => {
@@ -42,7 +50,17 @@ const getStatusDisplay = (status: BookingStatus, userType: 'client' | 'artist') 
   return statusMap[status][userType]
 }
 
-export function BookingProgressTracker({ status, userType }: BookingProgressTrackerProps) {
+export function BookingProgressTracker({
+  status,
+  userType,
+  appointmentDate,
+  artistName,
+  clientName,
+  artistId,
+  currentUserId,
+  bookingId
+}: BookingProgressTrackerProps) {
+  const [showDetailsOverlay, setShowDetailsOverlay] = useState(false)
   const statusDisplay = getStatusDisplay(status, userType)
 
   // Artists with pending status should not show progress tracker at all
@@ -51,12 +69,36 @@ export function BookingProgressTracker({ status, userType }: BookingProgressTrac
     return null
   }
 
+  const handleClick = () => {
+    // Only open overlay for scheduled appointments
+    if (status === 'scheduled') {
+      setShowDetailsOverlay(true)
+    }
+  }
+
   return (
-    <div className={`booking-progress-tracker ${statusDisplay.color}`}>
-      <div className="progress-content">
-        <span className="progress-icon">{statusDisplay.icon}</span>
-        <span className="progress-text">{statusDisplay.text}</span>
+    <>
+      <div className={`booking-progress-tracker ${statusDisplay.color}`}>
+        <div
+          className={`progress-content ${status === 'scheduled' ? 'clickable' : ''}`}
+          onClick={handleClick}
+        >
+          <span className="progress-icon">{statusDisplay.icon}</span>
+          <span className="progress-text">{statusDisplay.text}</span>
+        </div>
       </div>
-    </div>
+
+      <AppointmentDetailsOverlay
+        isOpen={showDetailsOverlay}
+        onClose={() => setShowDetailsOverlay(false)}
+        userType={userType}
+        appointmentDate={appointmentDate}
+        artistName={artistName}
+        clientName={clientName}
+        artistId={artistId}
+        currentUserId={currentUserId}
+        bookingId={bookingId}
+      />
+    </>
   )
 }

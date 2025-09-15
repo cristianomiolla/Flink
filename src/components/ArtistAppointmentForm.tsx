@@ -148,15 +148,7 @@ export function ArtistAppointmentForm({
       if (insertedData && insertedData[0] && sendMessage) {
         const appointmentMessage = JSON.stringify({
           type: 'booking_request',
-          booking_id: insertedData[0].id,
-          booking_data: {
-            subject: appointmentForm.subject,
-            appointment_date: appointmentDateTime,
-            appointment_duration: parseInt(appointmentForm.appointment_duration),
-            deposit_amount: parseFloat(appointmentForm.deposit_amount),
-            artist_notes: appointmentForm.artist_notes || null,
-            created_at: new Date().toISOString()
-          }
+          booking_id: insertedData[0].id
         })
         
         // Send the appointment message to the client
@@ -373,7 +365,7 @@ export function ArtistAppointmentForm({
               <button
                 type="submit"
                 className="action-btn primary"
-                disabled={loading}
+                disabled={loading || !appointmentForm.subject.trim() || !appointmentForm.appointment_date || !appointmentForm.appointment_time || !appointmentForm.deposit_amount || parseFloat(appointmentForm.deposit_amount) <= 0}
               >
                 <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path d="M20 6L9 17l-5-5"></path>

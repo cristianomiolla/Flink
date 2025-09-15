@@ -82,10 +82,9 @@ const useIsMobile = () => {
 const parseBookingRequestMessage = (content: string) => {
   try {
     const parsed = JSON.parse(content)
-    if (parsed.type === 'booking_request' && parsed.booking_data) {
+    if (parsed.type === 'booking_request' && parsed.booking_id) {
       return {
-        booking_id: parsed.booking_id,
-        booking_data: parsed.booking_data
+        booking_id: parsed.booking_id
       }
     }
   } catch {
@@ -120,6 +119,7 @@ export function MessagesPage() {
   const [appointmentClientData, setAppointmentClientData] = useState<{ id: string; name: string } | null>(null)
   const [refreshBookingStatusFn, setRefreshBookingStatusFn] = useState<(() => Promise<void>) | null>(null)
   const [mobileRefreshBookingStatusFn, setMobileRefreshBookingStatusFn] = useState<(() => Promise<void>) | null>(null)
+  const [refreshMessagesFn, setRefreshMessagesFn] = useState<(() => Promise<void>) | null>(null)
   
   // Hook for mobile booking status - must be before any early returns
   // Use artistId directly for mobile since it's available from useParams
@@ -257,6 +257,25 @@ export function MessagesPage() {
     if (mobileRefreshBookingStatusFn) {
       await mobileRefreshBookingStatusFn()
     }
+
+    // Force refresh messages to show the appointment card immediately for sender
+    if (isMobile && artistId) {
+      // Reload mobile conversation messages
+      setTimeout(async () => {
+        const messages = await fetchConversationMessages(artistId)
+        const formattedMessages = messages.map(msg => ({
+          id: msg.id,
+          content: msg.content,
+          timestamp: msg.created_at,
+          isFromCurrentUser: msg.sender_id === user.id
+        }))
+        setConversationMessages(formattedMessages)
+        setTimeout(() => scrollToBottom(), 100)
+      }, 500)
+    } else if (refreshMessagesFn) {
+      // For desktop, use the messages refresh function
+      setTimeout(() => refreshMessagesFn(), 500)
+    }
   }
   
   // Funzione per salvare la prenotazione nel database
@@ -318,11 +337,10 @@ export function MessagesPage() {
       }
       
       
-      // Crea un messaggio nella conversazione con i dati della prenotazione
+      // Crea un messaggio nella conversazione con il booking ID
       const bookingMessage = JSON.stringify({
         type: 'booking_request',
-        booking_id: data[0].id,
-        booking_data: bookingData
+        booking_id: data[0].id
       })
       
       // Invia il messaggio di prenotazione nella conversazione
@@ -340,6 +358,25 @@ export function MessagesPage() {
       // Aggiorna anche la versione mobile se attiva
       if (mobileRefreshBookingStatusFn) {
         await mobileRefreshBookingStatusFn()
+      }
+
+      // Force refresh messages to show the booking card immediately for sender
+      if (isMobile && artistId) {
+        // Reload mobile conversation messages
+        setTimeout(async () => {
+          const messages = await fetchConversationMessages(artistId)
+          const formattedMessages = messages.map(msg => ({
+            id: msg.id,
+            content: msg.content,
+            timestamp: msg.created_at,
+            isFromCurrentUser: msg.sender_id === user.id
+          }))
+          setConversationMessages(formattedMessages)
+          setTimeout(() => scrollToBottom(), 100)
+        }, 500)
+      } else if (refreshMessagesFn) {
+        // For desktop, use the messages refresh function
+        setTimeout(() => refreshMessagesFn(), 500)
       }
       
     } catch (error) {
@@ -410,6 +447,15 @@ export function MessagesPage() {
 
   const handleAuthRequired = useCallback(() => {
     setShowAuthOverlay(true)
+  }, [])
+
+  // Callback handlers for ChatConversation
+  const handleBookingStatusRefresh = useCallback((refreshFn: () => Promise<void>) => {
+    setRefreshBookingStatusFn(() => refreshFn)
+  }, [])
+
+  const handleMessagesRefresh = useCallback((refreshFn: () => Promise<void>) => {
+    setRefreshMessagesFn(() => refreshFn)
   }, [])
 
   // All state declarations first
@@ -913,10 +959,6 @@ export function MessagesPage() {
                         return (
                           <BookingRequestCard
                             key={message.id}
-                            bookingData={{
-                              ...bookingData.booking_data,
-                              created_at: message.timestamp
-                            }}
                             bookingId={bookingData.booking_id}
                             isFromCurrentUser={message.isFromCurrentUser}
                             timestamp={message.timestamp}
@@ -1297,10 +1339,10 @@ export function MessagesPage() {
                         </svg>
                         <span className="action-text">Annulla</span>
                       </button>
-                      <button 
-                        type="submit" 
+                      <button
+                        type="submit"
                         className={`action-btn ${imageUploading ? 'disabled' : ''}`}
-                        disabled={imageUploading}
+                        disabled={imageUploading || !bookingForm.subject.trim() || !bookingForm.tattoo_style || !bookingForm.body_area || !bookingForm.size_category || !bookingForm.color_preferences}
                       >
                         <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                           <path d="M12 5v14m7-7l-7-7-7 7"></path>
@@ -1471,9 +1513,8 @@ export function MessagesPage() {
                 // Il refresh dello stato booking sarà gestito dal hook useBookingStatus
               }}
               onOpenArtistAppointment={handleOpenArtistAppointment}
-              onBookingStatusRefresh={(refreshFn) => {
-                setRefreshBookingStatusFn(() => refreshFn)
-              }}
+              onBookingStatusRefresh={handleBookingStatusRefresh}
+              onMessagesRefresh={handleMessagesRefresh}
             />
           ) : (
             <div className="chat-conversation empty">
@@ -1815,7 +1856,11 @@ export function MessagesPage() {
                     </svg>
                     <span className="action-text">Annulla</span>
                   </button>
-                  <button type="submit" className="action-btn">
+                  <button
+                    type="submit"
+                    className="action-btn"
+                    disabled={!bookingForm.subject.trim() || !bookingForm.tattoo_style || !bookingForm.body_area || !bookingForm.size_category || !bookingForm.color_preferences}
+                  >
                     <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                       <path d="M12 5v14m7-7l-7-7-7 7"></path>
                     </svg>

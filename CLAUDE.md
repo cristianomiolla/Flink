@@ -115,7 +115,6 @@ CREATE INDEX idx_artist_services_pricing_type ON artist_services(pricing_type);
 CREATE INDEX idx_bookings_client_id ON bookings(client_id);
 CREATE INDEX idx_bookings_artist_id ON bookings(artist_id);
 CREATE INDEX idx_bookings_status ON bookings(status);
-CREATE INDEX idx_bookings_expires_at ON bookings(expires_at);
 ```
 
 #### RLS Policies
@@ -223,8 +222,7 @@ CREATE TABLE bookings (
     artist_notes TEXT,
     status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'expired', 'rejected', 'scheduled', 'rescheduled', 'cancelled', 'completed')),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    expires_at TIMESTAMPTZ DEFAULT (now() + INTERVAL '15 days')
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ```
 
@@ -299,6 +297,10 @@ When making code changes that require database modifications:
 4. **Use MCP integration** - Database operations can be performed through Claude Code's Supabase MCP server
 
 **Database Management**: All database operations are now handled directly through Supabase Dashboard or via the configured MCP server integration.
+
+**Booking Automation**: The `process-bookings` Edge Function runs daily at 2:00 AM UTC to automatically:
+- Complete appointments: Changes `status = 'scheduled'` to `'completed'` when `appointment_date < current_date`
+- Expire old requests: Changes `status = 'pending'` to `'expired'` when `created_at < current_date - 15 days` and `appointment_date IS NULL`
 
 ## Design System & Styling
 

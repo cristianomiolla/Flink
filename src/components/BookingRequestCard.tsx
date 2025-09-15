@@ -22,22 +22,22 @@ interface BookingRequestData {
 }
 
 interface BookingRequestCardProps {
-  bookingData: BookingRequestData
-  bookingId?: string  // booking_id viene passato separatamente
+  bookingId: string  // booking_id is now required
   isFromCurrentUser?: boolean
   timestamp: string
   mode?: 'message' | 'appointment' // New prop to control rendering mode
   participantName?: string // For appointment mode
 }
 
-export function BookingRequestCard({ bookingData, bookingId, isFromCurrentUser, timestamp, mode = 'message', participantName }: BookingRequestCardProps) {
+export function BookingRequestCard({ bookingId, isFromCurrentUser, timestamp, mode = 'message', participantName }: BookingRequestCardProps) {
   const { user } = useAuth()
   const [currentStatus, setCurrentStatus] = useState<string>('pending')
   const [loading, setLoading] = useState(true)
+  const [fullBookingData, setFullBookingData] = useState<BookingRequestData | null>(null)
 
-  // Fetch status dinamicamente dal database
+  // Fetch complete booking data from database
   useEffect(() => {
-    const fetchStatus = async () => {
+    const fetchBookingData = async () => {
       // Skip fetching if user is not authenticated or no bookingId
       if (!user || !bookingId) {
         setLoading(false)
@@ -47,25 +47,43 @@ export function BookingRequestCard({ bookingData, bookingId, isFromCurrentUser, 
       try {
         const { data, error } = await supabase
           .from('bookings')
-          .select('status')
+          .select('*')
           .eq('id', bookingId)
           .maybeSingle()
 
         if (error) {
-          console.warn('Error fetching booking status:', error)
+          console.warn('Error fetching booking data:', error)
           setCurrentStatus('pending')
-        } else {
-          setCurrentStatus(data?.status || 'pending')
+          setFullBookingData(null)
+        } else if (data) {
+          setCurrentStatus(data.status || 'pending')
+          setFullBookingData({
+            subject: data.subject,
+            tattoo_style: data.tattoo_style,
+            body_area: data.body_area,
+            size_category: data.size_category,
+            color_preferences: data.color_preferences,
+            meaning: data.meaning,
+            budget_min: data.budget_min,
+            budget_max: data.budget_max,
+            reference_images: data.reference_images,
+            created_at: data.created_at,
+            appointment_date: data.appointment_date,
+            appointment_duration: data.appointment_duration,
+            deposit_amount: data.deposit_amount,
+            artist_notes: data.artist_notes
+          })
         }
       } catch (error) {
-        console.warn('Error fetching booking status:', error)
+        console.warn('Error fetching booking data:', error)
         setCurrentStatus('pending')
+        setFullBookingData(null)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchStatus()
+    fetchBookingData()
   }, [bookingId, user])
 
   const formatTime = (timestamp: string) => {
@@ -80,23 +98,25 @@ export function BookingRequestCard({ bookingData, bookingId, isFromCurrentUser, 
   }
 
   const formatBudget = () => {
-    if (bookingData.budget_min && bookingData.budget_max) {
-      return `€${bookingData.budget_min} - €${bookingData.budget_max}`
-    } else if (bookingData.budget_min) {
-      return `da €${bookingData.budget_min}`
-    } else if (bookingData.budget_max) {
-      return `fino a €${bookingData.budget_max}`
+    if (!fullBookingData) return 'Budget da definire'
+
+    if (fullBookingData.budget_min && fullBookingData.budget_max) {
+      return `€${fullBookingData.budget_min} - €${fullBookingData.budget_max}`
+    } else if (fullBookingData.budget_min) {
+      return `da €${fullBookingData.budget_min}`
+    } else if (fullBookingData.budget_max) {
+      return `fino a €${fullBookingData.budget_max}`
     }
     return 'Budget da definire'
   }
 
   const formatAppointmentDate = () => {
-    if (!bookingData.appointment_date) return ''
-    const date = new Date(bookingData.appointment_date)
-    return date.toLocaleDateString('it-IT', { 
+    if (!fullBookingData?.appointment_date) return ''
+    const date = new Date(fullBookingData.appointment_date)
+    return date.toLocaleDateString('it-IT', {
       weekday: 'long',
-      year: 'numeric', 
-      month: 'long', 
+      year: 'numeric',
+      month: 'long',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
@@ -104,9 +124,9 @@ export function BookingRequestCard({ bookingData, bookingId, isFromCurrentUser, 
   }
 
   const formatDuration = () => {
-    if (!bookingData.appointment_duration) return ''
-    const hours = Math.floor(bookingData.appointment_duration / 60)
-    const minutes = bookingData.appointment_duration % 60
+    if (!fullBookingData?.appointment_duration) return ''
+    const hours = Math.floor(fullBookingData.appointment_duration / 60)
+    const minutes = fullBookingData.appointment_duration % 60
     if (hours > 0 && minutes > 0) {
       return `${hours}h ${minutes}min`
     } else if (hours > 0) {
@@ -117,15 +137,14 @@ export function BookingRequestCard({ bookingData, bookingId, isFromCurrentUser, 
   }
 
   // Check if this is an artist appointment (has appointment-specific fields)
-  const isArtistAppointment = !!(bookingData.appointment_date || bookingData.deposit_amount)
+  const isArtistAppointment = !!(fullBookingData?.appointment_date || fullBookingData?.deposit_amount)
 
   const getStatusBadge = () => {
     // Mostra loading mentre carica lo status
     if (loading) {
       return <span className="status-badge pending">Caricamento...</span>
     }
-    
-    
+
     switch (currentStatus) {
       case 'pending':
         return <span className="status-badge pending">In attesa</span>
@@ -169,102 +188,108 @@ export function BookingRequestCard({ bookingData, bookingId, isFromCurrentUser, 
           </div>
         )}
         
-        <div className="booking-field">
-          <span className="field-label">Soggetto:</span>
-          <span className="field-value">{bookingData.subject}</span>
-        </div>
+        {fullBookingData && (
+          <div className="booking-field">
+            <span className="field-label">Soggetto:</span>
+            <span className="field-value">{fullBookingData.subject}</span>
+          </div>
+        )}
           
-          {isArtistAppointment ? (
-            // Artist appointment specific fields
+          {fullBookingData && (
             <>
-              {bookingData.appointment_date && (
-                <div className="booking-field">
-                  <span className="field-label">Data e Ora:</span>
-                  <span className="field-value">{formatAppointmentDate()}</span>
-                </div>
-              )}
-              
-              {bookingData.appointment_duration && (
-                <div className="booking-field">
-                  <span className="field-label">Durata:</span>
-                  <span className="field-value">{formatDuration()}</span>
-                </div>
-              )}
-              
-              {bookingData.deposit_amount && (
-                <div className="booking-field">
-                  <span className="field-label">Acconto:</span>
-                  <span className="field-value budget">€{bookingData.deposit_amount}</span>
-                </div>
-              )}
-              
-              {bookingData.artist_notes && (
-                <div className="booking-field">
-                  <span className="field-label">Note Artista:</span>
-                  <span className="field-value">{bookingData.artist_notes}</span>
-                </div>
-              )}
-            </>
-          ) : (
-            // Client request specific fields
-            <>
-              {bookingData.tattoo_style && (
-                <div className="booking-field">
-                  <span className="field-label">Stile:</span>
-                  <span className="field-value">{bookingData.tattoo_style}</span>
-                </div>
-              )}
-              
-              {bookingData.body_area && (
-                <div className="booking-field">
-                  <span className="field-label">Zona:</span>
-                  <span className="field-value">{bookingData.body_area}</span>
-                </div>
-              )}
-              
-              {bookingData.size_category && (
-                <div className="booking-field">
-                  <span className="field-label">Dimensioni:</span>
-                  <span className="field-value">{bookingData.size_category}</span>
-                </div>
-              )}
-              
-              {bookingData.color_preferences && (
-                <div className="booking-field">
-                  <span className="field-label">Colore:</span>
-                  <span className="field-value">{bookingData.color_preferences}</span>
-                </div>
-              )}
-              
-              {bookingData.meaning && (
-                <div className="booking-field">
-                  <span className="field-label">Significato:</span>
-                  <span className="field-value">{bookingData.meaning}</span>
-                </div>
-              )}
-              
-              {bookingData.reference_images && bookingData.reference_images.length > 0 && (
-                <div className="booking-field reference-images">
-                  <span className="field-label">Riferimenti:</span>
-                  <div className="reference-images-container">
-                    {bookingData.reference_images.map((imageUrl, index) => (
-                      <div key={index} className="reference-image">
-                        <img 
-                          src={imageUrl} 
-                          alt={`Riferimento ${index + 1}`}
-                          className="reference-image-preview"
-                          onClick={() => window.open(imageUrl, '_blank')}
-                        />
+              {isArtistAppointment ? (
+                // Artist appointment specific fields
+                <>
+                  {fullBookingData.appointment_date && (
+                    <div className="booking-field">
+                      <span className="field-label">Data e Ora:</span>
+                      <span className="field-value">{formatAppointmentDate()}</span>
+                    </div>
+                  )}
+
+                  {fullBookingData.appointment_duration && (
+                    <div className="booking-field">
+                      <span className="field-label">Durata:</span>
+                      <span className="field-value">{formatDuration()}</span>
+                    </div>
+                  )}
+
+                  {fullBookingData.deposit_amount && (
+                    <div className="booking-field">
+                      <span className="field-label">Acconto:</span>
+                      <span className="field-value budget">€{fullBookingData.deposit_amount}</span>
+                    </div>
+                  )}
+
+                  {fullBookingData.artist_notes && (
+                    <div className="booking-field">
+                      <span className="field-label">Note Artista:</span>
+                      <span className="field-value">{fullBookingData.artist_notes}</span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                // Client request specific fields
+                <>
+                  {fullBookingData.tattoo_style && (
+                    <div className="booking-field">
+                      <span className="field-label">Stile:</span>
+                      <span className="field-value">{fullBookingData.tattoo_style}</span>
+                    </div>
+                  )}
+
+                  {fullBookingData.body_area && (
+                    <div className="booking-field">
+                      <span className="field-label">Zona:</span>
+                      <span className="field-value">{fullBookingData.body_area}</span>
+                    </div>
+                  )}
+
+                  {fullBookingData.size_category && (
+                    <div className="booking-field">
+                      <span className="field-label">Dimensioni:</span>
+                      <span className="field-value">{fullBookingData.size_category}</span>
+                    </div>
+                  )}
+
+                  {fullBookingData.color_preferences && (
+                    <div className="booking-field">
+                      <span className="field-label">Colore:</span>
+                      <span className="field-value">{fullBookingData.color_preferences}</span>
+                    </div>
+                  )}
+
+                  {fullBookingData.meaning && (
+                    <div className="booking-field">
+                      <span className="field-label">Significato:</span>
+                      <span className="field-value">{fullBookingData.meaning}</span>
+                    </div>
+                  )}
+
+                  {fullBookingData.reference_images && fullBookingData.reference_images.length > 0 && (
+                    <div className="booking-field reference-images">
+                      <span className="field-label">Riferimenti:</span>
+                      <div className="reference-images-container">
+                        {fullBookingData.reference_images.map((imageUrl, index) => (
+                          <div key={index} className="reference-image">
+                            <img
+                              src={imageUrl}
+                              alt={`Riferimento ${index + 1}`}
+                              className="reference-image-preview"
+                              onClick={() => window.open(imageUrl, '_blank')}
+                            />
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    </div>
+                  )}
+
+                  <div className="booking-field">
+                    <span className="field-label">Budget:</span>
+                    <span className="field-value budget">{formatBudget()}</span>
                   </div>
-                </div>
+                </>
               )}
-              
-              <div className="booking-field">
-                <span className="field-label">Budget:</span>
-                <span className="field-value budget">{formatBudget()}</span>
-              </div>
             </>
           )}
       </div>

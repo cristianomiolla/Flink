@@ -78,3 +78,24 @@
   border-color: var(--muted-foreground);
   color: var(--muted-foreground);
 }
+
+/* Clickable state for scheduled appointments */
+.progress-content.clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.progress-content.clickable:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.booking-progress-tracker.success .progress-content.clickable:hover {
+  background: #10b981;
+  color: var(--background);
+}
+
+.booking-progress-tracker.success .progress-content.clickable:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

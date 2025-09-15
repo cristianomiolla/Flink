@@ -56,7 +56,8 @@
       "Bash(netstat:*)",
       "Bash(taskkill:*)",
       "mcp__supabase__search_docs",
-      "Bash(code:*)"
+      "Bash(code:*)",
+      "mcp__supabase__list_edge_functions"
     ]
   },
   "enableAllProjectMcpServers": true,

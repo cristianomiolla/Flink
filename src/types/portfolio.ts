@@ -131,7 +131,6 @@ export interface BookingRequestData {
 export interface BookingRequestMessage {
   type: 'booking_request'
   booking_id: string
-  booking_data: BookingRequestData
 }
 
 export type MessageType = 'text' | 'booking_request'

@@ -408,20 +408,11 @@
 }
 
 .portfolio-action-item {
-  display: flex;
-  align-items: center;
   gap: 0.5rem;
   width: 100%;
   padding: 0.75rem;
   font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  border: none;
   border-bottom: 1px solid var(--border);
-  background: var(--background);
-  color: var(--foreground);
-  cursor: pointer;
-  transition: all 0.2s;
 }
 
 .portfolio-action-item:last-child {
@@ -429,12 +420,13 @@
 }
 
 .portfolio-action-item:hover {
-  background: var(--muted);
+  background: var(--accent);
+  color: var(--accent-foreground);
 }
 
 .portfolio-action-item.delete-action:hover {
-  background: #EF4343;
-  color: #ffffff;
+  background: var(--accent);
+  color: var(--accent-foreground);
 }
 
 .portfolio-action-item svg {

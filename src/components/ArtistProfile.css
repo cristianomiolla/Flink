@@ -279,7 +279,7 @@
 
 .original-price {
   font-size: 1.1rem;
-  color: #171717;
+  color: var(--foreground);
   text-decoration: line-through;
   font-weight: 600;
   text-transform: uppercase;

@@ -6,7 +6,7 @@
   z-index: 100;
   backdrop-filter: blur(8px);
   background-color: rgba(255, 255, 255, 0.95);
-  border-bottom: 1px solid #EF4343;
+  border-bottom: 1px solid var(--border-red);
 }
 
 .header-content {

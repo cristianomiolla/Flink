@@ -95,7 +95,7 @@
 }
 
 .artist-actions .btn.btn-accent {
-  background: #171717;
+  background: var(--primary);
   color: #ffffff;
 }
 
@@ -106,11 +106,11 @@
 
 .artist-actions .btn.btn-secondary {
   background: #ffffff;
-  color: #171717;
+  color: var(--foreground);
 }
 
 .artist-actions .btn.btn-secondary:hover {
-  background: #EF4343;
+  background: var(--accent);
   color: #ffffff;
 }
 

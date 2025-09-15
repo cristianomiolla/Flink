@@ -2,7 +2,7 @@
 
 .category-bar {
   background: #ffffff;
-  border-bottom: 1px solid #EF4343;
+  border-bottom: 1px solid var(--border-red);
   padding: 1rem 0;
 }
 
@@ -30,7 +30,7 @@
 
 .category-tag {
   background: var(--grey-light);
-  color: #171717;
+  color: var(--foreground);
   border: 1px solid var(--border);
   border-radius: 50px;
   padding: 0.5rem 0.875rem;
@@ -43,12 +43,12 @@
 }
 
 .category-tag:hover {
-  background: #EF4343;
+  background: var(--accent);
   color: #ffffff;
 }
 
 .category-tag.active {
-  background: #171717;
+  background: var(--primary);
   color: #ffffff;
   border-color: var(--border);
 }
@@ -67,7 +67,7 @@
 
 .toggle-btn {
   background: #ffffff;
-  color: #171717;
+  color: var(--foreground);
   border: none;
   border-radius: 0;
   padding: 0.625rem 1rem;
@@ -85,14 +85,14 @@
 }
 
 .toggle-btn:hover:not(.active) {
-  background: #EF4343;
+  background: var(--accent);
   color: #ffffff;
   border-radius: 0;
 }
 
 .toggle-btn.active,
 .toggle-btn.active:hover {
-  background: #171717;
+  background: var(--primary);
   color: #ffffff;
   border-radius: 0 !important;
 }
@@ -111,7 +111,7 @@
 
 .flash-btn {
   background: var(--background);
-  color: #171717;
+  color: var(--foreground);
   border: 1px solid var(--border);
   border-radius: 0;
   padding: 0.5rem 0.875rem;
@@ -124,14 +124,14 @@
 }
 
 .flash-btn:hover {
-  background: #EF4343;
+  background: var(--accent);
   color: #ffffff;
 }
 
 .flash-btn.active {
-  background: #EF4343;
+  background: var(--accent);
   color: #ffffff;
-  border-color: #EF4343;
+  border-color: var(--border-red);
 }
 
 .flash-btn:focus {
@@ -178,7 +178,7 @@
   }
   
   .category-tags::-webkit-scrollbar-thumb {
-    background: #EF4343;
+    background: var(--accent);
     border-radius: 0;
   }
   
@@ -192,12 +192,12 @@
   
   .category-tag:hover {
     background: var(--grey-light);
-    color: #171717;
+    color: var(--foreground);
     border: 1px solid var(--border);
   }
   
   .category-tag.active {
-    background: #171717;
+    background: var(--primary);
     color: #ffffff;
     border: 1px solid var(--border);
   }
@@ -220,12 +220,12 @@
   
   .toggle-btn:hover:not(.active) {
     background: #ffffff;
-    color: #171717;
+    color: var(--foreground);
     border-radius: 0;
   }
   
   .toggle-btn.active:hover {
-    background: #171717;
+    background: var(--primary);
     color: #ffffff;
     border-radius: 0 !important;
   }
@@ -241,14 +241,14 @@
   }
   
   .flash-btn:hover {
-    background: #EF4343;
+    background: var(--accent);
     color: #ffffff;
-    border: 1px solid #EF4343;
+    border: 1px solid var(--border-red);
   }
   
   .flash-btn.active {
-    background: #EF4343;
+    background: var(--accent);
     color: #ffffff;
-    border: 1px solid #EF4343;
+    border: 1px solid var(--border-red);
   }
 }

@@ -242,9 +242,9 @@
 
 
 .modal-contact-btn {
-  background: #171717;
+  background: var(--primary);
   color: #ffffff;
-  border-color: #171717;
+  border-color: var(--primary);
 }
 
 .modal-contact-btn:hover {

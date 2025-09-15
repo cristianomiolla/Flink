@@ -13,10 +13,9 @@ import { supabase } from '../lib/supabase'
 const parseBookingRequestMessage = (content: string) => {
   try {
     const parsed = JSON.parse(content)
-    if (parsed.type === 'booking_request' && parsed.booking_data) {
+    if (parsed.type === 'booking_request' && parsed.booking_id) {
       return {
-        booking_id: parsed.booking_id,
-        booking_data: parsed.booking_data
+        booking_id: parsed.booking_id
       }
     }
   } catch {
@@ -91,9 +90,10 @@ interface ChatConversationProps {
   onOpenArtistAppointment?: (participantId: string, participantName: string) => void
   onBookingRequestSent?: () => void
   onBookingStatusRefresh?: (refreshFn: () => Promise<void>) => void
+  onMessagesRefresh?: (refreshFn: () => Promise<void>) => void
 }
 
-export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages, hideHeaderAndInput = false, onOpenBookingRequest, onOpenArtistAppointment, onBookingStatusRefresh }: ChatConversationProps) {
+export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages, hideHeaderAndInput = false, onOpenBookingRequest, onOpenArtistAppointment, onBookingStatusRefresh, onMessagesRefresh }: ChatConversationProps) {
   const { user, profile } = useAuth()
   const [newMessage, setNewMessage] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
@@ -107,6 +107,13 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
     return userId1 === user.id ? userId2 : userId1
   }, [user])
 
+  // Scroll to bottom of messages list
+  const scrollToBottom = useCallback(() => {
+    if (messagesListRef.current) {
+      messagesListRef.current.scrollTop = messagesListRef.current.scrollHeight
+    }
+  }, [])
+
   // Get participant ID for booking status
   const participantId = chat ? getParticipantId(chat.id) : null
   const { bookingData, showProgressTracker, showPinnedAction, refreshBookingStatus } = useBookingStatus(participantId)
@@ -118,13 +125,36 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
     }
   }, [refreshBookingStatus, onBookingStatusRefresh])
 
+  // Pass messages refresh function to parent component
+  useEffect(() => {
+    if (onMessagesRefresh && chat) {
+      const refreshMessages = async () => {
+        if (!chat || !propFetchConversationMessages) return
 
-  // Scroll to bottom of messages list
-  const scrollToBottom = useCallback(() => {
-    if (messagesListRef.current) {
-      messagesListRef.current.scrollTop = messagesListRef.current.scrollHeight
+        const participantId = getParticipantId(chat.id)
+        if (!participantId) return
+
+        try {
+          const conversationMessages = await propFetchConversationMessages(participantId)
+
+          // Convert to local Message format
+          const formattedMessages: Message[] = conversationMessages.map((msg: DatabaseMessage) => ({
+            id: msg.id,
+            content: msg.content,
+            timestamp: msg.created_at,
+            isFromCurrentUser: msg.sender_id === user?.id
+          }))
+
+          setMessages(formattedMessages)
+          setTimeout(() => scrollToBottom(), 100)
+        } catch (error) {
+          console.error('Error refreshing conversation messages:', error)
+        }
+      }
+
+      onMessagesRefresh(refreshMessages)
     }
-  }, [])
+  }, [onMessagesRefresh, chat?.id, user?.id, propFetchConversationMessages, getParticipantId, scrollToBottom])
 
 
   // Reset messages when chat becomes null or changes
@@ -369,6 +399,12 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
             <BookingProgressTracker
               status={bookingData.status}
               userType={profile.profile_type}
+              appointmentDate={bookingData.appointment_date}
+              artistName={profile.profile_type === 'client' ? chat.participant.name : undefined}
+              clientName={profile.profile_type === 'artist' ? chat.participant.name : undefined}
+              artistId={bookingData.artist_id}
+              currentUserId={user?.id}
+              bookingId={bookingData.id}
             />
           )}
 
@@ -389,10 +425,6 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
                 return (
                   <BookingRequestCard
                     key={message.id}
-                    bookingData={{
-                      ...bookingData.booking_data,
-                      created_at: message.timestamp
-                    }}
                     bookingId={bookingData.booking_id}
                     isFromCurrentUser={message.isFromCurrentUser}
                     timestamp={message.timestamp}

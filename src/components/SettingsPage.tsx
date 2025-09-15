@@ -10,6 +10,7 @@ import './AuthOverlay.css'
 // Lazy load overlay components
 const EmailChangeOverlay = lazy(() => import('./EmailChangeOverlay').then(module => ({ default: module.EmailChangeOverlay })))
 const FullNameChangeOverlay = lazy(() => import('./FullNameChangeOverlay').then(module => ({ default: module.FullNameChangeOverlay })))
+const PasswordChangeOverlay = lazy(() => import('./PasswordChangeOverlay').then(module => ({ default: module.PasswordChangeOverlay })))
 
 interface SettingsPageProps {
   onLogoClick?: () => void
@@ -20,6 +21,7 @@ export function SettingsPage({ onLogoClick }: SettingsPageProps) {
   const navigate = useNavigate()
   const [showEmailOverlay, setShowEmailOverlay] = useState(false)
   const [showFullNameOverlay, setShowFullNameOverlay] = useState(false)
+  const [showPasswordOverlay, setShowPasswordOverlay] = useState(false)
   const [showProfileTypeOverlay, setShowProfileTypeOverlay] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -29,8 +31,7 @@ export function SettingsPage({ onLogoClick }: SettingsPageProps) {
   }, [])
 
   const handlePasswordChangeClick = () => {
-    // Password change functionality removed - component was deleted
-    alert('Funzionalità temporaneamente non disponibile')
+    setShowPasswordOverlay(true)
   }
 
   const handleEmailChangeClick = () => {
@@ -196,6 +197,16 @@ export function SettingsPage({ onLogoClick }: SettingsPageProps) {
         </div>
       </div>
 
+
+      {/* Password Change Overlay */}
+      {showPasswordOverlay && (
+        <Suspense fallback={<div />}>
+          <PasswordChangeOverlay
+            isOpen={showPasswordOverlay}
+            onClose={() => setShowPasswordOverlay(false)}
+          />
+        </Suspense>
+      )}
 
       {/* Email Change Overlay */}
       {showEmailOverlay && (

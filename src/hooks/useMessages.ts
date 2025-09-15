@@ -6,13 +6,9 @@ import { useAuth } from './useAuth'
 const formatLastMessageForDisplay = (content: string, isFromCurrentUser: boolean): string => {
   try {
     const parsed = JSON.parse(content)
-    if (parsed.type === 'booking_request' && parsed.booking_data) {
-      // Check if it's an appointment (has appointment_date) or just a booking request
-      if (parsed.booking_data.appointment_date) {
-        return isFromCurrentUser ? 'Appuntamento creato' : 'Appuntamento fissato'
-      } else {
-        return isFromCurrentUser ? 'Richiesta inviata' : 'Richiesta ricevuta'
-      }
+    if (parsed.type === 'booking_request' && parsed.booking_id) {
+      // For booking requests, show generic message since we don't have booking_data
+      return isFromCurrentUser ? 'Richiesta inviata' : 'Richiesta ricevuta'
     }
   } catch {
     // If it's not JSON, it's a regular message
@@ -212,6 +208,7 @@ export function useMessages() {
       })
 
       const newConversations = Array.from(conversationMap.values())
+        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
       setConversations(newConversations)
       // Convert to MessageWithProfiles format with actual profile data
       const messagesWithProfiles = filteredMessages.map(message => {
@@ -373,17 +370,17 @@ export function useMessages() {
         const existingConv = prev.find(conv => conv.id === conversationKey)
         
         if (existingConv) {
-          // Update existing conversation
-          return prev.map(conv => 
-            conv.id === conversationKey 
-              ? { 
-                  ...conv, 
+          // Update existing conversation and sort by timestamp
+          return prev.map(conv =>
+            conv.id === conversationKey
+              ? {
+                  ...conv,
                   lastMessage: formatLastMessageForDisplay(content, true),
                   timestamp: new Date().toISOString(),
                   isFromCurrentUser: true
                 }
               : conv
-          )
+          ).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
         } else {
           // Mark that we need to create a new conversation
           needsNewConversation = true
@@ -426,7 +423,8 @@ export function useMessages() {
           isFromCurrentUser: true
         }
 
-        setConversations(prev => [newConversation, ...prev])
+        setConversations(prev => [newConversation, ...prev]
+          .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()))
       }
     } catch (err) {
       console.error('Error updating conversation locally:', err)

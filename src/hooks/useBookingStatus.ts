@@ -77,11 +77,13 @@ export function useBookingStatus(participantId: string | null): UseBookingStatus
     await fetchBookingStatus()
   }, [fetchBookingStatus])
 
+  // Appointment completion is now handled server-side by Edge Function
+
   // Determina se una richiesta pending è scaduta (15 giorni) SE non c'è appointment_date
   const EXPIRY_TIME = 15 * 24 * 60 * 60 * 1000 // 15 giorni in millisecondi
   const isPendingExpired = Boolean(
-    bookingData && 
-    bookingData.status === 'pending' && 
+    bookingData &&
+    bookingData.status === 'pending' &&
     (Date.now() - new Date(bookingData.created_at).getTime()) > EXPIRY_TIME &&
     !bookingData.appointment_date
   )
@@ -97,13 +99,13 @@ export function useBookingStatus(participantId: string | null): UseBookingStatus
   // Determina se mostrare il progress tracker
   // Nascondi il tracker se:
   // 1. La richiesta è expired
-  // 2. La richiesta pending è scaduta (7 giorni)
+  // 2. La richiesta pending è scaduta (15 giorni)
   // 3. È completata da più di 3 giorni
   const showProgressTracker = Boolean(
-    bookingData && 
-    !['expired'].includes(bookingData.status) && 
+    bookingData &&
+    !['expired', 'completed'].includes(bookingData.status) &&
     !isPendingExpired &&
-    !(bookingData.status === 'completed' && 
+    !(bookingData.status === 'completed' &&
       new Date(bookingData.created_at).getTime() < Date.now() - (3 * 24 * 60 * 60 * 1000))
   )
 
@@ -111,9 +113,11 @@ export function useBookingStatus(participantId: string | null): UseBookingStatus
   // Mostra se:
   // 1. Non c'è booking attivo, O
   // 2. Non c'è progress tracker da mostrare (incluso pending scaduto), O
-  // 3. È un artista con booking pending (deve sempre vedere "Fissa appuntamento")
-  const showPinnedAction = !hasActiveBooking || !showProgressTracker || 
-    (profile?.profile_type === 'artist' && bookingData?.status === 'pending')
+  // 3. È un artista con booking pending (deve sempre vedere "Fissa appuntamento"), O
+  // 4. L'appuntamento è completato (status = 'completed')
+  const showPinnedAction = !hasActiveBooking || !showProgressTracker ||
+    (profile?.profile_type === 'artist' && bookingData?.status === 'pending') ||
+    bookingData?.status === 'completed'
 
   return {
     bookingData,

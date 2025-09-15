@@ -391,9 +391,30 @@
     stroke-width: 2;
   }
 
-  /* Booking form styles */
+  /* Booking form styles - Mobile responsive */
   .form-row {
     display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .budget-separator {
+    color: var(--muted-foreground);
+    font-weight: 600;
+    font-size: 1rem;
+    display: none; /* Hide separator on mobile since inputs are stacked */
+  }
+
+  .form-row .form-input {
+    width: 100%;
+  }
+}
+
+/* Desktop booking form styles */
+@media (min-width: 769px) {
+  .form-row {
+    display: flex;
+    flex-direction: row;
     align-items: center;
     gap: 0.75rem;
   }
@@ -402,29 +423,13 @@
     color: var(--muted-foreground);
     font-weight: 600;
     font-size: 1rem;
+    display: block; /* Show separator on desktop */
   }
 
   .form-row .form-input {
     flex: 1;
   }
 }
-
-  /* Booking form styles */
-  .form-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .budget-separator {
-    color: var(--muted-foreground);
-    font-weight: 600;
-    font-size: 1rem;
-  }
-
-  .form-row .form-input {
-    flex: 1;
-  }
 
 
 

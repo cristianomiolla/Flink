@@ -12,7 +12,7 @@
 .tab-button {
   flex: 1;
   background: #ffffff;
-  color: #171717;
+  color: var(--foreground);
   border: none;
   border-radius: 0;
   padding: 0.625rem 1rem;
@@ -45,14 +45,14 @@
 }
 
 .tab-button:hover:not(.active) {
-  background: #EF4343;
+  background: var(--accent);
   color: #ffffff;
   border-radius: 0;
 }
 
 .tab-button.active,
 .tab-button.active:hover {
-  background: #171717;
+  background: var(--primary);
   color: #ffffff;
   border-radius: 0 !important;
 }

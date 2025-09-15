@@ -95,24 +95,11 @@ export function AppointmentsPage() {
                 {appointments.map((appointment) => (
                   <BookingRequestCard
                     key={appointment.id}
-                    bookingData={{
-                      subject: appointment.subject,
-                      tattoo_style: appointment.tattoo_style,
-                      body_area: appointment.body_area,
-                      size_category: appointment.size_category,
-                      color_preferences: appointment.color_preferences,
-                      meaning: appointment.meaning,
-                      budget_min: appointment.budget_min,
-                      budget_max: appointment.budget_max,
-                      reference_images: appointment.reference_images,
-                      created_at: appointment.created_at,
-                      appointment_date: appointment.appointment_date || undefined
-                    }}
                     bookingId={appointment.id}
                     timestamp={appointment.created_at}
                     mode="appointment"
                     participantName={
-                      profile?.profile_type === 'artist' 
+                      profile?.profile_type === 'artist'
                         ? appointment.client_profile?.full_name || appointment.client_profile?.username || 'Cliente'
                         : appointment.artist_profile?.full_name || appointment.artist_profile?.username || 'Artista'
                     }
