@@ -5,7 +5,6 @@ import { supabase } from '../lib/supabase'
 import { useNavigate } from 'react-router-dom'
 import './BecomeArtistPage.css'
 import './AuthOverlay.css'
-import '../styles/tokens.css'
 
 interface BecomeArtistPageProps {
   onLogoClick?: () => void

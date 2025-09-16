@@ -30,8 +30,8 @@ const getStatusDisplay = (status: BookingStatus, userType: 'client' | 'artist') 
       artist: { text: 'RICHIESTA RIFIUTATA', icon: '❌', color: 'error' }
     },
     scheduled: {
-      client: { text: 'APPUNTAMENTO FISSATO', icon: '✅', color: 'success' },
-      artist: { text: 'APPUNTAMENTO FISSATO', icon: '✅', color: 'success' }
+      client: { text: 'APPUNTAMENTO PROGRAMMATO', icon: '✅', color: 'success' },
+      artist: { text: 'APPUNTAMENTO PROGRAMMATO', icon: '✅', color: 'success' }
     },
     rescheduled: {
       client: { text: 'APPUNTAMENTO MODIFICATO', icon: '🔄', color: 'info' },
@@ -53,7 +53,6 @@ const getStatusDisplay = (status: BookingStatus, userType: 'client' | 'artist') 
 export function BookingProgressTracker({
   status,
   userType,
-  appointmentDate,
   artistName,
   clientName,
   artistId,
@@ -70,8 +69,8 @@ export function BookingProgressTracker({
   }
 
   const handleClick = () => {
-    // Only open overlay for scheduled appointments
-    if (status === 'scheduled') {
+    // Open overlay for scheduled appointments and pending requests
+    if (status === 'scheduled' || status === 'pending') {
       setShowDetailsOverlay(true)
     }
   }
@@ -80,7 +79,7 @@ export function BookingProgressTracker({
     <>
       <div className={`booking-progress-tracker ${statusDisplay.color}`}>
         <div
-          className={`progress-content ${status === 'scheduled' ? 'clickable' : ''}`}
+          className={`progress-content ${(status === 'scheduled' || status === 'pending') ? 'clickable' : ''}`}
           onClick={handleClick}
         >
           <span className="progress-icon">{statusDisplay.icon}</span>
@@ -92,7 +91,6 @@ export function BookingProgressTracker({
         isOpen={showDetailsOverlay}
         onClose={() => setShowDetailsOverlay(false)}
         userType={userType}
-        appointmentDate={appointmentDate}
         artistName={artistName}
         clientName={clientName}
         artistId={artistId}

@@ -16,6 +16,16 @@
   margin-bottom: 0;
 }
 
+.detail-item:has(.form-input) {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.detail-item:has(.custom-dropdown) {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
 .detail-label {
   font-size: 0.875rem;
   font-weight: 600;
@@ -193,9 +203,6 @@
   border-color: var(--accent);
 }
 
-.auth-modal .form-label {
-  font-size: 14px;
-}
 
 .form-errors {
   display: flex;

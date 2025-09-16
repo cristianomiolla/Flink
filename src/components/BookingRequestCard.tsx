@@ -27,9 +27,10 @@ interface BookingRequestCardProps {
   timestamp: string
   mode?: 'message' | 'appointment' // New prop to control rendering mode
   participantName?: string // For appointment mode
+  cardType?: 'request' | 'appointment' // New prop to force card display type
 }
 
-export function BookingRequestCard({ bookingId, isFromCurrentUser, timestamp, mode = 'message', participantName }: BookingRequestCardProps) {
+export function BookingRequestCard({ bookingId, isFromCurrentUser, timestamp, mode = 'message', participantName, cardType }: BookingRequestCardProps) {
   const { user } = useAuth()
   const [currentStatus, setCurrentStatus] = useState<string>('pending')
   const [loading, setLoading] = useState(true)
@@ -136,8 +137,9 @@ export function BookingRequestCard({ bookingId, isFromCurrentUser, timestamp, mo
     }
   }
 
-  // Check if this is an artist appointment (has appointment-specific fields)
-  const isArtistAppointment = !!(fullBookingData?.appointment_date || fullBookingData?.deposit_amount)
+  // Determine display mode based on cardType prop or data availability
+  const isArtistAppointment = cardType === 'appointment' ||
+    (cardType !== 'request' && !!(fullBookingData?.appointment_date || fullBookingData?.deposit_amount))
 
   const getStatusBadge = () => {
     // Mostra loading mentre carica lo status
@@ -158,6 +160,8 @@ export function BookingRequestCard({ bookingId, isFromCurrentUser, timestamp, mo
         return <span className="status-badge accepted">Programmato</span>
       case 'completed':
         return <span className="status-badge accepted">Completato</span>
+      case 'cancelled':
+        return <span className="status-badge declined">Cancellato</span>
       default:
         return <span className="status-badge pending">In attesa</span>
     }
@@ -169,7 +173,7 @@ export function BookingRequestCard({ bookingId, isFromCurrentUser, timestamp, mo
         <div className="booking-title-container">
           <div className="booking-title">
             <span className="booking-icon">{isArtistAppointment ? '📅' : '📝'}</span>
-            <h4>{isArtistAppointment ? 'Appuntamento Fissato' : 'Richiesta Tatuaggio'}</h4>
+            <h4>{isArtistAppointment ? 'Appuntamento' : 'Richiesta Tatuaggio'}</h4>
           </div>
           <div className="status-badge-mobile">
             {getStatusBadge()}
@@ -295,7 +299,9 @@ export function BookingRequestCard({ bookingId, isFromCurrentUser, timestamp, mo
       </div>
       
       <div className="booking-footer">
-        <span className="booking-time">{formatTime(timestamp)}</span>
+        <span className="booking-time">
+          {isArtistAppointment ? `Appuntamento creato il ${formatTime(timestamp)}` : `Richiesta creata il ${formatTime(timestamp)}`}
+        </span>
       </div>
     </div>
   )

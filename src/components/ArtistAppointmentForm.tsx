@@ -147,7 +147,7 @@ export function ArtistAppointmentForm({
       // Create a message in the conversation with the appointment data
       if (insertedData && insertedData[0] && sendMessage) {
         const appointmentMessage = JSON.stringify({
-          type: 'booking_request',
+          type: 'appointment_scheduled',
           booking_id: insertedData[0].id
         })
         

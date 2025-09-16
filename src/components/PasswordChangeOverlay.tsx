@@ -8,7 +8,7 @@ interface PasswordChangeOverlayProps {
 }
 
 export function PasswordChangeOverlay({ isOpen, onClose }: PasswordChangeOverlayProps) {
-  const [currentPassword, setCurrentPassword] = useState('')
+  const [, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)

@@ -98,6 +98,7 @@ export function AppointmentsPage() {
                     bookingId={appointment.id}
                     timestamp={appointment.created_at}
                     mode="appointment"
+                    cardType="appointment"
                     participantName={
                       profile?.profile_type === 'artist'
                         ? appointment.client_profile?.full_name || appointment.client_profile?.username || 'Cliente'

@@ -10,6 +10,10 @@ const formatLastMessageForDisplay = (content: string, isFromCurrentUser: boolean
       // For booking requests, show generic message since we don't have booking_data
       return isFromCurrentUser ? 'Richiesta inviata' : 'Richiesta ricevuta'
     }
+    if (parsed.type === 'appointment_scheduled' && parsed.booking_id) {
+      // For appointment scheduled notifications
+      return isFromCurrentUser ? 'Appuntamento programmato' : 'Appuntamento confermato'
+    }
   } catch {
     // If it's not JSON, it's a regular message
   }

@@ -5,7 +5,6 @@ import './Dropdown.css'
 import './AuthOverlay.css'
 import './ImageUpload.css'
 import './ChatConversation.css'
-import '../styles/tokens.css'
 import { SearchBar } from './SearchBar'
 import { ChatList } from './ChatList'
 import { ChatConversation } from './ChatConversation'
@@ -82,9 +81,10 @@ const useIsMobile = () => {
 const parseBookingRequestMessage = (content: string) => {
   try {
     const parsed = JSON.parse(content)
-    if (parsed.type === 'booking_request' && parsed.booking_id) {
+    if ((parsed.type === 'booking_request' || parsed.type === 'appointment_scheduled') && parsed.booking_id) {
       return {
-        booking_id: parsed.booking_id
+        booking_id: parsed.booking_id,
+        message_type: parsed.type
       }
     }
   } catch {
@@ -267,7 +267,7 @@ export function MessagesPage() {
           id: msg.id,
           content: msg.content,
           timestamp: msg.created_at,
-          isFromCurrentUser: msg.sender_id === user.id
+          isFromCurrentUser: msg.sender_id === user?.id
         }))
         setConversationMessages(formattedMessages)
         setTimeout(() => scrollToBottom(), 100)
@@ -369,7 +369,7 @@ export function MessagesPage() {
             id: msg.id,
             content: msg.content,
             timestamp: msg.created_at,
-            isFromCurrentUser: msg.sender_id === user.id
+            isFromCurrentUser: msg.sender_id === user?.id
           }))
           setConversationMessages(formattedMessages)
           setTimeout(() => scrollToBottom(), 100)
@@ -478,23 +478,48 @@ export function MessagesPage() {
   const { conversations, loading, error, deleteConversation, markConversationAsRead, sendMessage, fetchConversationMessages } = useMessages()
   const mobileMessagesListRef = useRef<HTMLDivElement>(null)
   
-  // Scroll to bottom of mobile messages list
+  // Scroll to bottom of mobile messages list with booking card support
   const scrollToBottom = useCallback(() => {
     if (mobileMessagesListRef.current) {
       const element = mobileMessagesListRef.current
-      
-      // Try scrolling to the bottom anchor element
-      const bottomAnchor = element.querySelector('#messages-bottom')
-      if (bottomAnchor) {
-        bottomAnchor.scrollIntoView({ behavior: 'auto', block: 'start', inline: 'nearest' })
-        
-        // Add extra scroll to compensate for mobile padding
+      const hasBookingCard = element.querySelector('.booking-request-card:last-of-type') !== null
+
+      if (hasBookingCard) {
+        // Booking cards need aggressive scrolling
+        element.scrollTop = element.scrollHeight + 200
+
+        // Use bottom anchor for initial positioning
+        const bottomAnchor = element.querySelector('#messages-bottom')
+        if (bottomAnchor) {
+          bottomAnchor.scrollIntoView({ behavior: 'auto', block: 'center' })
+        }
+
         setTimeout(() => {
-          element.scrollTop = element.scrollTop + 80
-        }, 10)
+          element.scrollTop = element.scrollHeight
+        }, 100)
+
+        setTimeout(() => {
+          const currentScroll = element.scrollTop
+          const maxScroll = element.scrollHeight - element.clientHeight
+
+          if (Math.abs(currentScroll - maxScroll) > 5) {
+            element.scrollTop = element.scrollHeight + 100
+
+            // Try scrolling to the last booking card directly
+            const lastBookingCard = element.querySelector('.booking-request-card:last-of-type')
+            if (lastBookingCard) {
+              lastBookingCard.scrollIntoView({ behavior: 'auto', block: 'end' })
+            }
+          }
+        }, 300)
       } else {
-        // Force maximum scroll
-        element.scrollTop = element.scrollHeight
+        // Regular messages
+        const bottomAnchor = element.querySelector('#messages-bottom')
+        if (bottomAnchor) {
+          bottomAnchor.scrollIntoView({ behavior: 'auto', block: 'start', inline: 'nearest' })
+        } else {
+          element.scrollTop = element.scrollHeight
+        }
       }
     }
   }, [])
@@ -546,10 +571,10 @@ export function MessagesPage() {
     if (artistId && user) {
       // Generate the conversation ID
       const conversationId = generateConversationId(user.id, artistId)
-      
+
       // Check if conversation already exists
       const existingConversation = conversations.find(conv => conv.id === conversationId)
-      
+
       if (existingConversation) {
         // Select existing conversation
         setSelectedChatId(conversationId)
@@ -558,8 +583,12 @@ export function MessagesPage() {
         // Fetch artist profile for new conversation
         fetchArtistProfile(artistId)
       }
+    } else if (!artistId && isMobile) {
+      // Reset selected chat when returning to mobile chat list
+      setSelectedChatId(null)
+      setNewChatArtist(null)
     }
-  }, [artistId, user, conversations, fetchArtistProfile])
+  }, [artistId, user, conversations, fetchArtistProfile, isMobile])
 
   // Update newChatArtist state when conversations change
   useEffect(() => {
@@ -587,19 +616,15 @@ export function MessagesPage() {
           id: msg.id,
           content: msg.content,
           timestamp: msg.created_at,
-          isFromCurrentUser: msg.sender_id === user.id
+          isFromCurrentUser: msg.sender_id === user?.id
         }))
 
-        // Only update if messages have actually changed
-        setConversationMessages(prevMessages => {
-          if (JSON.stringify(prevMessages) !== JSON.stringify(formattedMessages)) {
-            // Schedule scroll to bottom after state update
-            requestAnimationFrame(() => {
-              setTimeout(() => scrollToBottom(), 50)
-            })
-            return formattedMessages
-          }
-          return prevMessages
+        // Always update messages and scroll to bottom (like desktop ChatConversation)
+        setConversationMessages(formattedMessages)
+
+        // Always scroll to bottom after loading messages
+        requestAnimationFrame(() => {
+          setTimeout(() => scrollToBottom(), 150)
         })
       } catch (error) {
         console.error('Error loading conversation messages:', error)
@@ -611,11 +636,6 @@ export function MessagesPage() {
 
     // Load initial messages
     loadConversationMessages(true)
-
-    // Scroll to bottom when conversation first loads
-    requestAnimationFrame(() => {
-      setTimeout(() => scrollToBottom(), 100)
-    })
 
     // Setup real-time subscription for mobile conversation
     const channel = supabase
@@ -646,7 +666,7 @@ export function MessagesPage() {
           const newMessages = [...prev, formattedMessage]
           // Schedule scroll to bottom after state update
           requestAnimationFrame(() => {
-            setTimeout(() => scrollToBottom(), 50)
+            setTimeout(() => scrollToBottom(), 100)
           })
           return newMessages
         })
@@ -694,6 +714,15 @@ export function MessagesPage() {
       unreadCount: 0
     }
   }
+
+  // Scroll to bottom whenever a mobile chat is opened/reopened
+  useEffect(() => {
+    if (isMobile && artistId && selectedChat) {
+      requestAnimationFrame(() => {
+        setTimeout(() => scrollToBottom(), 200)
+      })
+    }
+  }, [isMobile, artistId, selectedChat?.id, scrollToBottom])
 
   const handleChatSelect = (chatId: string) => {
     // Find conversation first
@@ -935,6 +964,16 @@ export function MessagesPage() {
               <BookingProgressTracker
                 status={mobileBookingData.status}
                 userType={profile.profile_type}
+                appointmentDate={mobileBookingData.appointment_date || undefined}
+                artistName={profile.profile_type === 'client' ? selectedChat?.participant?.name : undefined}
+                clientName={profile.profile_type === 'artist' ? selectedChat?.participant?.name : undefined}
+                artistId={profile.profile_type === 'client' ? (() => {
+                  if (!selectedChat || !user) return undefined
+                  const [userId1, userId2] = selectedChat.id.split('__')
+                  return userId1 === user.id ? userId2 : userId1
+                })() : user?.id}
+                currentUserId={user?.id}
+                bookingId={mobileBookingData.id}
               />
             )}
             
@@ -956,12 +995,14 @@ export function MessagesPage() {
                       
                       if (bookingData) {
                         // Render BookingRequestCard for booking request messages
+                        const cardType = bookingData.message_type === 'appointment_scheduled' ? 'appointment' : 'request'
                         return (
                           <BookingRequestCard
                             key={message.id}
                             bookingId={bookingData.booking_id}
                             isFromCurrentUser={message.isFromCurrentUser}
                             timestamp={message.timestamp}
+                            cardType={cardType}
                           />
                         )
                       } else {
@@ -1304,29 +1345,31 @@ export function MessagesPage() {
 
                     <div className="form-group">
                       <label htmlFor="budget_min" className="form-label">
-                        BUDGET (€)
+                        BUDGET (€) <span className="required-indicator">*</span>
                       </label>
                       <div className="form-row">
-                        <input 
-                          id="budget_min" 
-                          className="form-input" 
-                          placeholder="Min" 
-                          type="number" 
+                        <input
+                          id="budget_min"
+                          className="form-input"
+                          placeholder="Min"
+                          type="number"
                           min="0"
                           step="10"
                           value={bookingForm.budget_min}
                           onChange={(e) => setBookingForm(prev => ({ ...prev, budget_min: e.target.value }))}
+                          required
                         />
                         <span className="budget-separator">-</span>
-                        <input 
-                          id="budget_max" 
-                          className="form-input" 
-                          placeholder="Max" 
-                          type="number" 
+                        <input
+                          id="budget_max"
+                          className="form-input"
+                          placeholder="Max"
+                          type="number"
                           min="0"
                           step="10"
                           value={bookingForm.budget_max}
                           onChange={(e) => setBookingForm(prev => ({ ...prev, budget_max: e.target.value }))}
+                          required
                         />
                       </div>
                       <div className="form-help">Indica il range di budget che hai in mente</div>
@@ -1342,7 +1385,7 @@ export function MessagesPage() {
                       <button
                         type="submit"
                         className={`action-btn ${imageUploading ? 'disabled' : ''}`}
-                        disabled={imageUploading || !bookingForm.subject.trim() || !bookingForm.tattoo_style || !bookingForm.body_area || !bookingForm.size_category || !bookingForm.color_preferences}
+                        disabled={imageUploading || !bookingForm.subject.trim() || !bookingForm.tattoo_style || !bookingForm.body_area || !bookingForm.size_category || !bookingForm.color_preferences || !bookingForm.budget_min || !bookingForm.budget_max}
                       >
                         <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                           <path d="M12 5v14m7-7l-7-7-7 7"></path>
@@ -1821,29 +1864,31 @@ export function MessagesPage() {
 
                 <div className="form-group">
                   <label htmlFor="budget_min" className="form-label">
-                    BUDGET (€)
+                    BUDGET (€) <span className="required-indicator">*</span>
                   </label>
                   <div className="form-row">
-                    <input 
-                      id="budget_min" 
-                      className="form-input" 
-                      placeholder="Min" 
-                      type="number" 
+                    <input
+                      id="budget_min"
+                      className="form-input"
+                      placeholder="Min"
+                      type="number"
                       min="0"
                       step="10"
                       value={bookingForm.budget_min}
                       onChange={(e) => setBookingForm(prev => ({ ...prev, budget_min: e.target.value }))}
+                      required
                     />
                     <span className="budget-separator">-</span>
-                    <input 
-                      id="budget_max" 
-                      className="form-input" 
-                      placeholder="Max" 
-                      type="number" 
+                    <input
+                      id="budget_max"
+                      className="form-input"
+                      placeholder="Max"
+                      type="number"
                       min="0"
                       step="10"
                       value={bookingForm.budget_max}
                       onChange={(e) => setBookingForm(prev => ({ ...prev, budget_max: e.target.value }))}
+                      required
                     />
                   </div>
                   <div className="form-help">Indica il range di budget che hai in mente</div>
@@ -1859,7 +1904,7 @@ export function MessagesPage() {
                   <button
                     type="submit"
                     className="action-btn"
-                    disabled={!bookingForm.subject.trim() || !bookingForm.tattoo_style || !bookingForm.body_area || !bookingForm.size_category || !bookingForm.color_preferences}
+                    disabled={!bookingForm.subject.trim() || !bookingForm.tattoo_style || !bookingForm.body_area || !bookingForm.size_category || !bookingForm.color_preferences || !bookingForm.budget_min || !bookingForm.budget_max}
                   >
                     <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                       <path d="M12 5v14m7-7l-7-7-7 7"></path>

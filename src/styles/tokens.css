@@ -305,7 +305,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-body);
-  font-size: 0.9rem;
+  font-size: 14px;
   border-radius: 0;
   transition: border-color 0.2s;
 }
@@ -331,7 +331,7 @@ body {
   background: var(--muted);
   color: var(--muted-foreground);
   font-family: var(--font-body);
-  font-size: 0.9rem;
+  font-size: 14px;
   border-radius: 0;
   opacity: 0.7;
 }

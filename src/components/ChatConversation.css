@@ -191,10 +191,11 @@
   .messages-page.mobile.conversation .messages-list {
     margin-top: 137px; /* Account for fixed header (70px) + pinned button (77px) - 10px */
     padding: 16px;
-    padding-bottom: 0;
+    padding-bottom: 0; /* Remove extra padding */
     overflow-y: scroll !important; /* Force scroll */
     background: var(--background);
     -webkit-overflow-scrolling: touch; /* iOS smooth scrolling */
+    scroll-behavior: smooth; /* Use smooth scroll for better UX */
   }
 }
 
