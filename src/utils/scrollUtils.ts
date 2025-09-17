@@ -75,7 +75,7 @@ const performScroll = (
 /**
  * Creates a unified scroll function with React timing optimization
  */
-export const createScrollToBottom = (containerRef: React.RefObject<HTMLElement>) => {
+export const createScrollToBottom = (containerRef: React.RefObject<HTMLElement | null>) => {
   return (options: ScrollOptions = {}) => {
     if (!containerRef.current) return
 

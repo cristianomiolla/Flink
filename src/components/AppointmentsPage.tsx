@@ -33,6 +33,13 @@ export function AppointmentsPage() {
       default:
         return true
     }
+  }).sort((a, b) => {
+    // Sort by appointment date/time (most recent first)
+    // If appointment_date is null, fall back to created_at
+    const dateA = a.appointment_date ? new Date(a.appointment_date) : new Date(a.created_at)
+    const dateB = b.appointment_date ? new Date(b.appointment_date) : new Date(b.created_at)
+
+    return dateB.getTime() - dateA.getTime() // Most recent first
   })
 
   const getFilterCounts = () => {

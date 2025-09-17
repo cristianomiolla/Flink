@@ -6,6 +6,8 @@ import './AuthOverlay.css'
 
 interface BookingData {
   id: string
+  client_id: string
+  artist_id: string
   subject: string
   tattoo_style?: string
   body_area?: string
