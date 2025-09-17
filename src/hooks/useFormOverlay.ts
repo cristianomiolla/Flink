@@ -48,15 +48,6 @@ export function useFormOverlay<T extends Record<string, any>>({
     }
   }, [errors])
 
-  // Clear all errors
-  const clearErrors = useCallback(() => {
-    setErrors({})
-  }, [])
-
-  // Set field error
-  const setFieldError = useCallback((field: string, error: string | string[]) => {
-    setErrors(prev => ({ ...prev, [field]: error }))
-  }, [])
 
   // Set multiple errors
   const setFormErrors = useCallback((newErrors: FormErrors) => {
@@ -72,8 +63,6 @@ export function useFormOverlay<T extends Record<string, any>>({
     successMessage,
     setSuccessMessage,
     handleInputChange,
-    clearErrors,
-    setFieldError,
     setFormErrors
   }
 }

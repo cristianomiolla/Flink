@@ -10,6 +10,53 @@
   padding: 2rem 0;
 }
 
+/* Filter Chips */
+.filter-chips {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  background: transparent;
+  border: 2px solid var(--foreground);
+  color: var(--foreground);
+  padding: 0.5rem 1rem;
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 2px 2px 0 var(--foreground);
+  position: relative;
+}
+
+.filter-chip:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--background);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--accent);
+}
+
+.filter-chip.active {
+  background: var(--foreground);
+  border-color: var(--foreground);
+  color: var(--background);
+  box-shadow: 2px 2px 0 var(--foreground);
+}
+
+.filter-chip.active:hover {
+  background: var(--foreground);
+  border-color: var(--foreground);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--foreground);
+}
+
 
 
 .appointments-content {
@@ -86,5 +133,15 @@
   .appointments-list .booking-request-card {
     width: 100%;
     max-width: none;
+  }
+
+  .filter-chips {
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .filter-chip {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
   }
 }

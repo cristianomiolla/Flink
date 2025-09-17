@@ -1,7 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-Deno.serve(async (req) => {
+Deno.serve(async () => {
   try {
     // Inizializza il client Supabase con service role key
     const supabase = createClient(
@@ -11,19 +11,19 @@ Deno.serve(async (req) => {
 
     // 1. Completa gli appuntamenti passati (appointment_date < oggi)
     const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD format
-    const { data: completedData, error: completedError, count: completedCount } = await supabase
+    const { error: completedError, count: completedCount } = await supabase
       .from('bookings')
       .update({
         status: 'completed',
         updated_at: new Date().toISOString()
       })
-      .eq('status', 'scheduled')
+      .in('status', ['scheduled', 'rescheduled'])
       .not('appointment_date', 'is', null)
       .lt('appointment_date', today)
       .select('id', { count: 'exact' })
 
     // 2. Scade le richieste pending > 15 giorni senza appointment_date
-    const { data: expiredData, error: expiredError, count: expiredCount } = await supabase
+    const { error: expiredError, count: expiredCount } = await supabase
       .from('bookings')
       .update({
         status: 'expired',
@@ -37,7 +37,6 @@ Deno.serve(async (req) => {
     // Controlla errori
     const error = completedError || expiredError
     const count = (completedCount || 0) + (expiredCount || 0)
-    const data = [...(completedData || []), ...(expiredData || [])]
 
     if (error) {
       console.error('Error processing bookings:', error)
@@ -63,7 +62,7 @@ Deno.serve(async (req) => {
       completed_count: completedCount || 0,
       expired_count: expiredCount || 0,
       total_processed: count || 0,
-      message: `Successfully completed ${completedCount || 0} appointments and expired ${expiredCount || 0} bookings`,
+      message: `Successfully completed ${completedCount || 0} appointments (scheduled/rescheduled) and expired ${expiredCount || 0} bookings`,
       timestamp: new Date().toISOString()
     }
 

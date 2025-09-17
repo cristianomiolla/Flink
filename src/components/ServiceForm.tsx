@@ -211,7 +211,7 @@ export function ServiceForm({
     setIsSubmitting(true)
     
     try {
-      let finalFormData = { ...formData }
+      const finalFormData = { ...formData }
       
       // Upload new image if selected
       if (selectedFile) {

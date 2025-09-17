@@ -137,7 +137,7 @@ Gestionale con stessi dati, accessibile da desktop header e mobile navbar (quint
 
 4. Logica di scadenza / aggiornamento
 
-Richiesta non accettata entro 15 giorni → “Richiesta senza risposta”
+Richiesta non accettata entro 15 giorni → “scaduta"
 
 Stato di avanzamento scompare
 
@@ -145,7 +145,7 @@ Cliente può inviare nuova richiesta
 
 Artista può fissare nuovo appuntamento
 
-Dopo 3 giorni da questo stato "completed	Tattoo completato	Tattoo completato	Sistema	Alla data dell’appuntamento dopo 6h dall'ora fissata" torna tutto come all'inizio e non si visualizzerà la stato di avanzamento ma: 
+Sistema	Dopo la data dell’appuntamento non si visualizzerà la stato di avanzamento ma: 
 Cliente → “Invia una richiesta”
 
 Artista → “Fissa appuntamento”

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './useAuth'
 
-type BookingStatus = 'pending' | 'expired' | 'rejected' | 'scheduled' | 'rescheduled' | 'cancelled' | 'completed'
+type BookingStatus = 'pending' | 'expired' | 'scheduled' | 'rescheduled' | 'cancelled' | 'completed'
 
 interface BookingData {
   id: string
@@ -11,6 +11,7 @@ interface BookingData {
   status: BookingStatus
   subject: string
   created_at: string
+  updated_at: string
   expires_at: string | null
   appointment_date: string | null
 }
@@ -23,7 +24,6 @@ interface UseBookingStatusReturn {
   hasActiveBooking: boolean
   showProgressTracker: boolean
   showPinnedAction: boolean
-  isPendingExpired: boolean
 }
 
 export function useBookingStatus(participantId: string | null): UseBookingStatusReturn {
@@ -77,47 +77,38 @@ export function useBookingStatus(participantId: string | null): UseBookingStatus
     await fetchBookingStatus()
   }, [fetchBookingStatus])
 
-  // Appointment completion is now handled server-side by Edge Function
-
-  // Determina se una richiesta pending è scaduta (15 giorni) SE non c'è appointment_date
-  const EXPIRY_TIME = 15 * 24 * 60 * 60 * 1000 // 15 giorni in millisecondi
-  const isPendingExpired = Boolean(
-    bookingData &&
-    bookingData.status === 'pending' &&
-    (Date.now() - new Date(bookingData.created_at).getTime()) > EXPIRY_TIME &&
-    !bookingData.appointment_date
-  )
+  // Appointment completion and expiration are now handled server-side by Edge Functions
 
   // Determina se c'è una prenotazione attiva
-  // Una richiesta pending scaduta non è considerata attiva
   const hasActiveBooking = Boolean(
-    bookingData && 
-    !['expired', 'rejected', 'cancelled'].includes(bookingData.status) &&
-    !isPendingExpired
+    bookingData &&
+    !['expired', 'cancelled'].includes(bookingData.status)
   )
 
   // Determina se mostrare il progress tracker
   // Nascondi il tracker se:
   // 1. La richiesta è expired
-  // 2. La richiesta pending è scaduta (15 giorni)
-  // 3. È completata da più di 3 giorni
+  // 2. È completata da più di 1 giorno dalla data dell'appuntamento
+  // 3. È cancellata da più di 1 giorno (basandosi su updated_at)
   const showProgressTracker = Boolean(
     bookingData &&
-    !['expired', 'completed'].includes(bookingData.status) &&
-    !isPendingExpired &&
-    !(bookingData.status === 'completed' &&
-      new Date(bookingData.created_at).getTime() < Date.now() - (3 * 24 * 60 * 60 * 1000))
+    !['expired'].includes(bookingData.status) &&
+    !(bookingData.status === 'completed' && bookingData.appointment_date &&
+      new Date(bookingData.appointment_date).getTime() < Date.now() - (1 * 24 * 60 * 60 * 1000)) &&
+    !(bookingData.status === 'cancelled' &&
+      new Date(bookingData.updated_at).getTime() < Date.now() - (1 * 24 * 60 * 60 * 1000))
   )
 
   // Determina se mostrare il pinned action button
+  // NON mostrare se:
+  // - C'è un progress tracker visibile per un appuntamento cancellato o completato
   // Mostra se:
   // 1. Non c'è booking attivo, O
-  // 2. Non c'è progress tracker da mostrare (incluso pending scaduto), O
-  // 3. È un artista con booking pending (deve sempre vedere "Fissa appuntamento"), O
-  // 4. L'appuntamento è completato (status = 'completed')
-  const showPinnedAction = !hasActiveBooking || !showProgressTracker ||
-    (profile?.profile_type === 'artist' && bookingData?.status === 'pending') ||
-    bookingData?.status === 'completed'
+  // 2. Non c'è progress tracker da mostrare, O
+  // 3. È un artista con booking pending (deve sempre vedere "Fissa appuntamento")
+  const showPinnedAction = !(showProgressTracker && (bookingData?.status === 'cancelled' || bookingData?.status === 'completed')) &&
+    (!hasActiveBooking || !showProgressTracker ||
+    (profile?.profile_type === 'artist' && bookingData?.status === 'pending'))
 
   return {
     bookingData,
@@ -126,7 +117,6 @@ export function useBookingStatus(participantId: string | null): UseBookingStatus
     refreshBookingStatus,
     hasActiveBooking,
     showProgressTracker,
-    showPinnedAction,
-    isPendingExpired
+    showPinnedAction
   }
 }

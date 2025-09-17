@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppointments } from '../hooks/useAppointments'
 import { useAuth } from '../hooks/useAuth'
@@ -8,14 +9,40 @@ import './AppointmentsPage.css'
 import './Header.css'
 import './PageHeader.css'
 
+type FilterType = 'programmati' | 'completati' | 'cancellati'
+
 export function AppointmentsPage() {
   const navigate = useNavigate()
   const { profile } = useAuth()
-  const { appointments, loading, error } = useAppointments()
+  const { appointments, loading, error, refreshAppointments } = useAppointments()
+  const [selectedFilter, setSelectedFilter] = useState<FilterType>('programmati')
 
   const handleLogoClick = () => {
     navigate('/')
   }
+
+  // Filter appointments based on selected chip
+  const filteredAppointments = appointments.filter(appointment => {
+    switch (selectedFilter) {
+      case 'programmati':
+        return appointment.status === 'scheduled' || appointment.status === 'rescheduled'
+      case 'completati':
+        return appointment.status === 'completed'
+      case 'cancellati':
+        return appointment.status === 'cancelled'
+      default:
+        return true
+    }
+  })
+
+  const getFilterCounts = () => {
+    const programmati = appointments.filter(a => a.status === 'scheduled' || a.status === 'rescheduled').length
+    const completati = appointments.filter(a => a.status === 'completed').length
+    const cancellati = appointments.filter(a => a.status === 'cancelled').length
+    return { programmati, completati, cancellati }
+  }
+
+  const filterCounts = getFilterCounts()
 
 
   if (loading) {
@@ -84,15 +111,48 @@ export function AppointmentsPage() {
             <div className="page-header">
               <div className="header-card">
                 <h2>I MIEI APPUNTAMENTI</h2>
-                <p>{profile?.profile_type === 'artist' 
-                    ? 'Gestisci le richieste dei tuoi clienti' 
+                <p>{profile?.profile_type === 'artist'
+                    ? 'Gestisci le richieste dei tuoi clienti'
                     : 'Tieni traccia delle tue prenotazioni'}</p>
+              </div>
+
+              {/* Filter Chips */}
+              <div className="filter-chips">
+                <button
+                  className={`filter-chip ${selectedFilter === 'programmati' ? 'active' : ''}`}
+                  onClick={() => setSelectedFilter('programmati')}
+                >
+                  Programmati ({filterCounts.programmati})
+                </button>
+                <button
+                  className={`filter-chip ${selectedFilter === 'completati' ? 'active' : ''}`}
+                  onClick={() => setSelectedFilter('completati')}
+                >
+                  Completati ({filterCounts.completati})
+                </button>
+                <button
+                  className={`filter-chip ${selectedFilter === 'cancellati' ? 'active' : ''}`}
+                  onClick={() => setSelectedFilter('cancellati')}
+                >
+                  Cancellati ({filterCounts.cancellati})
+                </button>
               </div>
             </div>
 
             <div className="appointments-content">
               <div className="appointments-list">
-                {appointments.map((appointment) => (
+                {filteredAppointments.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-content">
+                      <div className="empty-icon">📅</div>
+                      <h3 className="empty-title">Nessun appuntamento {selectedFilter}</h3>
+                      <p className="empty-description">
+                        Non hai appuntamenti {selectedFilter === 'programmati' ? 'programmati' : selectedFilter} al momento.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  filteredAppointments.map((appointment) => (
                   <BookingRequestCard
                     key={appointment.id}
                     bookingId={appointment.id}
@@ -104,8 +164,10 @@ export function AppointmentsPage() {
                         ? appointment.client_profile?.full_name || appointment.client_profile?.username || 'Cliente'
                         : appointment.artist_profile?.full_name || appointment.artist_profile?.username || 'Artista'
                     }
+                    onBookingUpdated={refreshAppointments}
                   />
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </div>

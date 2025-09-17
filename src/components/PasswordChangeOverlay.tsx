@@ -53,7 +53,7 @@ export function PasswordChangeOverlay({ isOpen, onClose }: PasswordChangeOverlay
         setConfirmPassword('')
         setSuccess('')
       }, 2000)
-    } catch (error) {
+    } catch {
       setError('Errore durante il cambio password. Riprova.')
     } finally {
       setIsSubmitting(false)

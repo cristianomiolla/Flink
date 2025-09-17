@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './BookingProgressTracker.css'
 import { AppointmentDetailsOverlay } from './AppointmentDetailsOverlay'
 
-type BookingStatus = 'pending' | 'expired' | 'rejected' | 'scheduled' | 'rescheduled' | 'cancelled' | 'completed'
+type BookingStatus = 'pending' | 'expired' | 'scheduled' | 'rescheduled' | 'cancelled' | 'completed'
 
 interface BookingProgressTrackerProps {
   status: BookingStatus
@@ -13,6 +13,7 @@ interface BookingProgressTrackerProps {
   artistId?: string
   currentUserId?: string
   bookingId?: string
+  onBookingUpdated?: () => void
 }
 
 const getStatusDisplay = (status: BookingStatus, userType: 'client' | 'artist') => {
@@ -24,10 +25,6 @@ const getStatusDisplay = (status: BookingStatus, userType: 'client' | 'artist') 
     expired: {
       client: { text: 'RICHIESTA SCADUTA', icon: '⏰', color: 'muted' },
       artist: { text: 'RICHIESTA SCADUTA', icon: '⏰', color: 'muted' }
-    },
-    rejected: {
-      client: { text: 'RICHIESTA RIFIUTATA', icon: '❌', color: 'error' },
-      artist: { text: 'RICHIESTA RIFIUTATA', icon: '❌', color: 'error' }
     },
     scheduled: {
       client: { text: 'APPUNTAMENTO PROGRAMMATO', icon: '✅', color: 'success' },
@@ -57,7 +54,8 @@ export function BookingProgressTracker({
   clientName,
   artistId,
   currentUserId,
-  bookingId
+  bookingId,
+  onBookingUpdated
 }: BookingProgressTrackerProps) {
   const [showDetailsOverlay, setShowDetailsOverlay] = useState(false)
   const statusDisplay = getStatusDisplay(status, userType)
@@ -69,8 +67,8 @@ export function BookingProgressTracker({
   }
 
   const handleClick = () => {
-    // Open overlay for scheduled appointments and pending requests
-    if (status === 'scheduled' || status === 'pending') {
+    // Open overlay for scheduled, rescheduled, pending, cancelled, and completed appointments
+    if (status === 'scheduled' || status === 'rescheduled' || status === 'pending' || status === 'cancelled' || status === 'completed') {
       setShowDetailsOverlay(true)
     }
   }
@@ -79,7 +77,7 @@ export function BookingProgressTracker({
     <>
       <div className={`booking-progress-tracker ${statusDisplay.color}`}>
         <div
-          className={`progress-content ${(status === 'scheduled' || status === 'pending') ? 'clickable' : ''}`}
+          className={`progress-content ${(status === 'scheduled' || status === 'rescheduled' || status === 'pending' || status === 'cancelled' || status === 'completed') ? 'clickable' : ''}`}
           onClick={handleClick}
         >
           <span className="progress-icon">{statusDisplay.icon}</span>
@@ -96,6 +94,7 @@ export function BookingProgressTracker({
         artistId={artistId}
         currentUserId={currentUserId}
         bookingId={bookingId}
+        onBookingUpdated={onBookingUpdated}
       />
     </>
   )

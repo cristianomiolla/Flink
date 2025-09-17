@@ -220,7 +220,7 @@ CREATE TABLE bookings (
     appointment_duration INTEGER,
     deposit_amount DECIMAL(8,2),
     artist_notes TEXT,
-    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'expired', 'rejected', 'scheduled', 'rescheduled', 'cancelled', 'completed')),
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'expired', 'scheduled', 'rescheduled', 'cancelled', 'completed')),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -243,7 +243,7 @@ CREATE TABLE bookings (
 - Follow relationships enable dynamic artist following functionality
 - Messages are ordered by `created_at` and support soft deletion via `deleted_at`
 - Services support flexible pricing (fixed, range, consultation) and body area categorization
-- Bookings support full appointment lifecycle: pending → expired/rejected/scheduled → completed/cancelled
+- Bookings support full appointment lifecycle: pending → expired/scheduled → completed/cancelled
 - Bookings automatically expire after 15 days if not responded to by artist
 
 ### Supabase Client Usage
@@ -361,7 +361,7 @@ The app follows a modular React architecture with authentication and state manag
 - `ArtistAppointmentForm.tsx` - Form for artists to create appointments
 - `useAppointments.ts` - Hook for managing appointment data (filters out pending status)
 - `useBookingStatus.ts` - Hook for tracking and updating booking status
-  - Booking lifecycle: `pending` → `expired`/`rejected`/`scheduled` → `completed`/`cancelled`
+  - Booking lifecycle: `pending` → `expired`/`scheduled` → `completed`/`cancelled`
   - Automatic expiration after 15 days for pending requests
   - Status-based filtering for different user views
 

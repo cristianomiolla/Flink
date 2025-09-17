@@ -6,7 +6,6 @@ export function useFollowedArtists() {
   const { user } = useAuth()
   const [followedArtistIds, setFollowedArtistIds] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (user) {
@@ -22,7 +21,6 @@ export function useFollowedArtists() {
 
     try {
       setLoading(true)
-      setError(null)
 
       const { data, error: followersError } = await supabase
         .from('followers')
@@ -37,7 +35,6 @@ export function useFollowedArtists() {
       setFollowedArtistIds(artistIds)
     } catch (err) {
       console.error('Error fetching followed artists:', err)
-      setError('Errore nel caricamento degli artisti seguiti')
       setFollowedArtistIds([])
     } finally {
       setLoading(false)
@@ -46,8 +43,6 @@ export function useFollowedArtists() {
 
   return {
     followedArtistIds,
-    loading,
-    error,
-    refetch: fetchFollowedArtists
+    loading
   }
 }

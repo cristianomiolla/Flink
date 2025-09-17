@@ -4,7 +4,6 @@ import './MessagesPage.css'
 import './Dropdown.css'
 import './AuthOverlay.css'
 import './ImageUpload.css'
-import './ChatConversation.css'
 import { SearchBar } from './SearchBar'
 import { ChatList } from './ChatList'
 import { ChatConversation } from './ChatConversation'
@@ -19,6 +18,8 @@ import { BookingRequestCard } from './BookingRequestCard'
 import { BookingProgressTracker } from './BookingProgressTracker'
 import { useBookingStatus } from '../hooks/useBookingStatus'
 import { ArtistAppointmentForm } from './ArtistAppointmentForm'
+import { createScrollToBottom } from '../utils/scrollUtils'
+import { useIsMobile } from '../hooks/useIsMobile'
 
 // Lazy load AuthOverlay component
 const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
@@ -59,23 +60,6 @@ function PinnedActionButton({ participantId, participantName, onOpenBookingReque
   )
 }
 
-// Hook to detect if we're on mobile
-const useIsMobile = () => {
-  const [isMobile, setIsMobile] = useState(false)
-
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth <= 768)
-    }
-    
-    checkIsMobile()
-    window.addEventListener('resize', checkIsMobile)
-    
-    return () => window.removeEventListener('resize', checkIsMobile)
-  }, [])
-
-  return isMobile
-}
 
 // Helper function to parse booking request message
 const parseBookingRequestMessage = (content: string) => {
@@ -120,6 +104,20 @@ export function MessagesPage() {
   const [refreshBookingStatusFn, setRefreshBookingStatusFn] = useState<(() => Promise<void>) | null>(null)
   const [mobileRefreshBookingStatusFn, setMobileRefreshBookingStatusFn] = useState<(() => Promise<void>) | null>(null)
   const [refreshMessagesFn, setRefreshMessagesFn] = useState<(() => Promise<void>) | null>(null)
+  const [bookingRefreshTrigger, setBookingRefreshTrigger] = useState(0)
+
+  // Function to trigger booking card refresh
+  const handleBookingUpdated = async () => {
+    setBookingRefreshTrigger(prev => prev + 1)
+
+    // Also refresh booking status for progress tracker
+    if (refreshBookingStatusFn) {
+      await refreshBookingStatusFn()
+    }
+    if (mobileRefreshBookingStatusFn) {
+      await mobileRefreshBookingStatusFn()
+    }
+  }
   
   // Hook for mobile booking status - must be before any early returns
   // Use artistId directly for mobile since it's available from useParams
@@ -478,51 +476,8 @@ export function MessagesPage() {
   const { conversations, loading, error, deleteConversation, markConversationAsRead, sendMessage, fetchConversationMessages } = useMessages()
   const mobileMessagesListRef = useRef<HTMLDivElement>(null)
   
-  // Scroll to bottom of mobile messages list with booking card support
-  const scrollToBottom = useCallback(() => {
-    if (mobileMessagesListRef.current) {
-      const element = mobileMessagesListRef.current
-      const hasBookingCard = element.querySelector('.booking-request-card:last-of-type') !== null
-
-      if (hasBookingCard) {
-        // Booking cards need aggressive scrolling
-        element.scrollTop = element.scrollHeight + 200
-
-        // Use bottom anchor for initial positioning
-        const bottomAnchor = element.querySelector('#messages-bottom')
-        if (bottomAnchor) {
-          bottomAnchor.scrollIntoView({ behavior: 'auto', block: 'center' })
-        }
-
-        setTimeout(() => {
-          element.scrollTop = element.scrollHeight
-        }, 100)
-
-        setTimeout(() => {
-          const currentScroll = element.scrollTop
-          const maxScroll = element.scrollHeight - element.clientHeight
-
-          if (Math.abs(currentScroll - maxScroll) > 5) {
-            element.scrollTop = element.scrollHeight + 100
-
-            // Try scrolling to the last booking card directly
-            const lastBookingCard = element.querySelector('.booking-request-card:last-of-type')
-            if (lastBookingCard) {
-              lastBookingCard.scrollIntoView({ behavior: 'auto', block: 'end' })
-            }
-          }
-        }, 300)
-      } else {
-        // Regular messages
-        const bottomAnchor = element.querySelector('#messages-bottom')
-        if (bottomAnchor) {
-          bottomAnchor.scrollIntoView({ behavior: 'auto', block: 'start', inline: 'nearest' })
-        } else {
-          element.scrollTop = element.scrollHeight
-        }
-      }
-    }
-  }, [])
+  // Unified scroll function for mobile using utility
+  const scrollToBottom = useCallback(createScrollToBottom(mobileMessagesListRef), [])
   
   // Convert Supabase conversations to Chat format for existing components
   const chats: Chat[] = conversations.map(conv => ({
@@ -623,9 +578,7 @@ export function MessagesPage() {
         setConversationMessages(formattedMessages)
 
         // Always scroll to bottom after loading messages
-        requestAnimationFrame(() => {
-          setTimeout(() => scrollToBottom(), 150)
-        })
+        scrollToBottom({ delay: 150 })
       } catch (error) {
         console.error('Error loading conversation messages:', error)
         setConversationMessages([])
@@ -665,9 +618,7 @@ export function MessagesPage() {
 
           const newMessages = [...prev, formattedMessage]
           // Schedule scroll to bottom after state update
-          requestAnimationFrame(() => {
-            setTimeout(() => scrollToBottom(), 100)
-          })
+          scrollToBottom({ delay: 100 })
           return newMessages
         })
       })
@@ -718,9 +669,7 @@ export function MessagesPage() {
   // Scroll to bottom whenever a mobile chat is opened/reopened
   useEffect(() => {
     if (isMobile && artistId && selectedChat) {
-      requestAnimationFrame(() => {
-        setTimeout(() => scrollToBottom(), 200)
-      })
+      scrollToBottom({ delay: 200 })
     }
   }, [isMobile, artistId, selectedChat?.id, scrollToBottom])
 
@@ -814,9 +763,7 @@ export function MessagesPage() {
           setConversationMessages(prev => {
             const newMessages = [...prev, optimisticMessage]
             // Ensure scroll to bottom after sending message
-            requestAnimationFrame(() => {
-              setTimeout(() => scrollToBottom(), 50)
-            })
+            scrollToBottom({ delay: 50 })
             return newMessages
           })
         }
@@ -974,6 +921,7 @@ export function MessagesPage() {
                 })() : user?.id}
                 currentUserId={user?.id}
                 bookingId={mobileBookingData.id}
+                onBookingUpdated={handleBookingUpdated}
               />
             )}
             
@@ -1003,6 +951,7 @@ export function MessagesPage() {
                             isFromCurrentUser={message.isFromCurrentUser}
                             timestamp={message.timestamp}
                             cardType={cardType}
+                            refreshTrigger={bookingRefreshTrigger}
                           />
                         )
                       } else {
@@ -1537,7 +1486,7 @@ export function MessagesPage() {
         {/* Chat Conversation Area */}
         <div className="chat-conversation-section">
           {selectedChat ? (
-            <ChatConversation 
+            <ChatConversation
               chat={selectedChat}
               onRequestDeleteChat={handleRequestDeleteChat}
               sendMessage={sendMessage}
@@ -1558,6 +1507,8 @@ export function MessagesPage() {
               onOpenArtistAppointment={handleOpenArtistAppointment}
               onBookingStatusRefresh={handleBookingStatusRefresh}
               onMessagesRefresh={handleMessagesRefresh}
+              refreshTrigger={bookingRefreshTrigger}
+              onBookingUpdated={handleBookingUpdated}
             />
           ) : (
             <div className="chat-conversation empty">

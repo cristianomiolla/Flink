@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
+import { AppointmentDetailsOverlay } from './AppointmentDetailsOverlay'
 import './BookingRequestCard.css'
 
 interface BookingRequestData {
@@ -28,64 +29,67 @@ interface BookingRequestCardProps {
   mode?: 'message' | 'appointment' // New prop to control rendering mode
   participantName?: string // For appointment mode
   cardType?: 'request' | 'appointment' // New prop to force card display type
+  refreshTrigger?: number // New prop to trigger refresh
+  onBookingUpdated?: () => void // Callback for when booking is updated
 }
 
-export function BookingRequestCard({ bookingId, isFromCurrentUser, timestamp, mode = 'message', participantName, cardType }: BookingRequestCardProps) {
-  const { user } = useAuth()
+export function BookingRequestCard({ bookingId, isFromCurrentUser, timestamp, mode = 'message', participantName, cardType, refreshTrigger, onBookingUpdated }: BookingRequestCardProps) {
+  const { user, profile } = useAuth()
   const [currentStatus, setCurrentStatus] = useState<string>('pending')
   const [loading, setLoading] = useState(true)
   const [fullBookingData, setFullBookingData] = useState<BookingRequestData | null>(null)
+  const [showDetailsOverlay, setShowDetailsOverlay] = useState(false)
 
   // Fetch complete booking data from database
-  useEffect(() => {
-    const fetchBookingData = async () => {
-      // Skip fetching if user is not authenticated or no bookingId
-      if (!user || !bookingId) {
-        setLoading(false)
-        return
-      }
+  const fetchBookingData = async () => {
+    // Skip fetching if user is not authenticated or no bookingId
+    if (!user || !bookingId) {
+      setLoading(false)
+      return
+    }
 
-      try {
-        const { data, error } = await supabase
-          .from('bookings')
-          .select('*')
-          .eq('id', bookingId)
-          .maybeSingle()
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('id', bookingId)
+        .maybeSingle()
 
-        if (error) {
-          console.warn('Error fetching booking data:', error)
-          setCurrentStatus('pending')
-          setFullBookingData(null)
-        } else if (data) {
-          setCurrentStatus(data.status || 'pending')
-          setFullBookingData({
-            subject: data.subject,
-            tattoo_style: data.tattoo_style,
-            body_area: data.body_area,
-            size_category: data.size_category,
-            color_preferences: data.color_preferences,
-            meaning: data.meaning,
-            budget_min: data.budget_min,
-            budget_max: data.budget_max,
-            reference_images: data.reference_images,
-            created_at: data.created_at,
-            appointment_date: data.appointment_date,
-            appointment_duration: data.appointment_duration,
-            deposit_amount: data.deposit_amount,
-            artist_notes: data.artist_notes
-          })
-        }
-      } catch (error) {
+      if (error) {
         console.warn('Error fetching booking data:', error)
         setCurrentStatus('pending')
         setFullBookingData(null)
-      } finally {
-        setLoading(false)
+      } else if (data) {
+        setCurrentStatus(data.status || 'pending')
+        setFullBookingData({
+          subject: data.subject,
+          tattoo_style: data.tattoo_style,
+          body_area: data.body_area,
+          size_category: data.size_category,
+          color_preferences: data.color_preferences,
+          meaning: data.meaning,
+          budget_min: data.budget_min,
+          budget_max: data.budget_max,
+          reference_images: data.reference_images,
+          created_at: data.created_at,
+          appointment_date: data.appointment_date,
+          appointment_duration: data.appointment_duration,
+          deposit_amount: data.deposit_amount,
+          artist_notes: data.artist_notes
+        })
       }
+    } catch (error) {
+      console.warn('Error fetching booking data:', error)
+      setCurrentStatus('pending')
+      setFullBookingData(null)
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchBookingData()
-  }, [bookingId, user])
+  }, [bookingId, user, refreshTrigger]) // fetchBookingData è definita inline e non cambia
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp)
@@ -141,12 +145,38 @@ export function BookingRequestCard({ bookingId, isFromCurrentUser, timestamp, mo
   const isArtistAppointment = cardType === 'appointment' ||
     (cardType !== 'request' && !!(fullBookingData?.appointment_date || fullBookingData?.deposit_amount))
 
+  // Handle card click to open modal overlay (only in appointment mode)
+  const handleCardClick = () => {
+    if (mode === 'appointment') {
+      setShowDetailsOverlay(true)
+    }
+  }
+
   const getStatusBadge = () => {
     // Mostra loading mentre carica lo status
     if (loading) {
       return <span className="status-badge pending">Caricamento...</span>
     }
 
+    // Per le "Richieste Tatuaggio" (non appuntamenti), usa logica speciale
+    if (!isArtistAppointment) {
+      switch (currentStatus) {
+        case 'pending':
+          return <span className="status-badge pending">In attesa</span>
+        case 'scheduled':
+        case 'rescheduled':
+        case 'completed':
+          return <span className="status-badge accepted">Accettata</span>
+        case 'expired':
+          return <span className="status-badge expired">Scaduta</span>
+        case 'cancelled':
+          return null // Non mostrare badge per richieste cancellate
+        default:
+          return null // Non mostrare badge per altri stati nelle richieste
+      }
+    }
+
+    // Per gli "Appuntamenti", usa la logica completa
     switch (currentStatus) {
       case 'pending':
         return <span className="status-badge pending">In attesa</span>
@@ -158,6 +188,8 @@ export function BookingRequestCard({ bookingId, isFromCurrentUser, timestamp, mo
         return <span className="status-badge declined">Rifiutata</span>
       case 'scheduled':
         return <span className="status-badge accepted">Programmato</span>
+      case 'rescheduled':
+        return <span className="status-badge accepted">Riprogrammato</span>
       case 'completed':
         return <span className="status-badge accepted">Completato</span>
       case 'cancelled':
@@ -168,7 +200,10 @@ export function BookingRequestCard({ bookingId, isFromCurrentUser, timestamp, mo
   }
 
   const cardContent = (
-    <div className="booking-request-card">
+    <div
+      className={`booking-request-card ${mode === 'appointment' ? 'clickable' : ''}`}
+      onClick={handleCardClick}
+    >
       <div className="booking-header">
         <div className="booking-title-container">
           <div className="booking-title">
@@ -187,7 +222,7 @@ export function BookingRequestCard({ bookingId, isFromCurrentUser, timestamp, mo
       <div className="booking-content">
         {mode === 'appointment' && participantName && (
           <div className="booking-field">
-            <span className="field-label">{isArtistAppointment ? 'Cliente' : 'Artista'}:</span>
+            <span className="field-label">{profile?.profile_type === 'artist' ? 'Cliente' : 'Artista'}:</span>
             <span className="field-value">{participantName}</span>
           </div>
         )}
@@ -308,7 +343,25 @@ export function BookingRequestCard({ bookingId, isFromCurrentUser, timestamp, mo
 
   // Return with or without message wrapper based on mode
   if (mode === 'appointment') {
-    return cardContent
+    return (
+      <>
+        {cardContent}
+        <AppointmentDetailsOverlay
+          isOpen={showDetailsOverlay}
+          onClose={() => setShowDetailsOverlay(false)}
+          userType={profile?.profile_type === 'artist' ? 'artist' : 'client'}
+          artistName={profile?.profile_type === 'client' ? participantName : undefined}
+          clientName={profile?.profile_type === 'artist' ? participantName : undefined}
+          bookingId={bookingId}
+          onBookingUpdated={() => {
+            fetchBookingData()
+            if (onBookingUpdated) {
+              onBookingUpdated()
+            }
+          }}
+        />
+      </>
+    )
   }
 
   return (

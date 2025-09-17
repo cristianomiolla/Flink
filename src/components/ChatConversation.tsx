@@ -8,6 +8,7 @@ import { BookingRequestCard } from './BookingRequestCard'
 import { BookingProgressTracker } from './BookingProgressTracker'
 import { useBookingStatus } from '../hooks/useBookingStatus'
 import { supabase } from '../lib/supabase'
+import { createScrollToBottom } from '../utils/scrollUtils'
 
 // Helper function to parse booking request message
 const parseBookingRequestMessage = (content: string) => {
@@ -92,9 +93,11 @@ interface ChatConversationProps {
   onBookingRequestSent?: () => void
   onBookingStatusRefresh?: (refreshFn: () => Promise<void>) => void
   onMessagesRefresh?: (refreshFn: () => Promise<void>) => void
+  refreshTrigger?: number
+  onBookingUpdated?: () => void
 }
 
-export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages, hideHeaderAndInput = false, onOpenBookingRequest, onOpenArtistAppointment, onBookingStatusRefresh, onMessagesRefresh }: ChatConversationProps) {
+export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propSendMessage, fetchConversationMessages: propFetchConversationMessages, hideHeaderAndInput = false, onOpenBookingRequest, onOpenArtistAppointment, onBookingStatusRefresh, onMessagesRefresh, refreshTrigger, onBookingUpdated }: ChatConversationProps) {
   const { user, profile } = useAuth()
   const [newMessage, setNewMessage] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
@@ -110,57 +113,8 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
     return userId1 === user.id ? userId2 : userId1
   }, [user])
 
-  // Enhanced scroll to bottom of messages list with retry mechanism and mobile support
-  const scrollToBottom = useCallback((retries = 2) => {
-    if (!messagesListRef.current) return
-
-    const container = messagesListRef.current
-    const isMobile = container.closest('.messages-page.mobile.conversation') !== null
-    const lastChild = container.lastElementChild
-    const hasBookingCard = lastChild?.querySelector('.booking-request-card') !== null
-
-    if (isMobile && hasBookingCard) {
-      // Mobile with booking card: simplified approach
-      container.scrollTop = container.scrollHeight
-
-      if (lastChild) {
-        lastChild.scrollIntoView({ behavior: 'auto', block: 'end', inline: 'nearest' })
-      }
-
-      // Single retry after a short delay
-      if (retries > 0) {
-        setTimeout(() => {
-          const currentScroll = container.scrollTop
-          const maxScroll = container.scrollHeight - container.clientHeight
-
-          if (Math.abs(currentScroll - maxScroll) > 10) {
-            container.scrollTop = container.scrollHeight
-            if (lastChild) {
-              lastChild.scrollIntoView({ behavior: 'auto', block: 'end' })
-            }
-          }
-        }, 200)
-      }
-    } else if (isMobile) {
-      // Mobile without booking card
-      if (lastChild) {
-        lastChild.scrollIntoView({ behavior: 'smooth', block: 'end' })
-      } else {
-        container.scrollTop = container.scrollHeight
-      }
-    } else {
-      // Desktop: original logic
-      const targetScroll = container.scrollHeight - container.clientHeight
-      if (Math.abs(container.scrollTop - targetScroll) < 5) return
-      container.scrollTop = container.scrollHeight
-
-      if (retries > 0) {
-        requestAnimationFrame(() => {
-          setTimeout(() => scrollToBottom(retries - 1), 100)
-        })
-      }
-    }
-  }, [])
+  // Unified scroll function using utility
+  const scrollToBottom = useCallback(createScrollToBottom(messagesListRef), [])
 
   // Get participant ID for booking status
   const participantId = chat ? getParticipantId(chat.id) : null
@@ -178,16 +132,12 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
     if (!messagesListRef.current) return
 
     resizeObserverRef.current = new ResizeObserver(() => {
-      // When content height changes, check if we need to scroll to bottom
+      // When content height changes, scroll to bottom with appropriate delay
       const isMobile = messagesListRef.current?.closest('.messages-page.mobile.conversation') !== null
       const hasBookingCard = messagesListRef.current?.lastElementChild?.querySelector('.booking-request-card') !== null
+      const delay = isMobile && hasBookingCard ? 200 : 100
 
-      // Use longer delay for booking cards on mobile
-      const delay = isMobile && hasBookingCard ? 500 : isMobile ? 200 : 100
-
-      requestAnimationFrame(() => {
-        setTimeout(() => scrollToBottom(1), delay) // Only one retry for resize events
-      })
+      scrollToBottom({ retries: 1, delay })
     })
 
     resizeObserverRef.current.observe(messagesListRef.current)
@@ -220,10 +170,8 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
           }))
 
           setMessages(formattedMessages)
-          // Use requestAnimationFrame + timeout for better timing
-          requestAnimationFrame(() => {
-            setTimeout(() => scrollToBottom(), 150)
-          })
+          // Scroll to bottom after loading messages
+          scrollToBottom({ delay: 150 })
         } catch (error) {
           console.error('Error refreshing conversation messages:', error)
         }
@@ -319,9 +267,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
     }, isNewChat ? 50 : 0)
 
     // Scroll to bottom when conversation first loads
-    requestAnimationFrame(() => {
-      setTimeout(() => scrollToBottom(), 300)
-    })
+    scrollToBottom({ delay: 200 })
 
     // Setup real-time subscription for this specific conversation
     const participantId = getLocalParticipantId(chat.id)
@@ -356,10 +302,8 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
           }
 
           const newMessages = [...prev, formattedMessage]
-          // Schedule scroll to bottom after state update with better timing
-          requestAnimationFrame(() => {
-            setTimeout(() => scrollToBottom(), 150)
-          })
+          // Schedule scroll to bottom after state update
+          scrollToBottom({ delay: 100 })
           return newMessages
         })
       })
@@ -403,10 +347,8 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
 
         setMessages(prev => [...prev, newMessage])
 
-        // Ensure scroll to bottom after sending message with better timing
-        requestAnimationFrame(() => {
-          setTimeout(() => scrollToBottom(), 100)
-        })
+        // Ensure scroll to bottom after sending message
+        scrollToBottom({ delay: 50 })
       } else {
         // If send failed, restore the message to input
         setNewMessage(messageContent)
@@ -510,6 +452,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
               artistId={bookingData.artist_id}
               currentUserId={user?.id}
               bookingId={bookingData.id}
+              onBookingUpdated={onBookingUpdated}
             />
           )}
 
@@ -535,6 +478,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
                     isFromCurrentUser={message.isFromCurrentUser}
                     timestamp={message.timestamp}
                     cardType={cardType}
+                    refreshTrigger={refreshTrigger}
                   />
                 )
               } else {

@@ -32,6 +32,7 @@ interface AppointmentDetailsOverlayProps {
   artistId?: string
   currentUserId?: string
   bookingId?: string
+  onBookingUpdated?: () => void
 }
 
 export function AppointmentDetailsOverlay({
@@ -41,7 +42,8 @@ export function AppointmentDetailsOverlay({
   artistName,
   clientName,
   artistId,
-  bookingId
+  bookingId,
+  onBookingUpdated
 }: AppointmentDetailsOverlayProps) {
   const { user } = useAuth()
   const [bookingData, setBookingData] = useState<BookingData | null>(null)
@@ -122,7 +124,7 @@ export function AppointmentDetailsOverlay({
   // Check if current user is the artist who created the appointment
   // Use bookingData.artist_id if available, otherwise fall back to props
   const isAppointmentCreator = user && bookingData &&
-    (artistId && user.id === artistId)
+    (artistId ? user.id === artistId : user.id === bookingData.artist_id)
 
   // Check if form data has been modified
   const hasChanges = () => {
@@ -144,8 +146,11 @@ export function AppointmentDetailsOverlay({
     )
   }
 
-  // Check if appointment can be edited (before appointment date/time)
+  // Check if appointment can be edited (only artists can edit, not cancelled/completed, and before appointment date)
   const canEditAppointment = () => {
+    // Only artists can edit appointments, clients are always in read-only mode
+    if (userType !== 'artist') return false
+    if (bookingData?.status === 'cancelled' || bookingData?.status === 'completed') return false
     if (!bookingData?.appointment_date) return true
     const appointmentDate = new Date(bookingData.appointment_date)
     const now = new Date()
@@ -200,8 +205,6 @@ export function AppointmentDetailsOverlay({
         return { text: 'In attesa', icon: '⏳', className: 'pending' }
       case 'expired':
         return { text: 'Scaduta', icon: '⏰', className: 'expired' }
-      case 'rejected':
-        return { text: 'Rifiutata', icon: '❌', className: 'declined' }
       case 'scheduled':
         return { text: 'Programmato', icon: '✅', className: 'accepted' }
       case 'rescheduled':
@@ -222,14 +225,26 @@ export function AppointmentDetailsOverlay({
     setSaving(true)
 
     try {
-      const updateData: any = {
+      const updateData: Partial<BookingData> & { updated_at?: string } = {
         updated_at: new Date().toISOString()
       }
+
+      // Check if appointment date or time has changed
+      const appointmentDateTime = bookingData?.appointment_date ? new Date(bookingData.appointment_date) : null
+      const originalDate = appointmentDateTime ? appointmentDateTime.toISOString().slice(0, 10) : ''
+      const originalTime = appointmentDateTime ? appointmentDateTime.toTimeString().slice(0, 5) : ''
+
+      let dateTimeChanged = false
 
       // Only update fields that have values
       if (editFormData.appointment_date && editFormData.appointment_time) {
         const combinedDateTime = new Date(`${editFormData.appointment_date}T${editFormData.appointment_time}`)
         updateData.appointment_date = combinedDateTime.toISOString()
+
+        // Check if date or time has changed
+        if (editFormData.appointment_date !== originalDate || editFormData.appointment_time !== originalTime) {
+          dateTimeChanged = true
+        }
       }
       if (editFormData.appointment_duration) {
         updateData.appointment_duration = parseInt(editFormData.appointment_duration)
@@ -239,6 +254,11 @@ export function AppointmentDetailsOverlay({
       }
       if (editFormData.artist_notes !== undefined) {
         updateData.artist_notes = editFormData.artist_notes
+      }
+
+      // If date or time changed, update status to 'rescheduled'
+      if (dateTimeChanged && bookingData?.status === 'scheduled') {
+        updateData.status = 'rescheduled'
       }
 
       const { error } = await supabase
@@ -254,6 +274,11 @@ export function AppointmentDetailsOverlay({
 
       // Update local state
       setBookingData(prev => prev ? { ...prev, ...updateData } : null)
+
+      // Notify parent component of booking update
+      if (onBookingUpdated) {
+        onBookingUpdated()
+      }
 
       // Reset form data to match the updated booking data
       if (updateData.appointment_date) {
@@ -333,6 +358,11 @@ export function AppointmentDetailsOverlay({
       // Update local state
       setBookingData(prev => prev ? { ...prev, status: 'cancelled' } : null)
 
+      // Notify parent component of booking update
+      if (onBookingUpdated) {
+        onBookingUpdated()
+      }
+
       // Close overlays without showing alert
       setShowCancelConfirmation(false)
       onClose()
@@ -365,17 +395,19 @@ export function AppointmentDetailsOverlay({
           <div className="auth-content">
           <div className="header-card">
             <h2>DETTAGLI {bookingData?.status === 'scheduled' || bookingData?.status === 'rescheduled' || bookingData?.status === 'completed' ? 'APPUNTAMENTO' : 'RICHIESTA'}</h2>
-            <p>{bookingData?.status === 'scheduled' || bookingData?.status === 'rescheduled' || bookingData?.status === 'completed'
-              ? 'Il tuo appuntamento è stato confermato'
-              : bookingData?.status === 'pending'
-                ? 'La tua richiesta è in attesa di risposta'
-                : bookingData?.status === 'rejected'
-                  ? 'La tua richiesta è stata rifiutata'
-                  : bookingData?.status === 'expired'
-                    ? 'La tua richiesta è scaduta'
-                    : bookingData?.status === 'cancelled'
-                      ? 'Appuntamento cancellato'
-                      : 'Dettagli della richiesta'}</p>
+            <p>{bookingData?.status === 'completed'
+              ? 'Tattoo completato con successo'
+              : bookingData?.status === 'scheduled'
+                ? 'Il tuo appuntamento è stato confermato'
+                : bookingData?.status === 'rescheduled'
+                  ? 'Il tuo appuntamento è stato modificato'
+                  : bookingData?.status === 'pending'
+                    ? 'La tua richiesta è in attesa di risposta'
+                    : bookingData?.status === 'expired'
+                        ? 'La tua richiesta è scaduta'
+                        : bookingData?.status === 'cancelled'
+                          ? 'Appuntamento cancellato'
+                          : 'Dettagli della richiesta'}</p>
           </div>
 
           <div className="appointment-details-content">
@@ -675,7 +707,7 @@ export function AppointmentDetailsOverlay({
             </div>
           )}
 
-          {isAppointmentCreator && (
+          {isAppointmentCreator && userType === 'artist' && bookingData?.status !== 'cancelled' && bookingData?.status !== 'completed' && (
             <div className="form-actions">
               {hasChanges() && (
                 <button
