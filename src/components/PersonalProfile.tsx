@@ -12,11 +12,11 @@ import { ServiceForm } from './ServiceForm'
 import { ActionButton, UploadIcon } from './ActionButton'
 import { ConfirmationModal } from './ConfirmationModal'
 import { supabase } from '../lib/supabase'
-import './PersonalProfile.css'
+import './ArtistProfile.css'
 import './ImageUpload.css'
 import './TabHeader.css'
 import './TabsNavigation.css'
-import './AuthOverlay.css'
+import './FormOverlay.css'
 import type { TabType, PortfolioItem, ArtistService, CreateServiceData } from '../types/portfolio'
 
 export function PersonalProfile() {
@@ -46,7 +46,8 @@ export function PersonalProfile() {
   const [formData, setFormData] = useState({
     bio: profile?.bio || '',
     location: profile?.location || '',
-    avatar_url: profile?.avatar_url || ''
+    avatar_url: profile?.avatar_url || '',
+    username: profile?.username || ''
   })
   const [uploadData, setUploadData] = useState({
     title: '',
@@ -97,7 +98,7 @@ export function PersonalProfile() {
         .order('created_at', { ascending: false })
 
       if (error) {
-        console.error('Error fetching portfolio items:', error)
+        // Error fetching portfolio items
         return
       }
 
@@ -113,14 +114,14 @@ export function PersonalProfile() {
         created_at: item.created_at,
         updated_at: item.updated_at,
         user_id: item.user_id,
-        artist_name: profile.full_name || profile.username || 'Tu',
-        full_name: profile.full_name || profile.username || 'Tu',
+        artist_name: profile.username || profile.full_name || 'Tu',
+        full_name: profile.username || profile.full_name || 'Tu',
         artist_avatar_url: profile.avatar_url
       }))
 
       setPortfolioItems(portfolioData)
     } catch (error) {
-      console.error('Error fetching portfolio items:', error)
+      // Error fetching portfolio items
     } finally {
       setPortfolioLoading(false)
     }
@@ -144,7 +145,7 @@ export function PersonalProfile() {
         })
 
       if (error) {
-        console.error('Storage upload error:', error)
+        // Storage upload error
         throw error
       }
 
@@ -155,7 +156,7 @@ export function PersonalProfile() {
 
       return urlData.publicUrl
     } catch (error) {
-      console.error('Error uploading image:', error)
+      // Error uploading image
       throw error
     }
   }
@@ -172,7 +173,7 @@ export function PersonalProfile() {
         try {
           imageUrl = await uploadImage(selectedFile)
         } catch (uploadError) {
-          console.error('Error uploading image:', uploadError)
+          // Error uploading image
           alert('Errore durante il caricamento dell\'immagine. Riprova.')
           setIsSubmitting(false)
           return
@@ -211,7 +212,7 @@ export function PersonalProfile() {
       }
 
       if (error) {
-        console.error('Error uploading portfolio item:', error)
+        // Error uploading portfolio item
         alert('Errore durante il caricamento del lavoro')
         return
       }
@@ -222,7 +223,7 @@ export function PersonalProfile() {
       await fetchPortfolioItems()
       setShowUploadOverlay(false)
     } catch (error) {
-      console.error('Error uploading portfolio item:', error)
+      // Error uploading portfolio item
       alert('Errore durante il caricamento del lavoro')
     } finally {
       setIsSubmitting(false)
@@ -251,7 +252,7 @@ export function PersonalProfile() {
             })
 
           if (uploadError) {
-            console.error('Error uploading avatar:', uploadError)
+            // Error uploading avatar
             
             // Handle specific storage errors
             if (uploadError.message?.includes('Bucket not found')) {
@@ -272,7 +273,7 @@ export function PersonalProfile() {
             
           avatarUrl = data.publicUrl
         } catch (error) {
-          console.error('Network error uploading avatar:', error)
+          // Network error uploading avatar
           alert('Errore di rete. Verifica la connessione internet e riprova.')
           return
         }
@@ -284,12 +285,13 @@ export function PersonalProfile() {
           bio: formData.bio.trim(),
           location: formData.location.trim(),
           avatar_url: avatarUrl,
+          username: formData.username.trim() || null,
           updated_at: new Date().toISOString()
         })
         .eq('user_id', profile.user_id)
 
       if (error) {
-        console.error('Error updating profile:', error)
+        // Error updating profile
         alert('Errore durante l\'aggiornamento del profilo')
         return
       }
@@ -304,7 +306,7 @@ export function PersonalProfile() {
       setAvatarPreview('')
       setShowEditOverlay(false)
     } catch (error) {
-      console.error('Error updating profile:', error)
+      // Error updating profile
       alert('Errore durante l\'aggiornamento del profilo')
     } finally {
       setIsSubmitting(false)
@@ -398,7 +400,8 @@ export function PersonalProfile() {
       setFormData({
         bio: profile.bio || '',
         location: profile.location || '',
-        avatar_url: profile.avatar_url || ''
+        avatar_url: profile.avatar_url || '',
+        username: profile.username || ''
       })
       // Load portfolio items when profile loads
       fetchPortfolioItems()
@@ -481,7 +484,7 @@ export function PersonalProfile() {
         .eq('id', itemToDelete)
 
       if (error) {
-        console.error('Error deleting portfolio item:', error)
+        // Error deleting portfolio item
         alert('Errore durante l\'eliminazione dell\'elemento')
         return
       }
@@ -496,7 +499,7 @@ export function PersonalProfile() {
       setShowConfirmationModal(false)
       setItemToDelete(null)
     } catch (error) {
-      console.error('Error deleting portfolio item:', error)
+      // Error deleting portfolio item
       alert('Errore durante l\'eliminazione dell\'elemento')
     }
   }
@@ -584,7 +587,7 @@ export function PersonalProfile() {
                 <Avatar
                   src={profile.avatar_url}
                   name={profile.full_name}
-                  alt={`Avatar di ${profile.full_name || profile.username || 'Utente'}`}
+                  alt={`Avatar di ${profile.username || profile.full_name || 'Utente'}`}
                   size="lg"
                   variant="bordered"
                 />
@@ -592,7 +595,18 @@ export function PersonalProfile() {
                 {/* Informazioni */}
                 <div className="profile-details">
                   <h1 className="profile-name">
-                    {profile.full_name || profile.username || 'Nome non disponibile'}
+                    {profile.profile_type === 'client' ? (
+                      profile.full_name || 'Nome non disponibile'
+                    ) : profile.username ? (
+                      <>
+                        {profile.username}
+                        {profile.full_name && (
+                          <span className="profile-real-name"> ({profile.full_name})</span>
+                        )}
+                      </>
+                    ) : (
+                      profile.full_name || 'Nome non disponibile'
+                    )}
                   </h1>
                   
                   {profile.location && (
@@ -865,7 +879,7 @@ export function PersonalProfile() {
                 </p>
               </div>
 
-              <form className="complete-profile-form" onSubmit={(e) => e.preventDefault()}>
+              <form className="auth-form" onSubmit={(e) => e.preventDefault()}>
                 {/* Avatar Field */}
                 <div className="form-group">
                   <label htmlFor="avatar" className="form-label">
@@ -875,7 +889,7 @@ export function PersonalProfile() {
                     <div className="current-avatar">
                       <Avatar
                         src={avatarPreview || formData.avatar_url}
-                        name={profile?.full_name || profile?.username || user?.email}
+                        name={profile?.username || profile?.full_name || user?.email}
                         alt={avatarPreview ? "Anteprima avatar" : "Avatar attuale"}
                         size="md"
                         variant="default"
@@ -911,6 +925,25 @@ export function PersonalProfile() {
                   </div>
                   <div className="form-help">
                     Formati supportati: JPG, PNG, GIF, WebP. Dimensione massima: 2MB
+                  </div>
+                </div>
+
+                {/* Username Field */}
+                <div className="form-group">
+                  <label htmlFor="username" className="form-label">
+                    NOME D'ARTE
+                  </label>
+                  <input
+                    type="text"
+                    id="username"
+                    className="form-input"
+                    placeholder="Es. InkMaster, TattooArt..."
+                    value={formData.username}
+                    onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                    maxLength={50}
+                  />
+                  <div className="form-help">
+                    Il nome con cui vuoi essere conosciuto. Lascia vuoto per usare il nome completo
                   </div>
                 </div>
 
@@ -1010,7 +1043,7 @@ export function PersonalProfile() {
                 <p>{isEditMode ? 'Modifica i dettagli del tuo lavoro' : 'Carica un nuovo lavoro nel tuo portfolio'}</p>
               </div>
 
-              <form className="upload-portfolio-form" onSubmit={(e) => e.preventDefault()}>
+              <form className="auth-form" onSubmit={(e) => e.preventDefault()}>
                 {/* Title Field */}
                 <div className="form-group">
                   <label htmlFor="title" className="form-label">

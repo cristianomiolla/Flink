@@ -32,7 +32,7 @@ export function usePortfolioLikes(portfolioItemId: string) {
 
       if (error) {
         if (error.code === 'PGRST116' || error.message?.includes('406')) {
-          console.warn('Portfolio likes table not configured yet - likes feature disabled')
+          // Portfolio likes table not configured yet - likes feature disabled
           setTableExists(false)
           return
         }
@@ -41,7 +41,7 @@ export function usePortfolioLikes(portfolioItemId: string) {
       setTableExists(true)
       fetchLikeData()
     } catch (error) {
-      console.warn('Portfolio likes table not available:', error)
+      // Portfolio likes table not available
       setTableExists(false)
     }
   }
@@ -56,7 +56,7 @@ export function usePortfolioLikes(portfolioItemId: string) {
           .eq('portfolio_item_id', portfolioItemId)
 
         if (error && (error.code === 'PGRST116' || error.message?.includes('406') || error.code === '42501')) {
-          console.warn('Portfolio likes: RLS policies not configured correctly, using fallback')
+          // Portfolio likes: RLS policies not configured correctly, using fallback
           setLikeCount(0)
           setIsLiked(false)
           return
@@ -72,7 +72,7 @@ export function usePortfolioLikes(portfolioItemId: string) {
           .eq('portfolio_item_id', portfolioItemId)
 
         if (error && (error.code === 'PGRST116' || error.message?.includes('406') || error.code === '42501')) {
-          console.warn('Portfolio likes: RLS policies not configured correctly, using fallback')
+          // Portfolio likes: RLS policies not configured correctly, using fallback
           setLikeCount(0)
           setIsLiked(false)
           return
@@ -82,7 +82,6 @@ export function usePortfolioLikes(portfolioItemId: string) {
         setIsLiked(false)
       }
     } catch (error) {
-      console.error('Error fetching like data:', error)
       setLikeCount(0)
       setIsLiked(false)
     }
@@ -136,7 +135,6 @@ export function usePortfolioLikes(portfolioItemId: string) {
         setLikeCount(prev => prev + 1)
       }
     } catch (error) {
-      console.error('Error toggling like:', error)
       throw error
     } finally {
       setLoading(false)

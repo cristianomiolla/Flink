@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import type { CreateServiceData, ArtistService } from '../types/portfolio'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
-import './ServiceForm.css'
 import './ImageUpload.css'
 import './Dropdown.css'
+import './FormOverlay.css'
 
 const bodyAreaOptions = [
   { value: 'braccio', label: 'Braccio' },
@@ -97,7 +97,7 @@ export function ServiceForm({
 
       return data.publicUrl
     } catch (error) {
-      console.error('Error uploading image:', error)
+      // Error uploading image
       throw new Error('Errore durante il caricamento dell\'immagine')
     } finally {
       setImageUploading(false)
@@ -251,7 +251,7 @@ export function ServiceForm({
         }
       }
     } catch (error) {
-      console.error('Error submitting service:', error)
+      // Error submitting service
       alert('Errore durante il salvataggio del servizio')
     } finally {
       setIsSubmitting(false)
@@ -283,7 +283,7 @@ export function ServiceForm({
             <p>{isEditing ? 'Modifica i dettagli del tuo servizio' : 'Aggiungi un nuovo servizio alla tua offerta'}</p>
           </div>
 
-          <form className="upload-portfolio-form" onSubmit={handleSubmit}>
+          <form className="auth-form" onSubmit={handleSubmit}>
           {/* Service Name */}
           <div className="form-group">
             <label htmlFor="serviceName" className="form-label">

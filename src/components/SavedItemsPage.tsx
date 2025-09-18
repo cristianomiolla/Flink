@@ -64,7 +64,7 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
 
         if (savedError) {
           setError('Errore nel caricamento degli elementi salvati')
-          console.error('Error loading saved items:', savedError.message)
+          // Error loading saved items
           return
         }
 
@@ -86,7 +86,7 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
 
         if (portfolioError) {
           setError('Errore nel caricamento degli elementi salvati')
-          console.error('Error loading portfolio items:', portfolioError.message)
+          // Error loading portfolio items
           return
         }
 
@@ -101,8 +101,12 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
             
             return {
               ...portfolioItem,
-              artist_name: portfolioItem.profiles.full_name || portfolioItem.profiles.username || 'Unknown',
-              full_name: portfolioItem.profiles.full_name,
+              artist_name: portfolioItem.profiles.profile_type === 'client'
+                ? (portfolioItem.profiles.full_name || 'Unknown')
+                : (portfolioItem.profiles.username || portfolioItem.profiles.full_name || 'Unknown'),
+              full_name: portfolioItem.profiles.profile_type === 'client'
+                ? portfolioItem.profiles.full_name
+                : (portfolioItem.profiles.username || portfolioItem.profiles.full_name),
               username: portfolioItem.profiles.username,
               profile_type: portfolioItem.profiles.profile_type,
               bio: portfolioItem.profiles.bio,
@@ -115,7 +119,7 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
         setError(null)
       } catch (err) {
         setError('Errore nel caricamento degli elementi salvati')
-        console.error('Error loading saved items:', err)
+        // Error loading saved items
       } finally {
         setLoading(false)
       }

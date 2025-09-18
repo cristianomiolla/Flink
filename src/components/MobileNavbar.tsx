@@ -13,8 +13,12 @@ export function MobileNavbar({ onSearchClick }: MobileNavbarProps) {
   const { profile, user } = useAuth()
 
   const getDisplayName = (): string => {
-    if (profile?.full_name) return profile.full_name
-    if (profile?.username) return profile.username
+    if (profile?.profile_type === 'client') {
+      if (profile?.full_name) return profile.full_name
+    } else {
+      if (profile?.username) return profile.username
+      if (profile?.full_name) return profile.full_name
+    }
     if (user?.email) {
       const emailPart = user.email.split('@')[0]
       if (emailPart.includes('.')) {
@@ -60,18 +64,20 @@ export function MobileNavbar({ onSearchClick }: MobileNavbarProps) {
         <span className="mobile-nav-label">Cerca</span>
       </button>
 
-      <button 
-        className={`mobile-nav-item ${isActive('/saved') ? 'active' : ''}`}
-        onClick={() => handleNavigation('/saved')}
-        aria-label="Elementi salvati"
-      >
-        <svg className="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
-        </svg>
-        <span className="mobile-nav-label">Salvati</span>
-      </button>
+      {profile?.profile_type !== 'artist' && (
+        <button
+          className={`mobile-nav-item ${isActive('/saved') ? 'active' : ''}`}
+          onClick={() => handleNavigation('/saved')}
+          aria-label="Elementi salvati"
+        >
+          <svg className="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+          </svg>
+          <span className="mobile-nav-label">Salvati</span>
+        </button>
+      )}
 
-      <button 
+      <button
         className={`mobile-nav-item ${isActive('/messages') ? 'active' : ''}`}
         onClick={() => handleNavigation('/messages')}
         aria-label="Messaggi"
@@ -82,7 +88,23 @@ export function MobileNavbar({ onSearchClick }: MobileNavbarProps) {
         <span className="mobile-nav-label">Messaggi</span>
       </button>
 
-      <button 
+      {profile?.profile_type === 'artist' && (
+        <button
+          className={`mobile-nav-item ${isActive('/appointments') ? 'active' : ''}`}
+          onClick={() => handleNavigation('/appointments')}
+          aria-label="Appuntamenti"
+        >
+          <svg className="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span className="mobile-nav-label">Agenda</span>
+        </button>
+      )}
+
+      <button
         className={`mobile-nav-item ${isActive('/profile-menu') ? 'active' : ''}`}
         onClick={() => handleNavigation('/profile-menu')}
         aria-label="Profilo"
@@ -90,7 +112,9 @@ export function MobileNavbar({ onSearchClick }: MobileNavbarProps) {
         <div className="mobile-nav-avatar">
           <Avatar
             src={profile?.avatar_url}
-            name={user ? (profile?.full_name || getDisplayName()) : undefined}
+            name={user ? (profile?.profile_type === 'client'
+              ? (profile?.full_name || getDisplayName())
+              : (profile?.username || profile?.full_name || getDisplayName())) : undefined}
             alt={`Avatar di ${getDisplayName()}`}
             size="xs"
             variant="default"

@@ -216,7 +216,7 @@
   width: 100%;
   padding: 0.75rem;
   font-family: var(--font-sans);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.3px;
@@ -229,6 +229,7 @@
   justify-content: center;
   gap: 0.4rem;
   border-radius: 0;
+  box-sizing: border-box;
 }
 
 

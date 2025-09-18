@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { validatePassword, validateEmail } from '../lib/passwordValidation'
 import { supabase } from '../lib/supabase'
-import './AuthOverlay.css'
+import './FormOverlay.css'
 
 interface AuthOverlayProps {
   isOpen: boolean

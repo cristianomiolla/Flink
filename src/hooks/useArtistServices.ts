@@ -27,7 +27,6 @@ export function useArtistServices(userId?: string) {
       setServices(data || [])
       setError(null)
     } catch (err) {
-      console.error('Error fetching artist services:', err)
       setError('Errore nel caricamento dei servizi')
       setServices([])
     } finally {
@@ -99,7 +98,6 @@ export function useArtistServices(userId?: string) {
       setError(null)
       return true
     } catch (err) {
-      console.error('Error creating service:', err)
       setError('Errore nella creazione del servizio')
       return false
     }
@@ -151,7 +149,6 @@ export function useArtistServices(userId?: string) {
       setError(null)
       return true
     } catch (err) {
-      console.error('Error updating service:', err)
       setError('Errore nell\'aggiornamento del servizio')
       return false
     }
@@ -171,7 +168,6 @@ export function useArtistServices(userId?: string) {
       setError(null)
       return true
     } catch (err) {
-      console.error('Error deleting service:', err)
       setError('Errore nella cancellazione del servizio')
       return false
     }

@@ -31,8 +31,12 @@ export function ProfileDropdown() {
   if (loading || !user) return null
 
   const getDisplayName = (): string => {
-    if (profile?.full_name) return profile.full_name
-    if (profile?.username) return profile.username
+    if (profile?.profile_type === 'client') {
+      if (profile?.full_name) return profile.full_name
+    } else {
+      if (profile?.username) return profile.username
+      if (profile?.full_name) return profile.full_name
+    }
     if (user?.email) {
       const emailPart = user.email.split('@')[0]
       // Se contiene punti, trasformali in spazi e metti maiuscole
@@ -127,7 +131,9 @@ export function ProfileDropdown() {
     <div className="profile-dropdown" ref={dropdownRef}>
       <Avatar
         src={profile.avatar_url}
-        name={profile.full_name || getDisplayName()}
+        name={profile.profile_type === 'client'
+          ? (profile.full_name || getDisplayName())
+          : (profile.username || profile.full_name || getDisplayName())}
         alt={`Avatar di ${getDisplayName()}`}
         size="sm"
         variant="default"
@@ -139,13 +145,17 @@ export function ProfileDropdown() {
           <div className="dropdown-header">
             <Avatar
               src={profile.avatar_url}
-              name={profile.full_name || getDisplayName()}
+              name={profile.profile_type === 'client'
+          ? (profile.full_name || getDisplayName())
+          : (profile.username || profile.full_name || getDisplayName())}
               alt={`Avatar di ${getDisplayName()}`}
               size="sm"
               variant="default"
             />
             <div className="user-info">
-              <div className="user-name">{profile.full_name && profile.full_name.trim() ? profile.full_name : getDisplayName()}</div>
+              <div className="user-name">{profile.profile_type === 'client'
+                ? (profile.full_name && profile.full_name.trim() ? profile.full_name : getDisplayName())
+                : (profile.username || (profile.full_name && profile.full_name.trim() ? profile.full_name : getDisplayName()))}</div>
               <div className="user-type">{getProfileTypeDisplayName(profile.profile_type)}</div>
             </div>
           </div>
@@ -167,12 +177,21 @@ export function ProfileDropdown() {
               Il mio profilo
             </button>
           )}
-          <button className="dropdown-item profile-dropdown-item" onClick={() => {
-            navigate('/appointments')
-            setIsOpen(false)
-          }}>
-            Appuntamenti
-          </button>
+{profile.profile_type === 'artist' ? (
+            <button className="dropdown-item profile-dropdown-item" onClick={() => {
+              navigate('/saved')
+              setIsOpen(false)
+            }}>
+              Elementi salvati
+            </button>
+          ) : (
+            <button className="dropdown-item profile-dropdown-item" onClick={() => {
+              navigate('/appointments')
+              setIsOpen(false)
+            }}>
+              Appuntamenti
+            </button>
+          )}
           <button className="dropdown-item profile-dropdown-item" onClick={() => {
             navigate('/settings')
             setIsOpen(false)

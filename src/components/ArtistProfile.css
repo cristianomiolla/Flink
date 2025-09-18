@@ -67,6 +67,14 @@
   line-height: 1.2;
 }
 
+.profile-real-name {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--grey-dark);
+  text-transform: none;
+  margin-left: 0.75rem;
+}
+
 .profile-location {
   font-size: 1.1rem;
   font-weight: 600;
@@ -403,6 +411,13 @@
   
   .profile-name {
     font-size: 2rem;
+  }
+
+  .profile-real-name {
+    display: block;
+    margin-left: 0;
+    margin-top: 0.5rem;
+    font-size: 1.2rem;
   }
   
   .profile-location {

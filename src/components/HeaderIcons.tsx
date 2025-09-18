@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 import './HeaderIcons.css'
 
 export function HeaderIcons() {
   const navigate = useNavigate()
+  const { profile } = useAuth()
 
   const handleMessagesClick = () => {
     navigate('/messages')
@@ -10,6 +12,10 @@ export function HeaderIcons() {
 
   const handleSavedClick = () => {
     navigate('/saved')
+  }
+
+  const handleAppointmentsClick = () => {
+    navigate('/appointments')
   }
 
   const handleNotificationsClick = () => {
@@ -29,16 +35,32 @@ export function HeaderIcons() {
         </svg>
       </button>
 
-      <button 
-        className="header-icon-btn" 
-        onClick={handleSavedClick}
-        aria-label="Elementi salvati"
-        title="Elementi salvati"
-      >
-        <svg className="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-        </svg>
-      </button>
+{profile?.profile_type === 'artist' ? (
+        <button
+          className="header-icon-btn"
+          onClick={handleAppointmentsClick}
+          aria-label="Appuntamenti"
+          title="Agenda"
+        >
+          <svg className="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect width="18" height="18" x="3" y="4" rx="2" ry="2" strokeWidth={1} />
+            <line x1="16" y1="2" x2="16" y2="6" strokeWidth={1} />
+            <line x1="8" y1="2" x2="8" y2="6" strokeWidth={1} />
+            <line x1="3" y1="10" x2="21" y2="10" strokeWidth={1} />
+          </svg>
+        </button>
+      ) : (
+        <button
+          className="header-icon-btn"
+          onClick={handleSavedClick}
+          aria-label="Elementi salvati"
+          title="Elementi salvati"
+        >
+          <svg className="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+          </svg>
+        </button>
+      )}
 
       <button 
         className="header-icon-btn" 

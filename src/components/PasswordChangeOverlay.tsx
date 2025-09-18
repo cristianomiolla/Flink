@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
-import './AuthOverlay.css'
+import './FormOverlay.css'
 
 interface PasswordChangeOverlayProps {
   isOpen: boolean

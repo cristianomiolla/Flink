@@ -5,7 +5,7 @@ import { SearchBar } from './SearchBar'
 import { PageHeader } from './PageHeader'
 import { supabase } from '../lib/supabase'
 import './SettingsPage.css'
-import './AuthOverlay.css'
+import './FormOverlay.css'
 
 // Lazy load overlay components
 const EmailChangeOverlay = lazy(() => import('./EmailChangeOverlay').then(module => ({ default: module.EmailChangeOverlay })))
@@ -62,7 +62,7 @@ export function SettingsPage({ onLogoClick }: SettingsPageProps) {
         .eq('user_id', profile.user_id)
       
       if (error) {
-        console.error('Error changing profile type:', error)
+        // Error changing profile type
         alert('Errore durante il cambio del tipo di profilo. Riprova.')
         return
       }
@@ -76,7 +76,7 @@ export function SettingsPage({ onLogoClick }: SettingsPageProps) {
       setShowProfileTypeOverlay(false)
       navigate('/')
     } catch (error) {
-      console.error('Error changing profile type:', error)
+      // Error changing profile type
       alert('Errore durante il cambio del tipo di profilo. Riprova.')
     } finally {
       setIsSubmitting(false)

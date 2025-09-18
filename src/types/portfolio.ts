@@ -15,6 +15,8 @@ export interface DatabasePortfolioItem {
 export interface PortfolioItem extends DatabasePortfolioItem {
   readonly artist_name?: string
   readonly full_name?: string | null
+  readonly username?: string | null
+  readonly profile_type?: 'client' | 'artist'
   readonly artist_avatar_url?: string | null
   readonly like_count?: number
 }

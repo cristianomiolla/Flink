@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
-import './AuthOverlay.css'
+import './FormOverlay.css'
 import './ActionButton.css'
 
 interface FullNameChangeOverlayProps {
@@ -121,7 +121,7 @@ export function FullNameChangeOverlay({ isOpen, onClose }: FullNameChangeOverlay
       })
 
       if (authError) {
-        console.warn('Warning: Could not update auth metadata:', authError.message)
+        // Warning: Could not update auth metadata
         // Don't fail the operation for this, as the profile was updated successfully
       }
 

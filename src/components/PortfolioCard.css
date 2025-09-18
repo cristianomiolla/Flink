@@ -105,7 +105,7 @@
 
 /* Content Section */
 .content-section {
-  padding: 0 1.25rem 1rem 1.25rem; /* Remove top padding, keep sides and bottom */
+  padding: 1rem 1.25rem 1rem 1.25rem; /* Add top padding, keep sides and bottom */
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -226,7 +226,6 @@
   display: flex;
   justify-content: space-between;
   margin-top: 0; /* No margin since it's directly under image */
-  padding: 0 0 1rem 0; /* Remove all side padding, keep only bottom padding */
 }
 
 .portfolio-actions .action-btn {
@@ -324,8 +323,6 @@
     justify-content: space-between;
     gap: 0;
     margin-top: 0; /* Remove margin for mobile too */
-    padding-top: 0; /* Remove top padding for mobile too */
-    padding-bottom: 0; /* Remove bottom padding for mobile */
   }
 
   .action-icon {

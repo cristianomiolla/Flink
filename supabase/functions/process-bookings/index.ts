@@ -39,7 +39,6 @@ Deno.serve(async () => {
     const count = (completedCount || 0) + (expiredCount || 0)
 
     if (error) {
-      console.error('Error processing bookings:', error)
       return new Response(
         JSON.stringify({
           success: false,
@@ -66,8 +65,6 @@ Deno.serve(async () => {
       timestamp: new Date().toISOString()
     }
 
-    console.log('Booking processing result:', result)
-
     return new Response(
       JSON.stringify(result),
       {
@@ -81,7 +78,6 @@ Deno.serve(async () => {
     )
 
   } catch (err) {
-    console.error('Unexpected error:', err)
     return new Response(
       JSON.stringify({
         success: false,

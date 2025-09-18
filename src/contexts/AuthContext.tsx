@@ -49,7 +49,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // data can be null if no profile found, which is valid
       return data as UserProfile | null
     } catch {
-      console.error('Error fetching profile')
       return null
     }
   }
@@ -71,7 +70,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
             setProfile(userProfile)
           }
         } catch {
-          console.error('Error fetching user profile')
           if (isMounted) {
             setProfile(null)
           }
@@ -97,7 +95,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const errorDescription = urlParams.get('error_description')
       
       if (error && errorDescription) {
-        console.error('Email confirmation error:', error, errorDescription)
         // Clean URL
         window.history.replaceState({}, document.title, window.location.pathname)
       }
@@ -150,10 +147,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
           ])
         
         if (profileError) {
-          console.error('Error creating profile:', profileError)
+          // Profile creation failed - will be handled by user attempting to access profile features
         }
       } catch (profileError) {
-        console.error('Error inserting profile:', profileError)
+        // Profile insertion failed - will be handled by user attempting to access profile features
       }
     }
 
@@ -168,7 +165,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       })
       return { error }
     } catch (networkError) {
-      console.error('Network error during sign in:', networkError)
       // Return null error and handle network issues in the UI
       return { error: null }
     }
@@ -197,7 +193,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const userProfile = await fetchUserProfile(user.id)
       setProfile(userProfile)
     } catch {
-      console.error('Error refreshing user profile')
+      // Profile refresh failed - user will see stale data until next refresh
     }
   }
 

@@ -58,7 +58,8 @@
       "mcp__supabase__search_docs",
       "Bash(code:*)",
       "mcp__supabase__list_edge_functions",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "mcp__supabase__get_advisors"
     ]
   },
   "enableAllProjectMcpServers": true,

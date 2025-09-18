@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { MainPage } from './MainPage'
 import { supabase } from '../lib/supabase'
 import { validatePassword } from '../lib/passwordValidation'
-import './AuthOverlay.css'
+import './FormOverlay.css'
 
 interface FormData {
   newPassword: string

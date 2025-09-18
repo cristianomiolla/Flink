@@ -32,14 +32,13 @@ export function useSavedTattoos() {
         .eq('user_id', userId)
 
       if (error) {
-        console.error('Error loading saved tattoos:', error.message)
         return
       }
 
       const savedIds = new Set(data.map(item => item.portfolio_item_id))
       setSavedTattoos(savedIds)
     } catch (error) {
-      console.error('Error loading saved tattoos:', error)
+      // Error loading saved tattoos
     } finally {
       setLoading(false)
     }
@@ -48,7 +47,6 @@ export function useSavedTattoos() {
   // Save a tattoo
   const saveTattoo = useCallback(async (portfolioItemId: string) => {
     if (!user) {
-      console.warn('User must be logged in to save tattoos')
       return false
     }
 
@@ -63,7 +61,6 @@ export function useSavedTattoos() {
         ])
 
       if (error) {
-        console.error('Error saving tattoo:', error.message)
         return false
       }
 
@@ -71,7 +68,6 @@ export function useSavedTattoos() {
       setSavedTattoos(prev => new Set([...prev, portfolioItemId]))
       return true
     } catch (error) {
-      console.error('Error saving tattoo:', error)
       return false
     }
   }, [user])
@@ -80,7 +76,6 @@ export function useSavedTattoos() {
   const unsaveTattoo = useCallback(async (portfolioItemId: string) => {
     const userId = getUserId()
     if (!userId) {
-      console.warn('User must be logged in to unsave tattoos')
       return false
     }
 
@@ -92,7 +87,6 @@ export function useSavedTattoos() {
         .eq('portfolio_item_id', portfolioItemId)
 
       if (error) {
-        console.error('Error unsaving tattoo:', error.message)
         return false
       }
 
@@ -104,7 +98,6 @@ export function useSavedTattoos() {
       })
       return true
     } catch (error) {
-      console.error('Error unsaving tattoo:', error)
       return false
     }
   }, [getUserId])

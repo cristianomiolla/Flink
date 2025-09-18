@@ -60,8 +60,12 @@ export function usePortfolioSearch() {
           description: item.description ?? '',
           tags: Array.isArray(item.tags) ? item.tags : [],
           image_url: item.image_url ?? '',
-          artist_name: profile?.full_name ?? profile?.username ?? '',
-          full_name: profile?.full_name ?? null,
+          artist_name: profile?.profile_type === 'client'
+            ? (profile?.full_name ?? '')
+            : (profile?.username ?? profile?.full_name ?? ''),
+          full_name: profile?.username ?? profile?.full_name ?? null,
+          username: profile?.username ?? null,
+          profile_type: profile?.profile_type,
           artist_avatar_url: profile?.avatar_url ?? null,
           location: profile?.location ?? item.location ?? null,
           like_count: likeCount
@@ -116,9 +120,8 @@ export function usePortfolioSearch() {
       setArtistProfiles(transformedProfiles)
       
     } catch {
-      console.warn('Failed to fetch artist profiles')
+      // Failed to fetch artist profiles - don't set global error since portfolio items might still work
       setArtistProfiles([]) // Ensure state is reset on error
-      // Don't set global error since portfolio items might still work
     }
   }, [])
 

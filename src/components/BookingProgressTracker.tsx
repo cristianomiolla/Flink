@@ -14,6 +14,7 @@ interface BookingProgressTrackerProps {
   currentUserId?: string
   bookingId?: string
   onBookingUpdated?: () => void
+  showParticipants?: boolean
 }
 
 const getStatusDisplay = (status: BookingStatus, userType: 'client' | 'artist') => {
@@ -55,7 +56,8 @@ export function BookingProgressTracker({
   artistId,
   currentUserId,
   bookingId,
-  onBookingUpdated
+  onBookingUpdated,
+  showParticipants = false
 }: BookingProgressTrackerProps) {
   const [showDetailsOverlay, setShowDetailsOverlay] = useState(false)
   const statusDisplay = getStatusDisplay(status, userType)
@@ -94,6 +96,7 @@ export function BookingProgressTracker({
         artistId={artistId}
         currentUserId={currentUserId}
         bookingId={bookingId}
+        showParticipants={showParticipants}
         onBookingUpdated={onBookingUpdated}
       />
     </>

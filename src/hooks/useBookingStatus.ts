@@ -57,7 +57,6 @@ export function useBookingStatus(participantId: string | null): UseBookingStatus
 
       setBookingData(data || null)
     } catch (err) {
-      console.error('Error fetching booking status:', err)
       setError(err instanceof Error ? err.message : 'Errore nel caricamento dello stato booking')
       setBookingData(null)
     } finally {

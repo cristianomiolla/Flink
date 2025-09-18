@@ -94,8 +94,7 @@ export function useAppointments(): UseAppointmentsReturn {
         .in('user_id', Array.from(userIds))
 
       if (profilesError) {
-        console.warn('Error fetching profiles:', profilesError)
-        // Continue without profile data
+        // Error fetching profiles - continue without profile data
         setAppointments(bookingsData)
         return
       }
@@ -115,7 +114,6 @@ export function useAppointments(): UseAppointmentsReturn {
 
       setAppointments(enrichedAppointments)
     } catch (err) {
-      console.error('Error fetching appointments:', err)
       setError(err instanceof Error ? err.message : 'Errore nel caricamento degli appuntamenti')
       setAppointments([])
     } finally {

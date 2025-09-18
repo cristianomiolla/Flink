@@ -26,7 +26,8 @@
   padding: 0.5rem;
   transition: all 0.2s ease;
   font-family: var(--font-sans);
-  min-width: 60px;
+  min-width: 50px;
+  flex: 1;
   position: relative;
 }
 

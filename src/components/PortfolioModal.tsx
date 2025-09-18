@@ -74,7 +74,9 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
   if (!isOpen) return null
 
   const badge = item.is_flash ? 'FLASH' : 'REALIZZATO'
-  const displayName = item.full_name || item.artist_name || 'Unknown Artist'
+  const displayName = item.profile_type === 'client'
+    ? (item.full_name || item.artist_name || 'Unknown User')
+    : (item.username || item.full_name || item.artist_name || 'Unknown Artist')
 
   const handleArtistNameClick = () => {
     const artistId = item.user_id || item.id
@@ -88,7 +90,7 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
     try {
       await toggleLike()
     } catch (error) {
-      console.error('Error toggling like:', error)
+      // Error toggling like
     }
   }
 

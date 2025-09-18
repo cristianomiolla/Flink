@@ -34,7 +34,6 @@ export function useFollowedArtists() {
       const artistIds = data?.map(follow => follow.following_id) || []
       setFollowedArtistIds(artistIds)
     } catch (err) {
-      console.error('Error fetching followed artists:', err)
       setFollowedArtistIds([])
     } finally {
       setLoading(false)

@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import './AuthOverlay.css'
+import './FormOverlay.css'
 
 interface ConfirmationModalProps {
   isOpen: boolean

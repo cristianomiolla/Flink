@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useOverlay } from '../hooks/useOverlay'
-import './AuthOverlay.css'
+import './FormOverlay.css'
 
 interface OverlayWrapperProps {
   isOpen: boolean

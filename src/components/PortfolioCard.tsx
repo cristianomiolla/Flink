@@ -29,8 +29,10 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
   const badge = item.is_flash ? 'FLASH' : 'REALIZZATO';
   const price = item.price;
 
-  // Use full_name first, then artist_name, then fallback
-  const displayName = item.full_name || item.artist_name || 'Unknown Artist';
+  // For artists: use username first, then full_name. For clients: always use full_name
+  const displayName = item.profile_type === 'client'
+    ? (item.full_name || item.artist_name || 'Unknown User')
+    : (item.username || item.full_name || item.artist_name || 'Unknown Artist');
 
   const handleArtistNameClick = (e: React.MouseEvent) => {
     e.stopPropagation() // Previene l'apertura del modal
@@ -65,7 +67,7 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
     try {
       await toggleLike()
     } catch (error) {
-      console.error('Error toggling like:', error)
+      // Error toggling like
     }
   }
 

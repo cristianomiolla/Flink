@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
-import './AuthOverlay.css'
+import './FormOverlay.css'
 import './Dropdown.css'
 
 interface ArtistAppointmentFormProps {
@@ -33,6 +33,7 @@ export function ArtistAppointmentForm({
     appointment_time: '',
     appointment_duration: '60',
     deposit_amount: '',
+    total_amount: '',
     artist_notes: ''
   })
 
@@ -70,7 +71,7 @@ export function ArtistAppointmentForm({
       return
     }
 
-    if (!appointmentForm.subject || !appointmentForm.appointment_date || !appointmentForm.appointment_time || !appointmentForm.deposit_amount) {
+    if (!appointmentForm.subject || !appointmentForm.appointment_date || !appointmentForm.appointment_time || !appointmentForm.deposit_amount || !appointmentForm.total_amount) {
       setError('Compila tutti i campi obbligatori')
       return
     }
@@ -93,7 +94,7 @@ export function ArtistAppointmentForm({
         .maybeSingle()
 
       if (fetchError) {
-        console.error('Error fetching existing booking:', fetchError)
+        // Error fetching existing booking
         setError('Errore nel recuperare la prenotazione esistente.')
         return
       }
@@ -103,6 +104,7 @@ export function ArtistAppointmentForm({
         appointment_date: appointmentDateTime,
         appointment_duration: parseInt(appointmentForm.appointment_duration),
         deposit_amount: parseFloat(appointmentForm.deposit_amount),
+        total_amount: parseFloat(appointmentForm.total_amount),
         artist_notes: appointmentForm.artist_notes || null,
         status: 'scheduled'
       }
@@ -118,7 +120,7 @@ export function ArtistAppointmentForm({
           .select()
 
         if (updateError) {
-          console.error('Errore nell\'aggiornare l\'appuntamento:', updateError)
+          // Error updating appointment
           setError('Errore nell\'invio dell\'appuntamento. Riprova.')
           return
         }
@@ -137,7 +139,7 @@ export function ArtistAppointmentForm({
           .select()
 
         if (insertError) {
-          console.error('Errore nel salvare l\'appuntamento:', insertError)
+          // Error saving appointment
           setError('Errore nell\'invio dell\'appuntamento. Riprova.')
           return
         }
@@ -155,7 +157,7 @@ export function ArtistAppointmentForm({
         try {
           await sendMessage(clientId, appointmentMessage)
         } catch (messageError) {
-          console.error('Error sending appointment message:', messageError)
+          // Error sending appointment message
           // Don't fail the appointment creation if message sending fails
         }
       }
@@ -167,7 +169,7 @@ export function ArtistAppointmentForm({
       
       onClose()
     } catch (error) {
-      console.error('Error creating appointment:', error)
+      // Error creating appointment
       setError('Errore nell\'invio dell\'appuntamento. Riprova.')
     } finally {
       setLoading(false)
@@ -322,6 +324,24 @@ export function ArtistAppointmentForm({
             </div>
 
             <div className="form-group">
+              <label htmlFor="total_amount" className="form-label">
+                PREZZO TOTALE TATUAGGIO (€) <span className="required-indicator">*</span>
+              </label>
+              <input
+                id="total_amount"
+                className="form-input"
+                placeholder="Es. 200"
+                type="number"
+                min="0"
+                step="10"
+                value={appointmentForm.total_amount}
+                onChange={(e) => setAppointmentForm(prev => ({ ...prev, total_amount: e.target.value }))}
+                required
+              />
+              <div className="form-help">Prezzo totale concordato per il tatuaggio</div>
+            </div>
+
+            <div className="form-group">
               <label htmlFor="deposit_amount" className="form-label">
                 ACCONTO RICHIESTO (€) <span className="required-indicator">*</span>
               </label>
@@ -365,7 +385,7 @@ export function ArtistAppointmentForm({
               <button
                 type="submit"
                 className="action-btn primary"
-                disabled={loading || !appointmentForm.subject.trim() || !appointmentForm.appointment_date || !appointmentForm.appointment_time || !appointmentForm.deposit_amount || parseFloat(appointmentForm.deposit_amount) <= 0}
+                disabled={loading || !appointmentForm.subject.trim() || !appointmentForm.appointment_date || !appointmentForm.appointment_time || !appointmentForm.total_amount || !appointmentForm.deposit_amount || parseFloat(appointmentForm.total_amount) <= 0 || parseFloat(appointmentForm.deposit_amount) <= 0}
               >
                 <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path d="M20 6L9 17l-5-5"></path>

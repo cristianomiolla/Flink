@@ -83,7 +83,7 @@ export function useArtistProfile(artistId: string) {
       if (portfolioResult.status === 'fulfilled' && !portfolioResult.value.error) {
         setPortfolioItems((portfolioResult.value.data as DatabasePortfolioItem[]) || [])
       } else {
-        console.warn('Failed to fetch portfolio items')
+        // Failed to fetch portfolio items
         setPortfolioItems([])
       }
 
@@ -91,7 +91,7 @@ export function useArtistProfile(artistId: string) {
       if (servicesResult.status === 'fulfilled' && !servicesResult.value.error) {
         setServices((servicesResult.value.data as ArtistService[]) || [])
       } else {
-        console.warn('Failed to fetch artist services')
+        // Failed to fetch artist services
         setServices([])
       }
       
