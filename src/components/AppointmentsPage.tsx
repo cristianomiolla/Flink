@@ -4,7 +4,8 @@ import { useAppointments } from '../hooks/useAppointments'
 import { useAuth } from '../hooks/useAuth'
 import { SearchBar } from './SearchBar'
 import LoadingSpinner from './LoadingSpinner'
-import { BookingRequestCard } from './BookingRequestCard'
+import { CompactAppointmentCard } from './CompactAppointmentCard'
+import './CompactAppointmentCard.css'
 import './AppointmentsPage.css'
 import './Header.css'
 import './PageHeader.css'
@@ -160,17 +161,15 @@ export function AppointmentsPage() {
                   </div>
                 ) : (
                   filteredAppointments.map((appointment) => (
-                  <BookingRequestCard
+                  <CompactAppointmentCard
                     key={appointment.id}
                     bookingId={appointment.id}
-                    timestamp={appointment.created_at}
-                    mode="appointment"
-                    cardType="appointment"
                     participantName={
                       profile?.profile_type === 'artist'
-                        ? appointment.client_profile?.full_name || appointment.client_profile?.username || 'Cliente'
-                        : appointment.artist_profile?.full_name || appointment.artist_profile?.username || 'Artista'
+                        ? (appointment.client_profile?.full_name || 'Cliente')
+                        : (appointment.artist_profile?.username || appointment.artist_profile?.full_name || 'Artista')
                     }
+                    showParticipants={true}
                     onBookingUpdated={refreshAppointments}
                   />
                   ))

@@ -1,0 +1,655 @@
+/* Form & Overlay Shared Styles - Unified Modal and Form System */
+
+/* Character count styling */
+.char-count {
+  font-size: 0.75rem;
+  color: var(--grey-dark);
+  text-align: right;
+}
+
+/* Form layout styling */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Required indicator */
+.required-indicator {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Checkbox Styles */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--foreground);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--border);
+  background: var(--background);
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"]:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.checkbox-text {
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+}
+
+/* File input styles */
+.file-input {
+  cursor: pointer;
+}
+
+.preview-image {
+  max-width: 200px;
+  max-height: 200px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  border-radius: 0;
+}
+
+/* Form help text */
+.form-help {
+  font-size: 0.75rem;
+  color: var(--grey-dark);
+}
+
+
+/* Services list */
+.services-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 2rem;
+}
+
+/* Form footer and actions */
+.booking-footer {
+  padding: 0.75rem;
+  border-top: 1px solid #eee;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.form-actions .action-btn {
+  flex: 1;
+  min-width: 120px;
+}
+
+.form-actions .action-btn:disabled {
+  background: var(--grey-medium);
+  color: var(--grey-dark);
+  border-color: var(--grey-medium);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Bio Suggestions */
+.bio-suggestions {
+  background: var(--grey-light);
+  padding: 1rem;
+  border: 1px solid var(--border);
+  margin-top: 0.5rem;
+}
+
+.suggestions-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+}
+
+.suggestions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.suggestion-item {
+  font-size: 0.75rem;
+  color: var(--grey-dark);
+  padding: 0.25rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+/* Appointment Details Overlay Styles */
+
+
+.detail-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-value {
+  font-size: 1rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.detail-value.success {
+  color: var(--success);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-icon {
+  font-size: 1.2rem;
+}
+
+
+.auth-modal-header {
+  padding: 60px 24px 0 24px;
+  position: relative;
+}
+
+/* Auth Sticky Header */
+.auth-header-sticky {
+  position: sticky;
+  top: 0;
+  right: 0;
+  height: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Close button styles now handled by unified modal system */
+
+.auth-tabs,
+.auth-modal .view-toggle {
+  display: flex;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  overflow: hidden;
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+.auth-tab,
+.auth-modal .toggle-btn {
+  background: #ffffff;
+  color: var(--foreground);
+  border: none;
+  border-radius: 0;
+  padding: 0.625rem 1rem;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  border-right: 1px solid var(--border);
+  text-transform: uppercase;
+  flex: 1;
+}
+
+.auth-tab:last-child,
+.auth-modal .toggle-btn:last-child {
+  border-right: none;
+}
+
+.auth-tab:hover:not(.active),
+.auth-modal .toggle-btn:hover:not(.active) {
+  background: var(--accent);
+  color: #ffffff;
+  border-radius: 0;
+}
+
+.auth-tab.active,
+.auth-tab.active:hover,
+.auth-modal .toggle-btn.active,
+.auth-modal .toggle-btn.active:hover {
+  background: var(--primary);
+  color: #ffffff;
+  border-radius: 0 !important;
+}
+
+.auth-tab:focus,
+.auth-tab:active,
+.auth-modal .toggle-btn:focus,
+.auth-modal .toggle-btn:active {
+  border-radius: 0 !important;
+}
+
+.auth-content {
+  padding: 0 1.5rem 2rem 1.5rem;
+}
+
+/* Google Sign-In Button */
+.auth-social {
+  margin: 1.5rem 0;
+}
+
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 10px 16px;
+  background: #ffffff;
+  color: var(--foreground);
+  border: 1px solid #dadce0;
+  border-radius: 0;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.btn-google:hover {
+  border-color: var(--border-red);
+}
+
+.btn-google:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.google-icon {
+  flex-shrink: 0;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.auth-divider span {
+  padding: 0 1rem;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Auth overlay specific form adjustments */
+
+.auth-modal .form-input:focus {
+  border-color: var(--accent);
+}
+
+
+.form-errors {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-error {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.password-requirements {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin-top: 0.25rem;
+}
+
+.password-requirements ul {
+  margin: 0.5rem 0 0 1rem;
+  padding: 0;
+}
+
+.password-requirements li {
+  margin: 0.25rem 0;
+}
+
+.password-requirements li.valid {
+  color: #16a34a;
+}
+
+.password-requirements li.invalid {
+  color: var(--accent);
+}
+
+.auth-submit-btn {
+  width: 100%;
+  padding: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.auth-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.auth-error {
+  background: rgba(239, 67, 67, 0.1);
+  border: 1px solid var(--accent);
+  padding: 1rem;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.auth-success {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid #16a34a;
+  padding: 1rem;
+  color: #16a34a;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+/* Mobile responsive - Auth specific (overlay/modal handled by unified system) */
+@media (max-width: 767px) {
+  .auth-modal-header {
+    padding: 60px 24px 0 24px;
+  }
+  
+  
+  .auth-content {
+    padding: 0 16px 1.5rem 16px;
+  }
+  
+  .auth-tabs {
+    border: 1px solid var(--border);
+  }
+  
+  .auth-tab {
+    padding: 0.5rem 0.75rem;
+    font-size: 13px;
+    border-right: 1px solid var(--border);
+  }
+  
+  .auth-tab:last-child {
+    border-right: none;
+  }
+  
+  .auth-tab:hover:not(.active) {
+    background: var(--accent);
+    color: #ffffff;
+    border-radius: 0;
+  }
+  
+  .auth-tab.active:hover {
+    background: var(--primary);
+    color: #ffffff;
+    border-radius: 0 !important;
+  }
+}
+
+/* Header Card Styles - Overlay specific */
+.modal-content .header-card {
+  background: var(--background);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.modal-content .header-card h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
+}
+
+.modal-content .header-card p {
+  font-size: 14px;
+  color: var(--grey-dark);
+  margin-top: 0 !important;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+/* Legacy password change styles - will be removed */
+.password-change-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.password-change-subtitle {
+  color: var(--grey-dark);
+  font-size: 0.875rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+@media (max-width: 767px) {
+  .modal-content .header-card h2 {
+    font-size: 1.25rem;
+  }
+
+  .modal-content .header-card p {
+    font-size: 0.8125rem;
+  }
+
+  .password-change-title {
+    font-size: 1.25rem;
+  }
+
+  .password-change-subtitle {
+    font-size: 0.8125rem;
+  }
+}
+
+/* Forgot Password Link */
+.forgot-password-container {
+  text-align: center;
+}
+
+.forgot-password-link {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0.25rem 0;
+  transition: color 0.2s ease;
+  text-transform: none;
+}
+
+.forgot-password-link:hover:not(:disabled) {
+  color: var(--accent);
+}
+
+.forgot-password-link:disabled {
+  color: var(--muted-foreground);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Success Message */
+.success-message {
+  background: #10B981;
+  color: white;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+/* Required Indicator */
+.required-indicator {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Form Actions - Centralized for all auth modals */
+.modal-content .form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.modal-content .form-actions .action-btn {
+  flex: 1;
+  min-width: 120px;
+}
+
+.modal-content .form-actions .action-btn:disabled {
+  background: var(--grey-medium);
+  color: var(--grey-dark);
+  border-color: var(--grey-medium);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Radio Group Styles */
+.radio-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  background: var(--background);
+  transition: all 0.2s;
+}
+
+.radio-option:hover {
+  border-color: var(--accent);
+  background: rgba(239, 67, 67, 0.05);
+}
+
+.radio-option input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+
+.radio-label {
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.radio-text {
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: var(--foreground);
+}
+
+/* Mobile responsive adjustments for new elements */
+@media (max-width: 767px) {
+  .modal-content .form-actions {
+    flex-direction: row;
+    gap: 0.75rem;
+  }
+  
+  .modal-content .form-actions .action-btn {
+    flex: 1;
+    min-width: auto;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .checkbox-label {
+    padding: 0.75rem;
+    background: var(--grey-light);
+    border: 1px solid var(--border);
+  }
+
+  .services-list {
+    margin-top: 1.5rem;
+  }
+
+  .bio-suggestions {
+    padding: 0.75rem;
+  }
+
+  .suggestions-title {
+    font-size: 0.75rem;
+  }
+
+  .suggestion-item {
+    font-size: 0.7rem;
+  }
+
+  .form-actions {
+    flex-direction: row;
+    gap: 0.75rem;
+  }
+
+  .form-actions .action-btn {
+    flex: 1;
+    min-width: auto;
+  }
+  
+  .radio-group {
+    gap: 0.75rem;
+  }
+  
+  .radio-option {
+    padding: 0.4rem;
+  }
+}

@@ -1,0 +1,311 @@
+/* Import design tokens */
+@import '../styles/tokens.css';
+
+.compact-appointment-card {
+  background: rgba(239, 67, 67, 0.1);
+  border: 1px solid var(--accent);
+  border-radius: 0;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  max-width: 600px;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+}
+
+.compact-appointment-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.compact-appointment-card.loading {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.compact-appointment-card.loading:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--accent);
+}
+
+/* Loading state */
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.loading-line {
+  height: 1rem;
+  background: linear-gradient(90deg, var(--grey-light) 25%, var(--border) 50%, var(--grey-light) 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 0;
+}
+
+.loading-line.short {
+  width: 60%;
+  height: 0.75rem;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Main appointment layout */
+.appointment-main {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+}
+
+/* Date and time - most prominent */
+.appointment-datetime {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  width: 110px;
+  max-width: 110px;
+  flex-shrink: 0;
+  padding: 0.75rem 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(239, 67, 67, 0.3);
+  box-sizing: border-box;
+}
+
+.appointment-date {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+  line-height: 1;
+}
+
+.appointment-time {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--foreground);
+  text-align: center;
+  line-height: 1;
+}
+
+/* Appointment info */
+.appointment-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+  max-width: calc(100% - 110px - 2rem);
+  padding-left: 0.5rem;
+  overflow: hidden;
+}
+
+.participant-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--grey-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  margin: 0;
+}
+
+.appointment-subject {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.3;
+  word-break: break-word;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  margin: 0;
+}
+
+/* Secondary details */
+.appointment-details {
+  border-top: 1px solid var(--border);
+  padding-top: 1.25rem;
+  margin-top: 1rem;
+  flex-shrink: 0;
+}
+
+.appointment-meta {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.compact-appointment-card .detail-item {
+  font-size: 0.875rem;
+  color: var(--grey-dark);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  padding: 0.25rem 0;
+}
+
+.compact-appointment-card .detail-item.total {
+  background: rgba(239, 67, 67, 0.1);
+  border: 1px solid var(--accent);
+  padding: 0.5rem 0.75rem;
+  font-weight: 700;
+  color: var(--foreground);
+  border-radius: 0;
+}
+
+.compact-appointment-card .detail-item.deposit {
+  background: rgba(23, 23, 23, 0.05);
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  font-weight: 700;
+  color: var(--grey-dark);
+  border-radius: 0;
+}
+
+.compact-appointment-card .detail-item.total .price-label,
+.compact-appointment-card .detail-item.deposit .price-label {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.compact-appointment-card .detail-item.total .price-value,
+.compact-appointment-card .detail-item.deposit .price-value {
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin-left: 0.25rem;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .compact-appointment-card {
+    padding: 1.25rem;
+    height: 140px;
+  }
+
+  .appointment-main {
+    gap: 1.5rem;
+  }
+
+  .appointment-datetime {
+    width: 90px;
+    max-width: 90px;
+    padding: 0.5rem 0.375rem;
+  }
+
+  .appointment-date {
+    font-size: 0.75rem;
+  }
+
+  .appointment-time {
+    font-size: 1.25rem;
+  }
+
+  .appointment-info {
+    gap: 0.5rem;
+    padding-left: 0.25rem;
+  }
+
+  .participant-name {
+    font-size: 0.6875rem;
+  }
+
+  .appointment-subject {
+    font-size: 1rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .appointment-details {
+    padding-top: 0.75rem;
+  }
+
+  .appointment-meta {
+    gap: 1.5rem;
+  }
+
+  .compact-appointment-card .detail-item {
+    font-size: 0.75rem;
+    gap: 0.375rem;
+  }
+
+  .compact-appointment-card .detail-item.total,
+  .compact-appointment-card .detail-item.deposit {
+    padding: 0.375rem 0.5rem;
+  }
+
+  .compact-appointment-card .detail-item.total .price-label,
+  .compact-appointment-card .detail-item.deposit .price-label {
+    font-size: 0.5625rem;
+  }
+
+  .compact-appointment-card .detail-item.total .price-value,
+  .compact-appointment-card .detail-item.deposit .price-value {
+    font-size: 0.75rem;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .compact-appointment-card {
+    height: 120px;
+    padding: 1rem;
+  }
+
+  .appointment-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .appointment-datetime {
+    flex-direction: row;
+    min-width: auto;
+    gap: 1rem;
+    padding: 0.5rem 0.75rem;
+    align-self: stretch;
+    justify-content: center;
+  }
+
+  .appointment-date,
+  .appointment-time {
+    text-align: center;
+  }
+
+  .appointment-info {
+    gap: 0.375rem;
+    padding-left: 0;
+  }
+
+  .appointment-details {
+    padding-top: 0.5rem;
+  }
+
+  .appointment-meta {
+    gap: 1rem;
+  }
+}

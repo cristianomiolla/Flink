@@ -4,7 +4,7 @@ import { Avatar } from './Avatar'
 import { useAuth } from '../hooks/useAuth'
 import { type Message as DatabaseMessage } from '../hooks/useMessages'
 import { ActionButton, DeleteIcon, SendIcon } from './ActionButton'
-import { BookingRequestCard } from './BookingRequestCard'
+import { AppointmentCard } from './AppointmentCard'
 import { BookingProgressTracker } from './BookingProgressTracker'
 import { useBookingStatus } from '../hooks/useBookingStatus'
 import { supabase } from '../lib/supabase'
@@ -39,7 +39,6 @@ function PinnedActionButton({ participantId, participantName, onOpenBookingReque
   if (!user || !profile || !participantId) return null
 
   const isArtist = profile.profile_type === 'artist'
-  const buttonText = isArtist ? '📅 FISSA APPUNTAMENTO' : '📝 INVIA UNA RICHIESTA'
 
   const handleClick = () => {
     
@@ -58,9 +57,13 @@ function PinnedActionButton({ participantId, participantName, onOpenBookingReque
     }
   }
 
+  const icon = isArtist ? '📅' : '📝'
+  const text = isArtist ? 'FISSA APPUNTAMENTO' : 'INVIA UNA RICHIESTA'
+
   return (
     <button className="pinned-action-btn" onClick={handleClick}>
-      {buttonText}
+      <span className="progress-icon">{icon}</span>
+      <span className="progress-text">{text}</span>
     </button>
   )
 }
@@ -173,7 +176,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
           // Scroll to bottom after loading messages
           scrollToBottom({ delay: 150 })
         } catch (error) {
-          console.error('Error refreshing conversation messages:', error)
+          // Error refreshing conversation messages
         }
       }
 
@@ -253,7 +256,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
           return prevMessages
         })
       } catch (error) {
-        console.error('Error loading conversation messages:', error)
+        // Error loading conversation messages
         setMessages([])
       } finally {
         if (showLoading) setLoading(false)
@@ -354,7 +357,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
         setNewMessage(messageContent)
       }
     } catch (error) {
-      console.error('Error sending message:', error)
+      // Error sending message
       // Restore message to input on error
       setNewMessage(messageContent)
     }
@@ -472,7 +475,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
                 // Render BookingRequestCard for booking request messages
                 const cardType = bookingData.message_type === 'appointment_scheduled' ? 'appointment' : 'request'
                 return (
-                  <BookingRequestCard
+                  <AppointmentCard
                     key={message.id}
                     bookingId={bookingData.booking_id}
                     isFromCurrentUser={message.isFromCurrentUser}

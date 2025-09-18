@@ -2,7 +2,7 @@ import { useState, useEffect, lazy, Suspense, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import './MessagesPage.css'
 import './Dropdown.css'
-import './AuthOverlay.css'
+import './FormOverlay.css'
 import './ImageUpload.css'
 import { SearchBar } from './SearchBar'
 import { ChatList } from './ChatList'
@@ -14,7 +14,7 @@ import { generateConversationId } from '../lib/messageUtils'
 import { supabase } from '../lib/supabase'
 import LoadingSpinner from './LoadingSpinner'
 import { ConfirmationModal } from './ConfirmationModal'
-import { BookingRequestCard } from './BookingRequestCard'
+import { AppointmentCard } from './AppointmentCard'
 import { BookingProgressTracker } from './BookingProgressTracker'
 import { useBookingStatus } from '../hooks/useBookingStatus'
 import { ArtistAppointmentForm } from './ArtistAppointmentForm'
@@ -37,7 +37,6 @@ function PinnedActionButton({ participantId, participantName, onOpenBookingReque
   if (!user || !profile || !participantId) return null
 
   const isArtist = profile.profile_type === 'artist'
-  const buttonText = isArtist ? '📅 FISSA APPUNTAMENTO' : '📝 INVIA UNA RICHIESTA'
 
   const handleClick = () => {
     if (isArtist) {
@@ -53,9 +52,13 @@ function PinnedActionButton({ participantId, participantName, onOpenBookingReque
     }
   }
 
+  const icon = isArtist ? '📅' : '📝'
+  const text = isArtist ? 'FISSA APPUNTAMENTO' : 'INVIA UNA RICHIESTA'
+
   return (
     <button className="pinned-action-btn" onClick={handleClick}>
-      {buttonText}
+      <span className="progress-icon">{icon}</span>
+      <span className="progress-text">{text}</span>
     </button>
   )
 }
@@ -178,7 +181,7 @@ export function MessagesPage() {
 
       return data.publicUrl
     } catch (error) {
-      console.error('Error uploading reference image:', error)
+      // Error uploading reference image
       throw new Error('Errore durante il caricamento dell\'immagine di riferimento')
     } finally {
       setImageUploading(false)
@@ -281,11 +284,7 @@ export function MessagesPage() {
     e.preventDefault()
     
     if (!user || !currentArtistId) {
-      console.error('Impossibile inviare richiesta: dati mancanti', { 
-        hasUser: !!user, 
-        hasCurrentArtistId: !!currentArtistId,
-        currentUrl: window.location.pathname 
-      })
+      // Cannot send request: missing data
       alert('Errore: impossibile inviare richiesta')
       return
     }
@@ -303,7 +302,7 @@ export function MessagesPage() {
         try {
           referenceImageUrl = await uploadReferenceImage(selectedReferenceFile)
         } catch (uploadError) {
-          console.error('Error uploading reference image:', uploadError)
+          // Error uploading reference image
           alert('Errore nel caricamento dell\'immagine di riferimento. La richiesta sarà inviata senza immagine.')
         }
       }
@@ -329,7 +328,7 @@ export function MessagesPage() {
         .select()
       
       if (error) {
-        console.error('Errore nel salvare la prenotazione:', error)
+        // Error saving booking
         alert('Errore nell\'invio della richiesta. Riprova.')
         return
       }
@@ -378,7 +377,7 @@ export function MessagesPage() {
       }
       
     } catch (error) {
-      console.error('Errore nel salvare la prenotazione:', error)
+      // Error saving booking
       alert('Errore nell\'invio della richiesta. Riprova.')
     }
   }
@@ -496,18 +495,20 @@ export function MessagesPage() {
     try {
       const { data: profile, error } = await supabase
         .from('profiles')
-        .select('user_id, full_name, username, avatar_url')
+        .select('user_id, full_name, username, avatar_url, profile_type')
         .eq('user_id', artistUserId)
         .single()
       
       if (error) {
-        console.error('Error fetching artist profile:', error)
+        // Error fetching artist profile
         return
       }
       
       const artist = {
         id: artistUserId,
-        name: profile?.full_name || profile?.username || 'Unknown Artist',
+        name: profile?.profile_type === 'client'
+          ? (profile?.full_name || 'Unknown User')
+          : (profile?.username || profile?.full_name || 'Unknown Artist'),
         avatar: profile?.avatar_url
       }
       
@@ -517,7 +518,7 @@ export function MessagesPage() {
         setNewChatArtist(artist)
       }
     } catch (error) {
-      console.error('Error fetching artist profile:', error)
+      // Error fetching artist profile
     }
   }, [user])
 
@@ -580,7 +581,7 @@ export function MessagesPage() {
         // Always scroll to bottom after loading messages
         scrollToBottom({ delay: 150 })
       } catch (error) {
-        console.error('Error loading conversation messages:', error)
+        // Error loading conversation messages
         setConversationMessages([])
       } finally {
         if (showLoading) setLoadingMessages(false)
@@ -718,7 +719,7 @@ export function MessagesPage() {
           await deleteConversation(conversation.participant.user_id)
         }
       } catch (err) {
-        console.error('Failed to delete conversation:', err)
+        // Failed to delete conversation
       }
     }
     setChatToDelete(null)
@@ -772,7 +773,7 @@ export function MessagesPage() {
         setNewMessage(messageContent)
       }
     } catch (error) {
-      console.error('Error sending message:', error)
+      // Error sending message
       // Restore message to input on error
       setNewMessage(messageContent)
     }
@@ -945,7 +946,7 @@ export function MessagesPage() {
                         // Render BookingRequestCard for booking request messages
                         const cardType = bookingData.message_type === 'appointment_scheduled' ? 'appointment' : 'request'
                         return (
-                          <BookingRequestCard
+                          <AppointmentCard
                             key={message.id}
                             bookingId={bookingData.booking_id}
                             isFromCurrentUser={message.isFromCurrentUser}
@@ -1494,7 +1495,7 @@ export function MessagesPage() {
               isModalOpen={showBookingRequest}
               onOpenBookingRequest={(participantId?: string) => {
                 if (!participantId) {
-                  console.error('Non posso aprire richiesta senza participantId')
+                  // Cannot open request without participantId
                   return
                 }
                 setCurrentArtistId(participantId)

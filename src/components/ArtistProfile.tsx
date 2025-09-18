@@ -10,6 +10,7 @@ import { Avatar } from './Avatar'
 import './ArtistProfile.css'
 import './TabHeader.css'
 import './TabsNavigation.css'
+import './FormOverlay.css'
 import type { TabType } from '../types/portfolio'
 
 export function ArtistProfile() {
@@ -99,8 +100,8 @@ export function ArtistProfile() {
                   {/* Avatar */}
                   <Avatar
                     src={profile.avatar_url}
-                    name={profile.full_name || profile.username}
-                    alt={`Avatar di ${profile.full_name || profile.username || 'Artista'}`}
+                    name={profile.username || profile.full_name}
+                    alt={`Avatar di ${profile.username || profile.full_name || 'Artista'}`}
                     size="lg"
                     variant="bordered"
                   />
@@ -108,7 +109,16 @@ export function ArtistProfile() {
                   {/* Informazioni */}
                   <div className="profile-details">
                     <h1 className="profile-name">
-                      {profile.full_name || profile.username || 'Artista Sconosciuto'}
+                      {profile.username ? (
+                        <>
+                          {profile.username}
+                          {profile.full_name && (
+                            <span className="profile-real-name"> ({profile.full_name})</span>
+                          )}
+                        </>
+                      ) : (
+                        profile.full_name || 'Artista Sconosciuto'
+                      )}
                     </h1>
                     
                     {profile.location && (
@@ -225,8 +235,8 @@ export function ArtistProfile() {
                                 created_at: item.created_at,
                                 updated_at: item.updated_at,
                                 user_id: item.user_id,
-                                artist_name: profile?.full_name || profile?.username || 'Artista',
-                                full_name: profile?.full_name || profile?.username || 'Artista'
+                                artist_name: profile?.username || profile?.full_name || 'Artista',
+                                full_name: profile?.username || profile?.full_name || 'Artista'
                               }}
                               onArtistClick={() => {
                                 // Handle artist navigation
@@ -352,8 +362,8 @@ export function ArtistProfile() {
                                 created_at: item.created_at,
                                 updated_at: item.updated_at,
                                 user_id: item.user_id,
-                                artist_name: profile?.full_name || profile?.username || 'Artista',
-                                full_name: profile?.full_name || profile?.username || 'Artista'
+                                artist_name: profile?.username || profile?.full_name || 'Artista',
+                                full_name: profile?.username || profile?.full_name || 'Artista'
                               }}
                               onArtistClick={() => {
                                 // Handle artist navigation

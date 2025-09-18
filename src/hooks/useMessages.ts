@@ -88,7 +88,7 @@ export function useMessages() {
         .eq('user_id', user.id)
 
       if (deletedError && deletedError.code !== 'PGRST116') { // PGRST116 = no rows returned
-        console.error('Error fetching deleted conversations:', deletedError)
+        // Error fetching deleted conversations - continuing without deletion info
       }
 
       const deletedConversationsMap = new Map(
@@ -111,7 +111,6 @@ export function useMessages() {
         .order('created_at', { ascending: false })
 
       if (messagesError) {
-        console.error('Supabase query error:', messagesError)
         throw messagesError
       }
 
@@ -150,12 +149,12 @@ export function useMessages() {
       })
 
       // Fetch profile data for all participants
-      const profilesMap = new Map<string, { user_id: string; full_name: string; username: string; avatar_url: string | null }>()
+      const profilesMap = new Map<string, { user_id: string; full_name: string; username: string; avatar_url: string | null; profile_type: 'client' | 'artist' }>()
       if (participantIds.size > 0) {
         try {
           const { data: profilesData, error: profilesError } = await supabase
             .from('profiles')
-            .select('user_id, full_name, username, avatar_url')
+            .select('user_id, full_name, username, avatar_url, profile_type')
             .in('user_id', Array.from(participantIds))
           
           if (!profilesError && profilesData) {
@@ -164,7 +163,7 @@ export function useMessages() {
             })
           }
         } catch (err) {
-          console.warn('Could not fetch profile data, using fallback names:', err)
+          // Could not fetch profile data, using fallback names
         }
       }
 
@@ -191,9 +190,9 @@ export function useMessages() {
 
           // Get profile data for the participant
           const participantProfile = profilesMap.get(otherParticipantId)
-          const participantName = participantProfile?.full_name || 
-                                 participantProfile?.username || 
-                                 `User ${otherParticipantId.slice(0, 8)}`
+          const participantName = participantProfile?.profile_type === 'client'
+            ? (participantProfile?.full_name || `User ${otherParticipantId.slice(0, 8)}`)
+            : (participantProfile?.username || participantProfile?.full_name || `User ${otherParticipantId.slice(0, 8)}`)
 
           conversationMap.set(conversationKey, {
             id: conversationKey,
@@ -229,13 +228,17 @@ export function useMessages() {
           deleted_at: null,
           sender: {
             user_id: message.sender_id,
-            full_name: senderProfile?.full_name || senderProfile?.username || `User ${message.sender_id.slice(0, 8)}`,
+            full_name: senderProfile?.profile_type === 'client'
+              ? (senderProfile?.full_name || `User ${message.sender_id.slice(0, 8)}`)
+              : (senderProfile?.username || senderProfile?.full_name || `User ${message.sender_id.slice(0, 8)}`),
             username: senderProfile?.username || '',
             avatar_url: senderProfile?.avatar_url || null
           },
           receiver: {
             user_id: message.receiver_id,
-            full_name: receiverProfile?.full_name || receiverProfile?.username || `User ${message.receiver_id.slice(0, 8)}`,
+            full_name: receiverProfile?.profile_type === 'client'
+              ? (receiverProfile?.full_name || `User ${message.receiver_id.slice(0, 8)}`)
+              : (receiverProfile?.username || receiverProfile?.full_name || `User ${message.receiver_id.slice(0, 8)}`),
             username: receiverProfile?.username || '',
             avatar_url: receiverProfile?.avatar_url || null
           }
@@ -244,7 +247,6 @@ export function useMessages() {
       setMessages(messagesWithProfiles)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch messages')
-      console.error('Error fetching conversations:', err)
     } finally {
       setLoading(false)
     }
@@ -264,7 +266,7 @@ export function useMessages() {
         .eq('participant_id', participantId)
 
       if (deletedError && deletedError.code !== 'PGRST116') { // PGRST116 = no rows returned
-        console.error('Error checking deleted conversations:', deletedError)
+        // Error checking deleted conversations - continuing with query
       }
 
       let deletedAt: string | null = null
@@ -305,12 +307,12 @@ export function useMessages() {
 
       // Fetch profile data for participants in this conversation
       const participantIds = [user.id, participantId]
-      const profilesMap = new Map<string, { user_id: string; full_name: string; username: string; avatar_url: string | null }>()
+      const profilesMap = new Map<string, { user_id: string; full_name: string; username: string; avatar_url: string | null; profile_type: 'client' | 'artist' }>()
       
       try {
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
-          .select('user_id, full_name, username, avatar_url')
+          .select('user_id, full_name, username, avatar_url, profile_type')
           .in('user_id', participantIds)
 
         if (!profilesError && profilesData) {
@@ -319,7 +321,7 @@ export function useMessages() {
           })
         }
       } catch (err) {
-        console.warn('Could not fetch profile data for conversation, using fallback names:', err)
+        // Could not fetch profile data for conversation, using fallback names
       }
 
       // Convert to MessageWithProfiles format with actual profile data
@@ -337,13 +339,17 @@ export function useMessages() {
           deleted_at: null,
           sender: {
             user_id: message.sender_id,
-            full_name: senderProfile?.full_name || senderProfile?.username || `User ${message.sender_id.slice(0, 8)}`,
+            full_name: senderProfile?.profile_type === 'client'
+              ? (senderProfile?.full_name || `User ${message.sender_id.slice(0, 8)}`)
+              : (senderProfile?.username || senderProfile?.full_name || `User ${message.sender_id.slice(0, 8)}`),
             username: senderProfile?.username || '',
             avatar_url: senderProfile?.avatar_url || null
           },
           receiver: {
             user_id: message.receiver_id,
-            full_name: receiverProfile?.full_name || receiverProfile?.username || `User ${message.receiver_id.slice(0, 8)}`,
+            full_name: receiverProfile?.profile_type === 'client'
+              ? (receiverProfile?.full_name || `User ${message.receiver_id.slice(0, 8)}`)
+              : (receiverProfile?.username || receiverProfile?.full_name || `User ${message.receiver_id.slice(0, 8)}`),
             username: receiverProfile?.username || '',
             avatar_url: receiverProfile?.avatar_url || null
           }
@@ -352,7 +358,6 @@ export function useMessages() {
 
       return messagesWithProfiles
     } catch (err) {
-      console.error('Error fetching conversation messages:', err)
       return []
     }
   }, [user])
@@ -399,7 +404,7 @@ export function useMessages() {
         try {
           const { data: profileData, error: profileError } = await supabase
             .from('profiles')
-            .select('user_id, full_name, username, avatar_url')
+            .select('user_id, full_name, username, avatar_url, profile_type')
             .eq('user_id', receiverId)
             .single()
 
@@ -407,7 +412,7 @@ export function useMessages() {
             participantProfile = profileData
           }
         } catch (err) {
-          console.warn('Could not fetch receiver profile:', err)
+          // Could not fetch receiver profile for new conversation
         }
 
         // Create new conversation
@@ -415,9 +420,9 @@ export function useMessages() {
           id: conversationKey,
           participant: {
             user_id: receiverId,
-            name: participantProfile?.full_name || 
-                  participantProfile?.username || 
-                  `User ${receiverId.slice(0, 8)}`,
+            name: participantProfile?.profile_type === 'client'
+              ? (participantProfile?.full_name || `User ${receiverId.slice(0, 8)}`)
+              : (participantProfile?.username || participantProfile?.full_name || `User ${receiverId.slice(0, 8)}`),
             username: participantProfile?.username || '',
             avatar: participantProfile?.avatar_url || null
           },
@@ -431,7 +436,7 @@ export function useMessages() {
           .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()))
       }
     } catch (err) {
-      console.error('Error updating conversation locally:', err)
+      // Error updating conversation locally after sending message
     }
   }, [user])
 
@@ -467,7 +472,6 @@ export function useMessages() {
 
       return true
     } catch (err) {
-      console.error('Error sending message:', err)
       setError(err instanceof Error ? err.message : 'Failed to send message')
       return false
     }
@@ -496,7 +500,7 @@ export function useMessages() {
           : conv
       ))
     } catch (err) {
-      console.error('Error marking messages as read:', err)
+      // Error marking messages as read
     }
   }
 
@@ -523,7 +527,6 @@ export function useMessages() {
       // Remove from local state (this will hide the conversation until new messages arrive)
       setConversations(prev => prev.filter(conv => conv.participant.user_id !== participantId))
     } catch (err) {
-      console.error('Error deleting conversation:', err)
       setError(err instanceof Error ? err.message : 'Failed to delete conversation')
     }
   }
@@ -553,7 +556,7 @@ export function useMessages() {
           try {
             const { data: profileData, error: profileError } = await supabase
               .from('profiles')
-              .select('user_id, full_name, username, avatar_url')
+              .select('user_id, full_name, username, avatar_url, profile_type')
               .eq('user_id', messageData.sender_id)
               .single()
 
@@ -561,7 +564,7 @@ export function useMessages() {
               senderProfile = profileData
             }
           } catch (err) {
-            console.warn('Could not fetch sender profile via broadcast:', err)
+            // Could not fetch sender profile via broadcast
           }
 
           // Get current user profile for receiver
@@ -569,7 +572,7 @@ export function useMessages() {
           try {
             const { data: profileData, error: profileError } = await supabase
               .from('profiles')
-              .select('user_id, full_name, username, avatar_url')
+              .select('user_id, full_name, username, avatar_url, profile_type')
               .eq('user_id', user.id)
               .single()
 
@@ -577,7 +580,7 @@ export function useMessages() {
               currentUserProfile = profileData
             }
           } catch (err) {
-            console.warn('Could not fetch current user profile via broadcast:', err)
+            // Could not fetch current user profile via broadcast
           }
 
           // Create MessageWithProfiles object
@@ -591,13 +594,17 @@ export function useMessages() {
             deleted_at: null,
             sender: {
               user_id: messageData.sender_id,
-              full_name: senderProfile?.full_name || senderProfile?.username || `User ${messageData.sender_id.slice(0, 8)}`,
+              full_name: senderProfile?.profile_type === 'client'
+                ? (senderProfile?.full_name || `User ${messageData.sender_id.slice(0, 8)}`)
+                : (senderProfile?.username || senderProfile?.full_name || `User ${messageData.sender_id.slice(0, 8)}`),
               username: senderProfile?.username || '',
               avatar_url: senderProfile?.avatar_url || null
             },
             receiver: {
               user_id: messageData.receiver_id,
-              full_name: currentUserProfile?.full_name || currentUserProfile?.username || `User ${messageData.receiver_id.slice(0, 8)}`,
+              full_name: currentUserProfile?.profile_type === 'client'
+                ? (currentUserProfile?.full_name || `User ${messageData.receiver_id.slice(0, 8)}`)
+                : (currentUserProfile?.username || currentUserProfile?.full_name || `User ${messageData.receiver_id.slice(0, 8)}`),
               username: currentUserProfile?.username || '',
               avatar_url: currentUserProfile?.avatar_url || null
             }
@@ -632,9 +639,9 @@ export function useMessages() {
                 id: conversationKey,
                 participant: {
                   user_id: messageData.sender_id,
-                  name: senderProfile?.full_name ||
-                        senderProfile?.username ||
-                        `User ${messageData.sender_id.slice(0, 8)}`,
+                  name: senderProfile?.profile_type === 'client'
+                    ? (senderProfile?.full_name || `User ${messageData.sender_id.slice(0, 8)}`)
+                    : (senderProfile?.username || senderProfile?.full_name || `User ${messageData.sender_id.slice(0, 8)}`),
                   username: senderProfile?.username || '',
                   avatar: senderProfile?.avatar_url || null
                 },
@@ -649,7 +656,7 @@ export function useMessages() {
           })
 
         } catch (error) {
-          console.error('Error processing realtime message:', error)
+          // Error processing realtime message
         }
       })
       .subscribe()

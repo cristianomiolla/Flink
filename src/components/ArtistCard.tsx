@@ -4,10 +4,10 @@ import { Avatar } from './Avatar'
 import { ActionButton } from './ActionButton'
 import { useAuth } from '../hooks/useAuth'
 import { useFollowers } from '../hooks/useFollowers'
-import type { ArtistProfile } from '../types/portfolio'
+import type { DatabaseProfile } from '../types/portfolio'
 
 interface ArtistCardProps {
-  profile: ArtistProfile
+  profile: DatabaseProfile
   onArtistClick?: (artistId: string) => void
   onAuthRequired?: () => void
   onContactArtist?: (artistId: string) => void
@@ -18,7 +18,9 @@ interface ArtistCardProps {
 export function ArtistCard({ profile, onArtistClick, onAuthRequired, onContactArtist, onFollowUpdate, isHorizontal = false }: ArtistCardProps) {
   const { user, profile: currentUserProfile } = useAuth()
   const { getFollowerStats, toggleFollow, fetchFollowerStats } = useFollowers()
-  const displayName = profile.full_name || profile.username || 'Unknown Artist'
+  const displayName = profile.profile_type === 'client'
+    ? (profile.full_name || 'Unknown User')
+    : (profile.username || profile.full_name || 'Unknown Artist')
   
   const followerStats = getFollowerStats(profile.user_id)
   const isFollowing = followerStats?.is_following || false
