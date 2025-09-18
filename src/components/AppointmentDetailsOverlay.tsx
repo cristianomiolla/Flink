@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
-import './AuthOverlay.css'
+import './FormOverlay.css'
 
 interface BookingData {
   id: string
@@ -20,6 +20,7 @@ interface BookingData {
   appointment_date?: string
   appointment_duration?: number
   deposit_amount?: number
+  total_amount?: number
   artist_notes?: string
   status: string
   created_at: string
@@ -35,6 +36,7 @@ interface AppointmentDetailsOverlayProps {
   currentUserId?: string
   bookingId?: string
   onBookingUpdated?: () => void
+  showParticipants?: boolean
 }
 
 export function AppointmentDetailsOverlay({
@@ -45,7 +47,8 @@ export function AppointmentDetailsOverlay({
   clientName,
   artistId,
   bookingId,
-  onBookingUpdated
+  onBookingUpdated,
+  showParticipants = false
 }: AppointmentDetailsOverlayProps) {
   const { user } = useAuth()
   const [bookingData, setBookingData] = useState<BookingData | null>(null)
@@ -57,6 +60,7 @@ export function AppointmentDetailsOverlay({
     appointment_time: '',
     appointment_duration: '',
     deposit_amount: '',
+    total_amount: '',
     artist_notes: ''
   })
   const [saving, setSaving] = useState(false)
@@ -79,7 +83,7 @@ export function AppointmentDetailsOverlay({
           .maybeSingle()
 
         if (error) {
-          console.error('Error fetching booking data:', error)
+          // Error fetching booking data
         } else if (data) {
           setBookingData(data)
           // Initialize edit form data
@@ -89,11 +93,12 @@ export function AppointmentDetailsOverlay({
             appointment_time: appointmentDateTime ? appointmentDateTime.toTimeString().slice(0, 5) : '',
             appointment_duration: data.appointment_duration?.toString() || '',
             deposit_amount: data.deposit_amount?.toString() || '',
+            total_amount: data.total_amount?.toString() || '',
             artist_notes: data.artist_notes || ''
           })
         }
       } catch (error) {
-        console.error('Error fetching booking data:', error)
+        // Error fetching booking data
       } finally {
         setLoading(false)
       }
@@ -137,6 +142,7 @@ export function AppointmentDetailsOverlay({
     const originalTime = appointmentDateTime ? appointmentDateTime.toTimeString().slice(0, 5) : ''
     const originalDuration = bookingData.appointment_duration?.toString() || ''
     const originalDeposit = bookingData.deposit_amount?.toString() || ''
+    const originalTotalAmount = bookingData.total_amount?.toString() || ''
     const originalNotes = bookingData.artist_notes || ''
 
     return (
@@ -144,6 +150,7 @@ export function AppointmentDetailsOverlay({
       editFormData.appointment_time !== originalTime ||
       editFormData.appointment_duration !== originalDuration ||
       editFormData.deposit_amount !== originalDeposit ||
+      editFormData.total_amount !== originalTotalAmount ||
       editFormData.artist_notes !== originalNotes
     )
   }
@@ -254,6 +261,9 @@ export function AppointmentDetailsOverlay({
       if (editFormData.deposit_amount) {
         updateData.deposit_amount = parseFloat(editFormData.deposit_amount)
       }
+      if (editFormData.total_amount) {
+        updateData.total_amount = parseFloat(editFormData.total_amount)
+      }
       if (editFormData.artist_notes !== undefined) {
         updateData.artist_notes = editFormData.artist_notes
       }
@@ -269,7 +279,7 @@ export function AppointmentDetailsOverlay({
         .eq('id', bookingId)
 
       if (error) {
-        console.error('Error updating appointment:', error)
+        // Error updating appointment
         alert('Errore durante la modifica dell\'appuntamento. Riprova.')
         return
       }
@@ -293,7 +303,7 @@ export function AppointmentDetailsOverlay({
       }
 
     } catch (error) {
-      console.error('Error updating appointment:', error)
+      // Error updating appointment
       alert('Errore durante la modifica dell\'appuntamento. Riprova.')
     } finally {
       setSaving(false)
@@ -352,7 +362,7 @@ export function AppointmentDetailsOverlay({
         .eq('id', bookingId)
 
       if (error) {
-        console.error('Error cancelling appointment:', error)
+        // Error cancelling appointment
         alert('Errore durante la cancellazione dell\'appuntamento. Riprova.')
         return
       }
@@ -370,7 +380,7 @@ export function AppointmentDetailsOverlay({
       onClose()
 
     } catch (error) {
-      console.error('Error cancelling appointment:', error)
+      // Error cancelling appointment
       alert('Errore durante la cancellazione dell\'appuntamento. Riprova.')
     } finally {
       setCancelling(false)
@@ -412,14 +422,14 @@ export function AppointmentDetailsOverlay({
                           : 'Dettagli della richiesta'}</p>
           </div>
 
-          <div className="appointment-details-content">
+          <div className="auth-form">
             {loading ? (
               <div className="detail-item">
                 <div className="detail-value">Caricamento dati appuntamento...</div>
               </div>
             ) : bookingData ? (
               <>
-                {userType === 'client' && artistName && (
+                {showParticipants && userType === 'client' && artistName && (
                   <div className="detail-item">
                     <div className="detail-label">Artista</div>
                     <div className="detail-value">
@@ -428,7 +438,7 @@ export function AppointmentDetailsOverlay({
                   </div>
                 )}
 
-                {userType === 'artist' && clientName && (
+                {showParticipants && userType === 'artist' && clientName && (
                   <div className="detail-item">
                     <div className="detail-label">Cliente</div>
                     <div className="detail-value">
@@ -640,6 +650,32 @@ export function AppointmentDetailsOverlay({
                   </div>
                 )}
 
+                {(bookingData.total_amount || (isAppointmentCreator && canEditAppointment())) && (
+                  <div className="detail-item">
+                    {isAppointmentCreator && canEditAppointment() ? (
+                      <div className="form-group">
+                        <label className="form-label">PREZZO TOTALE TATUAGGIO (€)</label>
+                        <input
+                          type="number"
+                          className="form-input"
+                          placeholder="Es. 200"
+                          value={editFormData.total_amount}
+                          onChange={(e) => setEditFormData(prev => ({ ...prev, total_amount: e.target.value }))}
+                          min="0"
+                          step="10"
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        <div className="detail-label">Prezzo Totale</div>
+                        <div className="detail-value budget">
+                          €{bookingData.total_amount}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+
                 {(bookingData.deposit_amount || (isAppointmentCreator && canEditAppointment())) && (
                   <div className="detail-item">
                     {isAppointmentCreator && canEditAppointment() ? (
@@ -697,48 +733,48 @@ export function AppointmentDetailsOverlay({
                 <div className="detail-value">Errore nel caricamento dei dati.</div>
               </div>
             )}
+
+            {bookingData && (
+              <div className="booking-footer">
+                <span>
+                  {bookingData.status === 'scheduled' || bookingData.status === 'rescheduled' || bookingData.status === 'completed'
+                    ? 'Appuntamento creato il'
+                    : 'Richiesta creata il'} {formatCreatedDate()}
+                </span>
+              </div>
+            )}
+
+            {isAppointmentCreator && userType === 'artist' && bookingData?.status !== 'cancelled' && bookingData?.status !== 'completed' && (
+              <div className="form-actions">
+                {hasChanges() ? (
+                  <button
+                    type="button"
+                    className="action-btn"
+                    onClick={handleSaveChanges}
+                    disabled={saving}
+                  >
+                    <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                      <polyline points="17,21 17,13 7,13 7,21"></polyline>
+                      <polyline points="7,3 7,8 15,8"></polyline>
+                    </svg>
+                    <span className="action-text">{saving ? 'Salvando...' : 'Salva'}</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="action-btn"
+                    onClick={handleCancelAppointment}
+                  >
+                    <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                    <span className="action-text">Cancella</span>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
-
-          {bookingData && (
-            <div className="booking-footer" style={{ marginTop: '1rem', padding: '0.75rem', borderTop: '1px solid #eee', fontSize: '0.875rem', color: '#666' }}>
-              <span>
-                {bookingData.status === 'scheduled' || bookingData.status === 'rescheduled' || bookingData.status === 'completed'
-                  ? 'Appuntamento creato il'
-                  : 'Richiesta creata il'} {formatCreatedDate()}
-              </span>
-            </div>
-          )}
-
-          {isAppointmentCreator && userType === 'artist' && bookingData?.status !== 'cancelled' && bookingData?.status !== 'completed' && (
-            <div className="form-actions">
-              {hasChanges() && (
-                <button
-                  type="button"
-                  className="action-btn"
-                  onClick={handleSaveChanges}
-                  disabled={saving}
-                >
-                  <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                    <polyline points="17,21 17,13 7,13 7,21"></polyline>
-                    <polyline points="7,3 7,8 15,8"></polyline>
-                  </svg>
-                  <span className="action-text">{saving ? 'Salvando...' : 'Salva'}</span>
-                </button>
-              )}
-
-              <button
-                type="button"
-                className="action-btn"
-                onClick={handleCancelAppointment}
-              >
-                <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M18 6L6 18M6 6l12 12"></path>
-                </svg>
-                <span className="action-text">Cancella</span>
-              </button>
-            </div>
-          )}
           </div>
         </div>
       </div>
