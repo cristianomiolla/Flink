@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 import './FormOverlay.css'
@@ -36,6 +36,23 @@ export function ArtistAppointmentForm({
     total_amount: '',
     artist_notes: ''
   })
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element
+      if (durationDropdownOpen || timeDropdownOpen) {
+        const dropdown = target.closest('.custom-dropdown')
+        if (!dropdown) {
+          setDurationDropdownOpen(false)
+          setTimeDropdownOpen(false)
+        }
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [durationDropdownOpen, timeDropdownOpen])
 
   const durationOptions = [
     { value: '30', label: '30 minuti' },
@@ -251,7 +268,10 @@ export function ArtistAppointmentForm({
                 <button
                   type="button"
                   className="dropdown-trigger"
-                  onClick={() => setTimeDropdownOpen(!timeDropdownOpen)}
+                  onClick={() => {
+                    setTimeDropdownOpen(!timeDropdownOpen)
+                    setDurationDropdownOpen(false)
+                  }}
                 >
                   <span className="dropdown-text">
                     {appointmentForm.appointment_time 
@@ -291,7 +311,10 @@ export function ArtistAppointmentForm({
                 <button
                   type="button"
                   className="dropdown-trigger"
-                  onClick={() => setDurationDropdownOpen(!durationDropdownOpen)}
+                  onClick={() => {
+                    setDurationDropdownOpen(!durationDropdownOpen)
+                    setTimeDropdownOpen(false)
+                  }}
                 >
                   <span className="dropdown-text">
                     {appointmentForm.appointment_duration 

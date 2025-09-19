@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import './SearchBar.css'
 import { AuthOverlay } from './AuthOverlay'
 import { Header } from './Header'
+import { LocationSelect } from './LocationSelect'
 
 interface SearchBarProps {
   onSearch?: (searchTerm: string, location: string) => void
@@ -20,10 +21,10 @@ export const SearchBar = memo(function SearchBar({ onSearch, onLogoClick, hideOn
   const handleSearch = () => {
     // Always navigate to home with search parameters
     navigate(`/?search=${encodeURIComponent(searchTerm)}&location=${encodeURIComponent(location)}`)
-    
+
     // Also call the onSearch callback if provided (for compatibility)
     onSearch?.(searchTerm, location)
-    
+
     // Hide mobile location input after search
     setShowMobileLocationInput(false)
   }
@@ -38,9 +39,9 @@ export const SearchBar = memo(function SearchBar({ onSearch, onLogoClick, hideOn
     // Hide location input if focus is not moving to location select or search button
     setTimeout(() => {
       const activeElement = document.activeElement
-      const isLocationSelect = activeElement?.closest('.location-input-container')
+      const isLocationSelect = activeElement?.closest('.location-select-container')
       const isSearchButton = activeElement?.closest('.search-btn')
-      
+
       if (!isLocationSelect && !isSearchButton) {
         setShowMobileLocationInput(false)
       }
@@ -66,17 +67,12 @@ export const SearchBar = memo(function SearchBar({ onSearch, onLogoClick, hideOn
               onKeyPress={handleKeyPress}
             />
           </div>
-          <div className="location-input-container">
-            <span className="location-icon">📍</span>
-            <input
-              type="text"
-              className="location-input"
-              placeholder="Città"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              onKeyPress={handleKeyPress}
-            />
-          </div>
+          <LocationSelect
+            value={location}
+            onChange={setLocation}
+            placeholder="Città"
+            onKeyPress={handleKeyPress}
+          />
           <button 
             className="btn btn-accent search-btn"
             onClick={handleSearch}
@@ -105,17 +101,12 @@ export const SearchBar = memo(function SearchBar({ onSearch, onLogoClick, hideOn
               />
             </div>
             {showMobileLocationInput && (
-              <div className="location-input-container">
-                <span className="location-icon">📍</span>
-                <input
-                  type="text"
-                  className="location-input"
-                  placeholder="Città"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                />
-              </div>
+              <LocationSelect
+                value={location}
+                onChange={setLocation}
+                placeholder="Città"
+                onKeyPress={handleKeyPress}
+              />
             )}
             {showMobileLocationInput && (
               <button 

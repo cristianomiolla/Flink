@@ -1,0 +1,119 @@
+/* LocationSelect Styles */
+
+.location-select-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  min-width: 100px;
+  max-width: 150px;
+}
+
+.location-select-container .location-icon {
+  position: absolute;
+  left: 0.75rem;
+  font-size: 14px;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.location-select-container .location-input {
+  background: transparent;
+  border: none;
+  padding: 0.625rem 1rem 0.625rem 2.5rem;
+  font-size: 14px;
+  font-family: var(--font-body);
+  color: var(--foreground);
+  transition: all 0.2s;
+  outline: none;
+  width: 100%;
+}
+
+.location-select-container .location-input::placeholder {
+  color: var(--muted-foreground);
+}
+
+.location-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border: 1px solid var(--border-red);
+  border-top: none;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: var(--z-dropdown, 100);
+  animation: dropdown-appear 0.15s ease-out;
+}
+
+@keyframes dropdown-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.location-dropdown-item {
+  padding: 0.5rem 0.75rem !important;
+  font-size: 14px !important;
+  font-family: var(--font-body) !important;
+  text-transform: none !important;
+  font-weight: normal !important;
+  border-bottom: 1px solid var(--border);
+}
+
+.location-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+/* Scrollbar styling for dropdown */
+.location-dropdown::-webkit-scrollbar {
+  width: 4px;
+}
+
+.location-dropdown::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+
+.location-dropdown::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+.location-dropdown::-webkit-scrollbar-thumb:hover {
+  background: var(--border-red);
+}
+
+/* Mobile adjustments */
+@media (max-width: 767px) {
+  .location-select-container {
+    min-width: auto;
+    max-width: none;
+    width: 100%;
+  }
+
+  .location-select-container .location-input {
+    padding: 0.5rem 1rem 0.5rem 2rem;
+    border: 1px solid var(--border-red) !important;
+    border-radius: 0;
+    background: var(--background);
+  }
+
+  .location-dropdown {
+    border: 1px solid var(--border-red);
+    border-top: none;
+  }
+
+  .location-dropdown-item {
+    padding: 0.75rem !important;
+    font-size: 16px !important;
+  }
+
+}

@@ -14,6 +14,41 @@
   align-items: center;
 }
 
+/* Fade effect on desktop only */
+@media (min-width: 769px) {
+  .horizontal-scroll-container::before,
+  .horizontal-scroll-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .horizontal-scroll-container::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.8), transparent);
+  }
+
+  .horizontal-scroll-container::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(255, 255, 255, 0.8), transparent);
+  }
+
+  /* Show fade effects based on scroll position */
+  .horizontal-scroll-container.show-left-fade::before {
+    opacity: 1;
+  }
+
+  .horizontal-scroll-container.show-right-fade::after {
+    opacity: 1;
+  }
+}
+
 .scroll-arrow {
   position: absolute;
   top: 50%;
@@ -90,15 +125,21 @@
 
   /* tab-header mobile styles are handled in ArtistProfile.css */
 
+  /* Break out of container on mobile */
+  .horizontal-section .horizontal-scroll-container {
+    margin: 0 -1rem; /* Negative margin to break out of container */
+  }
+
   .horizontal-portfolio-grid,
   .horizontal-artist-grid {
     gap: 1rem;
+    padding: 0 1rem; /* Add horizontal padding to match container */
   }
 
   .horizontal-card-wrapper {
     width: 240px;
   }
-  
+
   /* Hide navigation arrows on mobile */
   .scroll-arrow {
     display: none;
@@ -109,9 +150,10 @@
   .horizontal-card-wrapper {
     width: 220px;
   }
-  
+
   .horizontal-portfolio-grid,
   .horizontal-artist-grid {
     gap: 0.875rem;
+    padding: 0 1rem; /* Maintain padding on smaller screens */
   }
 }

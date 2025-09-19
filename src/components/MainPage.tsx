@@ -46,12 +46,19 @@ export function MainPage() {
   useEffect(() => {
     const searchFromUrl = searchParams.get('search') || ''
     const locationFromUrl = searchParams.get('location') || ''
-    
+
     if (searchFromUrl || locationFromUrl) {
-      search(searchFromUrl, locationFromUrl)
-      setSearchSource('search-bar')
+      // Only apply URL search if it's not overridden by category search
+      if (searchSource !== 'category') {
+        search(searchFromUrl, locationFromUrl)
+        setSearchSource('search-bar')
+      }
+    } else if (searchSource === 'search-bar') {
+      // Reset search when URL parameters are cleared and source was search-bar
+      search('', '')
+      setSearchSource(null)
     }
-  }, [searchParams, search])
+  }, [searchParams, search, searchSource])
 
   const handleSearch = useCallback((searchTerm: string, location: string) => {
     setSearchSource('search-bar')

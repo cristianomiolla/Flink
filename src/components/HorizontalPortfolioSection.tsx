@@ -15,29 +15,38 @@ interface HorizontalPortfolioSectionProps {
   onDelete?: (itemId: string) => void
 }
 
-export function HorizontalPortfolioSection({ 
-  title, 
-  items, 
-  onArtistClick, 
-  onAuthRequired, 
+export function HorizontalPortfolioSection({
+  title,
+  items,
+  onArtistClick,
+  onAuthRequired,
   onContactArtist,
   onShowMore,
   onEdit,
   onDelete
 }: HorizontalPortfolioSectionProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const scrollWrapperRef = useRef<HTMLDivElement>(null)
   const [showLeftArrow, setShowLeftArrow] = useState(false)
   const [showRightArrow, setShowRightArrow] = useState(true)
 
   const updateArrowVisibility = () => {
-    if (scrollContainerRef.current) {
+    if (scrollContainerRef.current && scrollWrapperRef.current) {
       const container = scrollContainerRef.current
+      const wrapper = scrollWrapperRef.current
       const scrollLeft = container.scrollLeft
       const scrollWidth = container.scrollWidth
       const clientWidth = container.clientWidth
-      
-      setShowLeftArrow(scrollLeft > 0)
-      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1) // -1 for rounding tolerance
+
+      const hasLeftContent = scrollLeft > 0
+      const hasRightContent = scrollLeft < scrollWidth - clientWidth - 1 // -1 for rounding tolerance
+
+      setShowLeftArrow(hasLeftContent)
+      setShowRightArrow(hasRightContent)
+
+      // Update fade effect classes
+      wrapper.classList.toggle('show-left-fade', hasLeftContent)
+      wrapper.classList.toggle('show-right-fade', hasRightContent)
     }
   }
 
@@ -91,10 +100,10 @@ export function HorizontalPortfolioSection({
             <span className="action-text">Mostra di più</span>
           </button>
         </div>
-        
-        <div className="horizontal-scroll-container">
+
+        <div ref={scrollWrapperRef} className="horizontal-scroll-container">
           {showLeftArrow && (
-            <button 
+            <button
               className="scroll-arrow scroll-arrow-left"
               onClick={scrollLeft}
               aria-label="Scorri a sinistra"
@@ -104,14 +113,14 @@ export function HorizontalPortfolioSection({
               </svg>
             </button>
           )}
-          
-          <div 
+
+          <div
             ref={scrollContainerRef}
             className="horizontal-portfolio-grid"
           >
             {items.slice(0, 12).map((item) => (
               <div key={item.id} className="horizontal-card-wrapper">
-                <PortfolioCard 
+                <PortfolioCard
                   item={item}
                   onArtistClick={onArtistClick}
                   onAuthRequired={onAuthRequired}
@@ -122,9 +131,9 @@ export function HorizontalPortfolioSection({
               </div>
             ))}
           </div>
-          
+
           {showRightArrow && (
-            <button 
+            <button
               className="scroll-arrow scroll-arrow-right"
               onClick={scrollRight}
               aria-label="Scorri a destra"

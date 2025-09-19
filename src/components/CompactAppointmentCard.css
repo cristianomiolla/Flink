@@ -104,6 +104,14 @@
   line-height: 1;
 }
 
+.appointment-duration {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--grey-dark);
+  text-align: center;
+  margin-top: 0.25rem;
+}
+
 /* Appointment info */
 .appointment-info {
   display: flex;
@@ -148,12 +156,20 @@
   flex-shrink: 0;
 }
 
+.appointment-details-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
 .appointment-meta {
   display: flex;
   gap: 2rem;
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
+  flex: 1;
 }
 
 .compact-appointment-card .detail-item {
@@ -167,6 +183,57 @@
   padding: 0.25rem 0;
 }
 
+/* Integrated pricing component */
+.pricing-summary {
+  background: rgba(239, 67, 67, 0.1);
+  border: 1px solid var(--accent);
+  padding: 0.75rem 1rem;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 140px;
+}
+
+.pricing-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pricing-row.total {
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(239, 67, 67, 0.3);
+  margin-top: 0.25rem;
+}
+
+.pricing-label {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  color: var(--grey-dark);
+  opacity: 0.9;
+}
+
+.pricing-label.total {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.pricing-value {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.pricing-value.total {
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+/* Fallback for individual detail items */
 .compact-appointment-card .detail-item.total {
   background: rgba(239, 67, 67, 0.1);
   border: 1px solid var(--accent);
@@ -201,70 +268,500 @@
   margin-left: 0.25rem;
 }
 
+/* Review section */
+.appointment-review {
+  flex-shrink: 0;
+  min-width: fit-content;
+}
+
+.review-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.review-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stars {
+  color: #FFD700;
+  font-size: 1rem;
+  letter-spacing: 0.125rem;
+}
+
+.rating-number {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--grey-dark);
+}
+
+.review-comment {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  font-style: italic;
+  line-height: 1.4;
+  padding: 0.5rem 0.75rem;
+  background: var(--muted);
+  border-left: 3px solid var(--accent);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.review-missing {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.review-text {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+.review-cta-button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.review-cta-button:hover {
+  background: var(--accent-dark, #d63d3d);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.review-cta-button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Layout control */
+.desktop-layout {
+  display: block;
+}
+
+.mobile-layout {
+  display: none;
+}
+
+/* Mobile Layout Styles - consistent with desktop brutalist design */
+.mobile-appointment-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.mobile-participant {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--grey-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  margin: 0;
+  order: 1;
+}
+
+.mobile-datetime {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  width: 100%;
+  max-width: 120px;
+  padding: 0.75rem 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(239, 67, 67, 0.3);
+  box-sizing: border-box;
+  order: 2;
+  align-self: flex-start;
+}
+
+.mobile-date {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+  line-height: 1;
+}
+
+.mobile-time {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--foreground);
+  text-align: center;
+  line-height: 1;
+}
+
+.mobile-duration {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--grey-dark);
+  text-align: center;
+  margin-top: 0.25rem;
+}
+
+.mobile-subject {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.3;
+  word-break: break-word;
+  margin: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.mobile-bottom-section {
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.mobile-details {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 1;
+}
+
+.mobile-price {
+  font-size: 0.875rem;
+  color: var(--grey-dark);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  padding: 0.25rem 0;
+}
+
+.mobile-price.total {
+  background: rgba(239, 67, 67, 0.1);
+  border: 1px solid var(--accent);
+  padding: 0.5rem 0.75rem;
+  font-weight: 700;
+  color: var(--foreground);
+  border-radius: 0;
+}
+
+.mobile-price.deposit {
+  background: rgba(23, 23, 23, 0.05);
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  font-weight: 700;
+  color: var(--grey-dark);
+  border-radius: 0;
+}
+
+/* Mobile pricing summary */
+.mobile-pricing-summary {
+  background: rgba(239, 67, 67, 0.1);
+  border: 1px solid var(--accent);
+  padding: 0.625rem 0.75rem;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-width: 120px;
+}
+
+.mobile-pricing-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mobile-pricing-row.total {
+  padding-top: 0.375rem;
+  border-top: 1px solid rgba(239, 67, 67, 0.3);
+  margin-top: 0.125rem;
+}
+
+.mobile-pricing-label {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  color: var(--grey-dark);
+  opacity: 0.9;
+}
+
+.mobile-pricing-label.total {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.mobile-pricing-value {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.mobile-pricing-value.total {
+  font-size: 0.875rem;
+  color: var(--accent);
+}
+
+/* Fallback for individual mobile price items */
+.mobile-price.total .price-label,
+.mobile-price.deposit .price-label {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.mobile-price.total .price-value,
+.mobile-price.deposit .price-value {
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin-left: 0.25rem;
+}
+
+.mobile-detail {
+  font-size: 0.875rem;
+  color: var(--grey-dark);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  padding: 0.25rem 0;
+}
+
+.mobile-review {
+  flex-shrink: 0;
+  min-width: fit-content;
+}
+
+.mobile-review-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mobile-review-rating {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mobile-stars {
+  color: #FFD700;
+  font-size: 1rem;
+  letter-spacing: 0.125rem;
+}
+
+.mobile-rating {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--grey-dark);
+}
+
+.mobile-review-comment {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  font-style: italic;
+  line-height: 1.4;
+  padding: 0.5rem 0.75rem;
+  background: var(--muted);
+  border-left: 3px solid var(--accent);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.mobile-no-review {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mobile-review-text {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+.mobile-review-cta-button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+.mobile-review-cta-button:hover {
+  background: var(--accent-dark, #d63d3d);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.mobile-review-cta-button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
 /* Mobile responsive */
 @media (max-width: 768px) {
+  /* Switch to mobile layout */
+  .desktop-layout {
+    display: none;
+  }
+
+  .mobile-layout {
+    display: block;
+  }
+
   .compact-appointment-card {
-    padding: 1.25rem;
-    height: 140px;
+    padding: 1rem;
+    min-height: 120px;
+    height: auto;
   }
 
-  .appointment-main {
-    gap: 1.5rem;
+  /* Responsive adjustments for mobile */
+  .mobile-appointment-header {
+    gap: 0.625rem;
+    margin-bottom: 0.75rem;
   }
 
-  .appointment-datetime {
-    width: 90px;
-    max-width: 90px;
-    padding: 0.5rem 0.375rem;
+  .mobile-datetime {
+    max-width: 100px;
+    padding: 0.625rem 0.375rem;
+    gap: 0.25rem;
   }
 
-  .appointment-date {
+  .mobile-date {
     font-size: 0.75rem;
   }
 
-  .appointment-time {
+  .mobile-time {
     font-size: 1.25rem;
   }
 
-  .appointment-info {
-    gap: 0.5rem;
-    padding-left: 0.25rem;
-  }
-
-  .participant-name {
+  .mobile-duration {
     font-size: 0.6875rem;
   }
 
-  .appointment-subject {
+  .mobile-participant {
+    font-size: 0.6875rem;
+  }
+
+  .mobile-subject {
     font-size: 1rem;
-    -webkit-line-clamp: 2;
   }
 
-  .appointment-details {
+  .mobile-bottom-section {
     padding-top: 0.75rem;
+    margin-top: 0.75rem;
+    gap: 0.875rem;
   }
 
-  .appointment-meta {
-    gap: 1.5rem;
+  .mobile-details {
+    gap: 1rem;
   }
 
-  .compact-appointment-card .detail-item {
+  .mobile-price.total .price-value,
+  .mobile-price.deposit .price-value {
     font-size: 0.75rem;
-    gap: 0.375rem;
   }
 
-  .compact-appointment-card .detail-item.total,
-  .compact-appointment-card .detail-item.deposit {
-    padding: 0.375rem 0.5rem;
-  }
-
-  .compact-appointment-card .detail-item.total .price-label,
-  .compact-appointment-card .detail-item.deposit .price-label {
+  .mobile-price.total .price-label,
+  .mobile-price.deposit .price-label {
     font-size: 0.5625rem;
   }
 
-  .compact-appointment-card .detail-item.total .price-value,
-  .compact-appointment-card .detail-item.deposit .price-value {
+  .mobile-detail {
+    font-size: 0.75rem;
+  }
+
+  .mobile-stars {
+    font-size: 0.875rem;
+  }
+
+  .mobile-rating {
+    font-size: 0.6875rem;
+  }
+
+  .mobile-review-text {
+    font-size: 0.6875rem;
+  }
+
+  .mobile-review-cta-button {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.625rem;
+    gap: 0.125rem;
+  }
+
+  .mobile-pricing-summary {
+    padding: 0.5rem 0.625rem;
+    gap: 0.25rem;
+    min-width: 100px;
+  }
+
+  .mobile-pricing-row {
+    gap: 0.5rem;
+  }
+
+  .mobile-pricing-label {
+    font-size: 0.5625rem;
+  }
+
+  .mobile-pricing-value {
+    font-size: 0.6875rem;
+  }
+
+  .mobile-pricing-value.total {
     font-size: 0.75rem;
   }
 }
@@ -272,40 +769,80 @@
 /* Very small screens */
 @media (max-width: 480px) {
   .compact-appointment-card {
-    height: 120px;
-    padding: 1rem;
+    padding: 0.875rem;
+    min-height: 110px;
   }
 
-  .appointment-main {
-    flex-direction: column;
-    align-items: flex-start;
+  .mobile-appointment-header {
+    gap: 0.5rem;
+    margin-bottom: 0.625rem;
+  }
+
+  .mobile-datetime {
+    max-width: 90px;
+    padding: 0.5rem 0.25rem;
+    gap: 0.125rem;
+  }
+
+  .mobile-date {
+    font-size: 0.6875rem;
+  }
+
+  .mobile-time {
+    font-size: 1.125rem;
+  }
+
+  .mobile-duration {
+    font-size: 0.625rem;
+  }
+
+  .mobile-subject {
+    font-size: 0.875rem;
+  }
+
+  .mobile-bottom-section {
+    padding-top: 0.625rem;
+    margin-top: 0.625rem;
     gap: 0.75rem;
   }
 
-  .appointment-datetime {
-    flex-direction: row;
-    min-width: auto;
-    gap: 1rem;
-    padding: 0.5rem 0.75rem;
-    align-self: stretch;
-    justify-content: center;
+  .mobile-details {
+    gap: 0.75rem;
   }
 
-  .appointment-date,
-  .appointment-time {
-    text-align: center;
+  .mobile-price.total .price-value,
+  .mobile-price.deposit .price-value {
+    font-size: 0.6875rem;
   }
 
-  .appointment-info {
+  .mobile-detail {
+    font-size: 0.6875rem;
+  }
+
+  .mobile-review-cta-button {
+    padding: 0.1875rem 0.375rem;
+    font-size: 0.5625rem;
+  }
+
+  .mobile-pricing-summary {
+    padding: 0.375rem 0.5rem;
+    gap: 0.1875rem;
+    min-width: 90px;
+  }
+
+  .mobile-pricing-row {
     gap: 0.375rem;
-    padding-left: 0;
   }
 
-  .appointment-details {
-    padding-top: 0.5rem;
+  .mobile-pricing-label {
+    font-size: 0.5rem;
   }
 
-  .appointment-meta {
-    gap: 1rem;
+  .mobile-pricing-value {
+    font-size: 0.625rem;
+  }
+
+  .mobile-pricing-value.total {
+    font-size: 0.6875rem;
   }
 }

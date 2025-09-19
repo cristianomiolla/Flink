@@ -13,31 +13,40 @@ interface HorizontalArtistSectionProps {
   onShowMore?: () => void
 }
 
-function HorizontalArtistSection({ 
-  title, 
-  artists, 
-  onArtistClick, 
-  onAuthRequired, 
+function HorizontalArtistSection({
+  title,
+  artists,
+  onArtistClick,
+  onAuthRequired,
   onContactArtist,
-  onShowMore 
+  onShowMore
 }: HorizontalArtistSectionProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const scrollWrapperRef = useRef<HTMLDivElement>(null)
   const [showLeftArrow, setShowLeftArrow] = useState(false)
   const [showRightArrow, setShowRightArrow] = useState(true)
 
   const updateArrowVisibility = () => {
-    if (scrollContainerRef.current) {
+    if (scrollContainerRef.current && scrollWrapperRef.current) {
       const container = scrollContainerRef.current
-      
+      const wrapper = scrollWrapperRef.current
+
       // Ensure container is rendered and has content
       if (container.scrollWidth === 0) return
-      
+
       const scrollLeft = container.scrollLeft
       const scrollWidth = container.scrollWidth
       const clientWidth = container.clientWidth
-      
-      setShowLeftArrow(scrollLeft > 0)
-      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1) // -1 for rounding tolerance
+
+      const hasLeftContent = scrollLeft > 0
+      const hasRightContent = scrollLeft < scrollWidth - clientWidth - 1 // -1 for rounding tolerance
+
+      setShowLeftArrow(hasLeftContent)
+      setShowRightArrow(hasRightContent)
+
+      // Update fade effect classes
+      wrapper.classList.toggle('show-left-fade', hasLeftContent)
+      wrapper.classList.toggle('show-right-fade', hasRightContent)
     }
   }
 
@@ -92,9 +101,9 @@ function HorizontalArtistSection({
           </button>
         </div>
         
-        <div className="horizontal-scroll-container">
+        <div ref={scrollWrapperRef} className="horizontal-scroll-container">
           {showLeftArrow && (
-            <button 
+            <button
               className="scroll-arrow scroll-arrow-left"
               onClick={scrollLeft}
               aria-label="Scorri a sinistra"
@@ -104,8 +113,8 @@ function HorizontalArtistSection({
               </svg>
             </button>
           )}
-          
-          <div 
+
+          <div
             ref={scrollContainerRef}
             className="horizontal-artist-grid"
           >

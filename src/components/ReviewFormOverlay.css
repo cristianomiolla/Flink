@@ -1,0 +1,114 @@
+/* Import design tokens */
+@import '../styles/tokens.css';
+
+/* Rating section specific styles */
+.rating-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.star-rating {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.star-button {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0.25rem;
+  line-height: 1;
+  font-family: inherit;
+  user-select: none;
+}
+
+.star-button:hover {
+  color: #FFD700;
+  transform: scale(1.1);
+}
+
+.star-button.filled {
+  color: #FFD700;
+}
+
+.star-button:active {
+  transform: scale(0.95);
+}
+
+.rating-text {
+  min-height: 1.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.rating-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+
+/* Form actions - override disabled state for submit button */
+.form-actions .action-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.form-actions .action-btn[disabled]:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Character count styling */
+.char-count {
+  font-size: 0.6875rem;
+  color: var(--muted-foreground);
+  text-align: right;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+/* Required indicator */
+.required-indicator {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .star-rating {
+    justify-content: center;
+  }
+
+  .star-button {
+    font-size: 1.75rem;
+    padding: 0.375rem;
+  }
+
+  .rating-section {
+    align-items: center;
+    text-align: center;
+  }
+
+}
+
+@media (max-width: 480px) {
+  .star-button {
+    font-size: 1.5rem;
+    padding: 0.25rem;
+  }
+
+  .rating-value {
+    font-size: 0.75rem;
+  }
+
+}

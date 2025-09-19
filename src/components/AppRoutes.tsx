@@ -67,7 +67,7 @@ export function AppRoutes() {
         
         {/* Appointments Route */}
         <Route path="/appointments" element={<AppointmentsPage />} />
-        
+
         <Route path="/settings" element={<SettingsPage onLogoClick={handleLogoClick} />} />
         <Route path="/become-artist" element={<BecomeArtistPage onLogoClick={handleLogoClick} />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />

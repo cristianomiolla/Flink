@@ -129,7 +129,7 @@ export function usePortfolioSearch() {
   const filteredItems = useMemo(() => {
     // Early return for empty data
     if (portfolioItems.length === 0) return []
-    
+
     let items = portfolioItems
 
     // Apply flash filter first (most selective)
