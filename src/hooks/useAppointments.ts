@@ -21,6 +21,10 @@ export interface AppointmentData {
   created_at: string
   expires_at: string | null
   appointment_date: string | null
+  appointment_duration?: number
+  total_amount?: number
+  deposit_amount?: number
+  artist_notes?: string
   client_profile?: {
     full_name: string | null
     username: string | null

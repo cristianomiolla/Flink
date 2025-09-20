@@ -11,7 +11,7 @@ interface EmailChangeOverlayProps {
   onClose: () => void
 }
 
-interface FormData {
+interface EmailFormData extends Record<string, unknown> {
   newEmail: string
 }
 
@@ -26,7 +26,7 @@ export function EmailChangeOverlay({ isOpen, onClose }: EmailChangeOverlayProps)
     setSuccessMessage,
     handleInputChange,
     setFormErrors
-  } = useFormOverlay<FormData>({
+  } = useFormOverlay<EmailFormData>({
     isOpen,
     initialFormData: { newEmail: '' }
   })

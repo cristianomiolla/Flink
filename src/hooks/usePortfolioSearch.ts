@@ -111,11 +111,11 @@ export function usePortfolioSearch() {
       }
 
       // Transform data to include follower_count
-      const transformedProfiles: ArtistProfile[] = profilesData?.map((profile: Record<string, unknown>) => ({
+      const transformedProfiles: ArtistProfile[] = profilesData?.map((profile: any) => ({
         ...profile,
-        follower_count: profile.followers?.length || 0,
+        follower_count: Array.isArray(profile.followers) ? profile.followers.length : 0,
         followers: undefined // Remove the nested followers array
-      })) || []
+      } as ArtistProfile)) || []
 
       setArtistProfiles(transformedProfiles)
       

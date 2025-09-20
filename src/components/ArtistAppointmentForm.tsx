@@ -157,7 +157,7 @@ export function ArtistAppointmentForm({
 
       if (fetchError) {
         // Error fetching existing booking
-        setError('Errore nel recuperare la prenotazione esistente.')
+        console.error('Errore nel recuperare la prenotazione esistente.')
         return
       }
 
@@ -183,7 +183,7 @@ export function ArtistAppointmentForm({
 
         if (updateError) {
           // Error updating appointment
-          setError('Errore nell\'invio dell\'appuntamento. Riprova.')
+          console.error('Errore nell\'invio dell\'appuntamento. Riprova.')
           return
         }
         insertedData = data
@@ -202,7 +202,7 @@ export function ArtistAppointmentForm({
 
         if (insertError) {
           // Error saving appointment
-          setError('Errore nell\'invio dell\'appuntamento. Riprova.')
+          console.error('Errore nell\'invio dell\'appuntamento. Riprova.')
           return
         }
         insertedData = data
