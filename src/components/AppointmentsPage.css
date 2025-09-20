@@ -1,66 +1,88 @@
 
 /* Page Container Styles */
 .page-container {
-  min-height: 100vh;
   background: var(--background);
   color: var(--foreground);
 }
 
 .page-content {
-  padding: 2rem 0;
-}
-
-/* Filter Chips */
-.filter-chips {
+  height: 100%;
+  overflow-y: auto;
   display: flex;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
-  justify-content: center;
-  flex-wrap: wrap;
+  flex-direction: column;
+  padding: 0 2rem;
 }
 
-.filter-chip {
-  background: transparent;
-  border: 2px solid var(--foreground);
-  color: var(--foreground);
-  padding: 0.5rem 1rem;
-  font-family: var(--font-family);
-  font-weight: 700;
-  font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 2px 2px 0 var(--foreground);
+
+/* Management Layout for Artists - same as messages-layout */
+.appointments-container.management-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(400px, 1fr);
+  height: calc(100vh - 140px);
+  max-width: 1200px;
+  width: 100%;
+  margin: 2rem auto 0;
+  gap: 0;
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: var(--shadow-heavy);
+  overflow: hidden;
+}
+
+/* Dynamic Content Area - same as chat-conversation-section */
+.management-content {
+  height: 100%;
+  overflow: hidden;
   position: relative;
 }
 
-.filter-chip:hover {
+/* Hidden sidebar layout */
+.appointments-container.management-layout.sidebar-hidden {
+  grid-template-columns: 1fr;
+}
+
+.appointments-container.management-layout.sidebar-hidden .management-sidebar {
+  display: none;
+}
+
+/* Sidebar toggle button */
+.sidebar-toggle-btn {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  width: 36px;
+  height: 36px;
+  background: var(--foreground);
+  color: var(--background);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 400;
+  transition: all 0.2s ease;
+  border-radius: 0;
+  z-index: 10;
+}
+
+.sidebar-toggle-btn:hover {
   background: var(--accent);
-  border-color: var(--accent);
   color: var(--background);
-  transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 0 var(--accent);
 }
 
-.filter-chip.active {
-  background: var(--foreground);
-  border-color: var(--foreground);
-  color: var(--background);
-  box-shadow: 2px 2px 0 var(--foreground);
+/* Page Header */
+.page-header {
+  flex-shrink: 0;
+  padding: 2rem 0 0;
 }
 
-.filter-chip.active:hover {
-  background: var(--foreground);
-  border-color: var(--foreground);
-  transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 0 var(--foreground);
-}
-
-
+/* Category Tags - imported from CategoryBar.css */
 
 .appointments-content {
   width: 100%;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .appointments-list {
@@ -68,6 +90,7 @@
   flex-direction: column;
   gap: 1.5rem;
   align-items: center;
+  padding: 2rem 0;
 }
 
 /* Apply sent message styling to appointment cards */
@@ -75,6 +98,11 @@
   background: rgba(239, 67, 67, 0.1);
   border: 1px solid var(--accent);
   width: 450px;
+}
+
+
+.appointments-list .empty-state .empty-content {
+  margin: 0;
 }
 
 
@@ -115,33 +143,101 @@
 
 /* Mobile responsive */
 @media (max-width: 768px) {
-  .page-container {
-    min-height: calc(100vh - 2rem - 70px - env(safe-area-inset-bottom));
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .appointments-page .container {
+  .appointments-container.management-layout {
     margin: 0;
+    height: 100vh;
+    max-width: 100%;
+    border: none;
+    grid-template-columns: 240px minmax(300px, 1fr);
   }
 
   .page-content {
-    flex: 1;
-    padding: 32px 16px;
+    padding: 0 1rem;
   }
-  
+
+  .sidebar-toggle-btn {
+    top: 1rem;
+    left: 1rem;
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+
   .appointments-list .booking-request-card {
     width: 100%;
     max-width: none;
   }
 
-  .filter-chips {
-    gap: 0.5rem;
-    margin-top: 1rem;
-  }
-
-  .filter-chip {
+  .category-tag {
     padding: 0.4rem 0.8rem;
     font-size: 0.8rem;
+  }
+}
+
+
+/* Dashboard Stats */
+.dashboard-stats {
+  margin: 1.5rem 0;
+  display: grid;
+  grid-template-columns: repeat(2, 150px);
+  gap: 1rem;
+}
+
+.stats-box {
+  background: var(--background);
+  border: 1px solid var(--border);
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
+}
+
+.stats-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.stats-label {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+
+.stats-value {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--accent);
+  line-height: 1.3;
+}
+
+/* Dashboard Stats Mobile */
+@media (max-width: 767px) {
+  .dashboard-stats {
+    margin: 1rem 0;
+    grid-template-columns: 1fr;
+  }
+
+  .stats-box {
+    padding: 0.75rem;
+  }
+
+  .stats-label {
+    font-size: 0.75rem;
+  }
+
+  .stats-value {
+    font-size: 0.875rem;
   }
 }

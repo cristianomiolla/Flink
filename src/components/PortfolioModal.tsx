@@ -89,7 +89,7 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
   const handleLike = async () => {
     try {
       await toggleLike()
-    } catch (error) {
+    } catch {
       // Error toggling like
     }
   }

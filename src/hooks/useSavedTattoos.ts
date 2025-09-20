@@ -37,7 +37,7 @@ export function useSavedTattoos() {
 
       const savedIds = new Set(data.map(item => item.portfolio_item_id))
       setSavedTattoos(savedIds)
-    } catch (error) {
+    } catch {
       // Error loading saved tattoos
     } finally {
       setLoading(false)
@@ -67,7 +67,7 @@ export function useSavedTattoos() {
       // Update local state
       setSavedTattoos(prev => new Set([...prev, portfolioItemId]))
       return true
-    } catch (error) {
+    } catch {
       return false
     }
   }, [user])
@@ -97,7 +97,7 @@ export function useSavedTattoos() {
         return newSet
       })
       return true
-    } catch (error) {
+    } catch {
       return false
     }
   }, [getUserId])

@@ -428,7 +428,7 @@ export function ArtistProfile() {
                       </div>
                       <div className="reviews-summary">
                         <div className="rating-average">
-                          <span className="rating-number">4.9</span>
+                          <span className="artist-rating-number">4.9</span>
                           <div className="rating-stars">★★★★★</div>
                           <span className="rating-count">127 recensioni</span>
                         </div>

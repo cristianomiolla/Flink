@@ -26,7 +26,7 @@ export function useArtistServices(userId?: string) {
 
       setServices(data || [])
       setError(null)
-    } catch (err) {
+    } catch {
       setError('Errore nel caricamento dei servizi')
       setServices([])
     } finally {
@@ -97,7 +97,7 @@ export function useArtistServices(userId?: string) {
       setServices(prev => [data, ...prev])
       setError(null)
       return true
-    } catch (err) {
+    } catch {
       setError('Errore nella creazione del servizio')
       return false
     }
@@ -106,7 +106,7 @@ export function useArtistServices(userId?: string) {
   const updateService = useCallback(async (serviceId: string, updates: Partial<CreateServiceData>): Promise<boolean> => {
     try {
       // Prepare updates according to new schema
-      const updateData: any = {}
+      const updateData: Record<string, unknown> = {}
       if (updates.name !== undefined) updateData.name = updates.name
       if (updates.description !== undefined) updateData.description = updates.description || null
       if (updates.body_area !== undefined) updateData.body_area = updates.body_area || null
@@ -148,7 +148,7 @@ export function useArtistServices(userId?: string) {
       ))
       setError(null)
       return true
-    } catch (err) {
+    } catch {
       setError('Errore nell\'aggiornamento del servizio')
       return false
     }
@@ -167,7 +167,7 @@ export function useArtistServices(userId?: string) {
       setServices(prev => prev.filter(service => service.id !== serviceId))
       setError(null)
       return true
-    } catch (err) {
+    } catch {
       setError('Errore nella cancellazione del servizio')
       return false
     }

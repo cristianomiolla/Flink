@@ -40,7 +40,7 @@ export function usePortfolioLikes(portfolioItemId: string) {
       
       setTableExists(true)
       fetchLikeData()
-    } catch (error) {
+    } catch {
       // Portfolio likes table not available
       setTableExists(false)
     }
@@ -81,7 +81,7 @@ export function usePortfolioLikes(portfolioItemId: string) {
         setLikeCount(count || 0)
         setIsLiked(false)
       }
-    } catch (error) {
+    } catch {
       setLikeCount(0)
       setIsLiked(false)
     }
@@ -134,8 +134,6 @@ export function usePortfolioLikes(portfolioItemId: string) {
         setIsLiked(true)
         setLikeCount(prev => prev + 1)
       }
-    } catch (error) {
-      throw error
     } finally {
       setLoading(false)
     }

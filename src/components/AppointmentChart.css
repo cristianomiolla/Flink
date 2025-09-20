@@ -1,0 +1,87 @@
+@import '../styles/tokens.css';
+
+.appointment-chart {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: var(--background);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.chart-title {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 1rem 0;
+  text-align: center;
+}
+
+/* View Toggle Container */
+.appointment-chart .toggle-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+/* View Toggle Styles */
+.appointment-chart .view-toggle {
+  display: inline-flex;
+}
+
+.chart-container {
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+}
+
+.chart-svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.chart-axis-label {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  fill: var(--muted-foreground);
+}
+
+.chart-point-label {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  fill: var(--foreground);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .appointment-chart {
+    margin: 1.5rem 0;
+    padding: 1rem;
+  }
+
+  .chart-title {
+    font-size: 0.875rem;
+    margin: 0.75rem 0 1rem 0;
+  }
+
+  .chart-container {
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .chart-svg {
+    min-width: 350px;
+  }
+
+  .chart-axis-label {
+    font-size: 0.7rem;
+  }
+
+  .chart-point-label {
+    font-size: 0.7rem;
+  }
+}

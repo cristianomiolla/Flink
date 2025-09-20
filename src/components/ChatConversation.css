@@ -134,7 +134,7 @@
   height: 18px !important;
 }
 
-.participant-name {
+.conversation-participant-name {
   font-family: var(--font-heading);
   font-size: 1.125rem;
   font-weight: 800;
@@ -149,7 +149,7 @@
 
 /* Mobile optimization */
 @media (max-width: 768px) {
-  .participant-name {
+  .conversation-participant-name {
     font-size: 14px;
     font-weight: 700;
   }

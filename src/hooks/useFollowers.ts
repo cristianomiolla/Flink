@@ -55,7 +55,7 @@ export function useFollowers() {
       })
 
       setFollowerStats(newStats)
-    } catch (error) {
+    } catch {
       // Error fetching follower stats
     } finally {
       setLoading(false)
@@ -102,7 +102,7 @@ export function useFollowers() {
       })
 
       return { success: true }
-    } catch (error) {
+    } catch {
       return { error: 'Failed to follow artist' }
     }
   }, [user, followerStats])
@@ -140,7 +140,7 @@ export function useFollowers() {
       })
 
       return { success: true }
-    } catch (error) {
+    } catch {
       return { error: 'Failed to unfollow artist' }
     }
   }, [user, followerStats])

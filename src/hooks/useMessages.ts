@@ -162,7 +162,7 @@ export function useMessages() {
               profilesMap.set(profile.user_id, profile)
             })
           }
-        } catch (err) {
+        } catch {
           // Could not fetch profile data, using fallback names
         }
       }
@@ -320,7 +320,7 @@ export function useMessages() {
             profilesMap.set(profile.user_id, profile)
           })
         }
-      } catch (err) {
+      } catch {
         // Could not fetch profile data for conversation, using fallback names
       }
 
@@ -357,7 +357,7 @@ export function useMessages() {
       })
 
       return messagesWithProfiles
-    } catch (err) {
+    } catch {
       return []
     }
   }, [user])
@@ -411,7 +411,7 @@ export function useMessages() {
           if (!profileError && profileData) {
             participantProfile = profileData
           }
-        } catch (err) {
+        } catch {
           // Could not fetch receiver profile for new conversation
         }
 
@@ -435,7 +435,7 @@ export function useMessages() {
         setConversations(prev => [newConversation, ...prev]
           .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()))
       }
-    } catch (err) {
+    } catch {
       // Error updating conversation locally after sending message
     }
   }, [user])
@@ -499,7 +499,7 @@ export function useMessages() {
           ? { ...conv, unreadCount: 0 }
           : conv
       ))
-    } catch (err) {
+    } catch {
       // Error marking messages as read
     }
   }
@@ -563,7 +563,7 @@ export function useMessages() {
             if (!profileError && profileData) {
               senderProfile = profileData
             }
-          } catch (err) {
+          } catch {
             // Could not fetch sender profile via broadcast
           }
 
@@ -579,7 +579,7 @@ export function useMessages() {
             if (!profileError && profileData) {
               currentUserProfile = profileData
             }
-          } catch (err) {
+          } catch {
             // Could not fetch current user profile via broadcast
           }
 
@@ -655,7 +655,7 @@ export function useMessages() {
             }
           })
 
-        } catch (error) {
+        } catch {
           // Error processing realtime message
         }
       })

@@ -1,5 +1,5 @@
 /* Import design tokens */
-@import '../styles/tokens.css';
+/* tokens.css is imported globally in index.css */
 
 .compact-appointment-card {
   background: rgba(239, 67, 67, 0.1);
@@ -125,7 +125,7 @@
   overflow: hidden;
 }
 
-.participant-name {
+.appointment-participant-name {
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--grey-dark);
@@ -292,7 +292,7 @@
   letter-spacing: 0.125rem;
 }
 
-.rating-number {
+.compact-rating-number {
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--grey-dark);
@@ -588,7 +588,7 @@
   letter-spacing: 0.125rem;
 }
 
-.mobile-rating {
+.mobile-compact-rating-number {
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--grey-dark);
@@ -729,7 +729,7 @@
     font-size: 0.875rem;
   }
 
-  .mobile-rating {
+  .mobile-compact-rating-number {
     font-size: 0.6875rem;
   }
 

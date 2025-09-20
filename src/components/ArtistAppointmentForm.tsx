@@ -23,9 +23,9 @@ export function ArtistAppointmentForm({
 }: ArtistAppointmentFormProps) {
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const [durationDropdownOpen, setDurationDropdownOpen] = useState(false)
   const [timeDropdownOpen, setTimeDropdownOpen] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({})
 
   const [appointmentForm, setAppointmentForm] = useState({
     subject: existingSubject,
@@ -80,21 +80,66 @@ export function ArtistAppointmentForm({
 
   const timeOptions = generateTimeOptions()
 
+  // Check if required fields are filled
+  const areRequiredFieldsFilled = () => {
+    return appointmentForm.subject.trim() &&
+           appointmentForm.appointment_date &&
+           appointmentForm.appointment_time &&
+           appointmentForm.total_amount &&
+           appointmentForm.deposit_amount
+  }
+
+  // Validate form and set field errors (only for filled fields)
+  const validateForm = () => {
+    const errors: {[key: string]: string} = {}
+
+    // Only validate numeric fields if they are filled
+    if (appointmentForm.total_amount) {
+      const totalAmount = parseFloat(appointmentForm.total_amount)
+      if (totalAmount <= 0) {
+        errors.total_amount = 'Il prezzo deve essere maggiore di zero'
+      } else if (totalAmount % 10 !== 0) {
+        errors.total_amount = 'Il prezzo deve essere un multiplo di 10 (es. 50, 100, 200)'
+      }
+    }
+
+    if (appointmentForm.deposit_amount) {
+      const depositAmount = parseFloat(appointmentForm.deposit_amount)
+      if (depositAmount <= 0) {
+        errors.deposit_amount = 'L\'acconto deve essere maggiore di zero'
+      } else if (depositAmount % 10 !== 0) {
+        errors.deposit_amount = 'L\'acconto deve essere un multiplo di 10 (es. 50, 100, 200)'
+      }
+    }
+
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
+  // Clear field error when user starts typing
+  const clearFieldError = (fieldName: string) => {
+    if (fieldErrors[fieldName]) {
+      setFieldErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[fieldName]
+        return newErrors
+      })
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!user) {
-      setError('Devi essere autenticato')
       return
     }
 
-    if (!appointmentForm.subject || !appointmentForm.appointment_date || !appointmentForm.appointment_time || !appointmentForm.deposit_amount || !appointmentForm.total_amount) {
-      setError('Compila tutti i campi obbligatori')
+    // Check required fields and validate form
+    if (!areRequiredFieldsFilled() || !validateForm()) {
       return
     }
 
     setLoading(true)
-    setError(null)
 
     try {
       // Combine date and time into ISO format
@@ -173,21 +218,23 @@ export function ArtistAppointmentForm({
         // Send the appointment message to the client
         try {
           await sendMessage(clientId, appointmentMessage)
-        } catch (messageError) {
+        } catch {
           // Error sending appointment message
           // Don't fail the appointment creation if message sending fails
         }
       }
 
+      // Clear any field errors on successful creation
+      setFieldErrors({})
+
       // Success - call callbacks and close
       if (onAppointmentCreated) {
         onAppointmentCreated()
       }
-      
+
       onClose()
-    } catch (error) {
-      // Error creating appointment
-      setError('Errore nell\'invio dell\'appuntamento. Riprova.')
+    } catch {
+      // Error creating appointment - could show a generic error in fieldErrors or handle differently
     } finally {
       setLoading(false)
     }
@@ -219,11 +266,6 @@ export function ArtistAppointmentForm({
             <p>Crea un nuovo appuntamento con {clientName}</p>
           </div>
 
-          {error && (
-            <div className="auth-error">
-              {error}
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
@@ -237,9 +279,16 @@ export function ArtistAppointmentForm({
                 maxLength={200}
                 type="text"
                 value={appointmentForm.subject}
-                onChange={(e) => setAppointmentForm(prev => ({ ...prev, subject: e.target.value }))}
-                required
+                onChange={(e) => {
+                  setAppointmentForm(prev => ({ ...prev, subject: e.target.value }))
+                  clearFieldError('subject')
+                }}
               />
+              {fieldErrors.subject && (
+                <div className="form-error">
+                  {fieldErrors.subject}
+                </div>
+              )}
               <div className="form-help">
                 {existingSubject ? 'Puoi modificare l\'oggetto se necessario' : 'Descrivi il tatuaggio da realizzare'}
               </div>
@@ -255,9 +304,16 @@ export function ArtistAppointmentForm({
                 type="date"
                 min={new Date().toISOString().split('T')[0]}
                 value={appointmentForm.appointment_date}
-                onChange={(e) => setAppointmentForm(prev => ({ ...prev, appointment_date: e.target.value }))}
-                required
+                onChange={(e) => {
+                  setAppointmentForm(prev => ({ ...prev, appointment_date: e.target.value }))
+                  clearFieldError('appointment_date')
+                }}
               />
+              {fieldErrors.appointment_date && (
+                <div className="form-error">
+                  {fieldErrors.appointment_date}
+                </div>
+              )}
             </div>
 
             <div className="form-group">
@@ -274,7 +330,7 @@ export function ArtistAppointmentForm({
                   }}
                 >
                   <span className="dropdown-text">
-                    {appointmentForm.appointment_time 
+                    {appointmentForm.appointment_time
                       ? timeOptions.find(opt => opt.value === appointmentForm.appointment_time)?.label || 'Seleziona orario'
                       : 'Seleziona orario'
                     }
@@ -293,6 +349,7 @@ export function ArtistAppointmentForm({
                         onClick={() => {
                           setAppointmentForm(prev => ({ ...prev, appointment_time: option.value }))
                           setTimeDropdownOpen(false)
+                          clearFieldError('appointment_time')
                         }}
                       >
                         {option.label}
@@ -301,6 +358,11 @@ export function ArtistAppointmentForm({
                   </div>
                 )}
               </div>
+              {fieldErrors.appointment_time && (
+                <div className="form-error">
+                  {fieldErrors.appointment_time}
+                </div>
+              )}
             </div>
 
             <div className="form-group">
@@ -355,12 +417,18 @@ export function ArtistAppointmentForm({
                 className="form-input"
                 placeholder="Es. 200"
                 type="number"
-                min="0"
-                step="10"
+                min="10"
                 value={appointmentForm.total_amount}
-                onChange={(e) => setAppointmentForm(prev => ({ ...prev, total_amount: e.target.value }))}
-                required
+                onChange={(e) => {
+                  setAppointmentForm(prev => ({ ...prev, total_amount: e.target.value }))
+                  clearFieldError('total_amount')
+                }}
               />
+              {fieldErrors.total_amount && (
+                <div className="form-error">
+                  {fieldErrors.total_amount}
+                </div>
+              )}
               <div className="form-help">Prezzo totale concordato per il tatuaggio</div>
             </div>
 
@@ -373,12 +441,18 @@ export function ArtistAppointmentForm({
                 className="form-input"
                 placeholder="Es. 50"
                 type="number"
-                min="0"
-                step="10"
+                min="10"
                 value={appointmentForm.deposit_amount}
-                onChange={(e) => setAppointmentForm(prev => ({ ...prev, deposit_amount: e.target.value }))}
-                required
+                onChange={(e) => {
+                  setAppointmentForm(prev => ({ ...prev, deposit_amount: e.target.value }))
+                  clearFieldError('deposit_amount')
+                }}
               />
+              {fieldErrors.deposit_amount && (
+                <div className="form-error">
+                  {fieldErrors.deposit_amount}
+                </div>
+              )}
               <div className="form-help">Importo dell'acconto richiesto al cliente</div>
             </div>
 
@@ -408,7 +482,7 @@ export function ArtistAppointmentForm({
               <button
                 type="submit"
                 className="action-btn primary"
-                disabled={loading || !appointmentForm.subject.trim() || !appointmentForm.appointment_date || !appointmentForm.appointment_time || !appointmentForm.total_amount || !appointmentForm.deposit_amount || parseFloat(appointmentForm.total_amount) <= 0 || parseFloat(appointmentForm.deposit_amount) <= 0}
+                disabled={loading || !areRequiredFieldsFilled()}
               >
                 <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path d="M20 6L9 17l-5-5"></path>

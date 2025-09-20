@@ -81,7 +81,7 @@ export function AppointmentCard({ bookingId, isFromCurrentUser, timestamp, mode 
           artist_notes: data.artist_notes
         })
       }
-    } catch (error) {
+    } catch {
       // Error fetching booking data
       setCurrentStatus('pending')
       setFullBookingData(null)
@@ -92,7 +92,7 @@ export function AppointmentCard({ bookingId, isFromCurrentUser, timestamp, mode 
 
   useEffect(() => {
     fetchBookingData()
-  }, [bookingId, user, refreshTrigger]) // fetchBookingData è definita inline e non cambia
+  }, [bookingId, user, refreshTrigger, fetchBookingData])
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp)

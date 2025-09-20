@@ -205,7 +205,7 @@ export function CompactAppointmentCard({
             {/* Subject and participant */}
             <div className="appointment-info">
               {participantName && (
-                <div className="participant-name">
+                <div className="appointment-participant-name">
                   {profile?.profile_type === 'artist' ? participantName : `con ${participantName}`}
                 </div>
               )}
@@ -255,7 +255,7 @@ export function CompactAppointmentCard({
                     <div className="review-content">
                       <div className="review-rating">
                         <span className="stars">{renderStars(reviewData.rating)}</span>
-                        <span className="rating-number">({reviewData.rating}/5)</span>
+                        <span className="compact-rating-number">({reviewData.rating}/5)</span>
                       </div>
                       {reviewData.comment && (
                         <div className="review-comment">"{reviewData.comment}"</div>
@@ -349,7 +349,7 @@ export function CompactAppointmentCard({
                   <div className="mobile-review-content">
                     <div className="mobile-review-rating">
                       <span className="mobile-stars">{renderStars(reviewData.rating)}</span>
-                      <span className="mobile-rating">({reviewData.rating}/5)</span>
+                      <span className="mobile-compact-rating-number">({reviewData.rating}/5)</span>
                     </div>
                     {reviewData.comment && (
                       <div className="mobile-review-comment">"{reviewData.comment}"</div>

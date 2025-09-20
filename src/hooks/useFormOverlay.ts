@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 interface UseFormOverlayOptions<T> {
   isOpen: boolean
   initialFormData: T
-  resetDependencies?: any[]
+  resetDependencies?: unknown[]
 }
 
 interface FormErrors {
@@ -14,7 +14,7 @@ interface FormErrors {
  * Custom hook for form overlay state management
  * Handles form data, errors, submission state, and success messages
  */
-export function useFormOverlay<T extends Record<string, any>>({
+export function useFormOverlay<T extends Record<string, unknown>>({
   isOpen,
   initialFormData,
   resetDependencies = []
@@ -32,10 +32,10 @@ export function useFormOverlay<T extends Record<string, any>>({
       setSuccessMessage('')
       setIsSubmitting(false)
     }
-  }, [isOpen, ...resetDependencies])
+  }, [isOpen, initialFormData, ...resetDependencies])
 
   // Handle input change with error clearing
-  const handleInputChange = useCallback((field: keyof T, value: any) => {
+  const handleInputChange = useCallback((field: keyof T, value: unknown) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     
     // Clear errors for the field being edited

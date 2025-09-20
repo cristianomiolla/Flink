@@ -371,7 +371,7 @@
   flex-wrap: wrap;
 }
 
-.rating-number {
+.artist-rating-number {
   font-size: 2.5rem;
   font-weight: 900;
   color: var(--accent);
@@ -493,7 +493,7 @@
     gap: 0.5rem;
   }
   
-  .rating-number {
+  .artist-rating-number {
     font-size: 2rem;
   }
   

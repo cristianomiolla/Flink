@@ -96,7 +96,7 @@ export function ServiceForm({
         .getPublicUrl(filePath)
 
       return data.publicUrl
-    } catch (error) {
+    } catch {
       // Error uploading image
       throw new Error('Errore durante il caricamento dell\'immagine')
     } finally {
@@ -250,7 +250,7 @@ export function ServiceForm({
           setFilePreview(null)
         }
       }
-    } catch (error) {
+    } catch {
       // Error submitting service
       alert('Errore durante il salvataggio del servizio')
     } finally {

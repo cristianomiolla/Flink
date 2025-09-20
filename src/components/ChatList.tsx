@@ -58,7 +58,7 @@ const ChatList = memo(function ChatList({ chats, selectedChatId, onChatSelect, o
               
               <div className="chat-content">
                 <div className="chat-header">
-                  <h3 className="chat-participant-name">
+                  <h3 className="chat-list-participant-name">
                     {chat.participant.name}
                   </h3>
                   <div className="chat-header-actions">

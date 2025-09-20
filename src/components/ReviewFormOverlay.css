@@ -1,5 +1,5 @@
 /* Import design tokens */
-@import '../styles/tokens.css';
+/* tokens.css is imported globally in index.css */
 
 /* Rating section specific styles */
 .rating-section {

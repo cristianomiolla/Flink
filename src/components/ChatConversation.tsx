@@ -175,7 +175,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
           setMessages(formattedMessages)
           // Scroll to bottom after loading messages
           scrollToBottom({ delay: 150 })
-        } catch (error) {
+        } catch {
           // Error refreshing conversation messages
         }
       }
@@ -255,7 +255,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
           }
           return prevMessages
         })
-      } catch (error) {
+      } catch {
         // Error loading conversation messages
         setMessages([])
       } finally {
@@ -356,7 +356,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
         // If send failed, restore the message to input
         setNewMessage(messageContent)
       }
-    } catch (error) {
+    } catch {
       // Error sending message
       // Restore message to input on error
       setNewMessage(messageContent)
@@ -412,7 +412,7 @@ export function ChatConversation({ chat, onRequestDeleteChat, sendMessage: propS
               size="sm"
               variant="default"
             />
-            <h2 className="participant-name">{chat.participant.name || 'Nome non disponibile'}</h2>
+            <h2 className="conversation-participant-name">{chat.participant.name || 'Nome non disponibile'}</h2>
           </div>
           <div className="conversation-actions">
             <ActionButton

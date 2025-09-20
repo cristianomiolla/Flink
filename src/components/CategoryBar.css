@@ -9,7 +9,6 @@
 .category-content {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 2rem;
 }
 
@@ -26,6 +25,12 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   align-items: center;
+  justify-content: center;
+}
+
+/* Main page specific: align category-tags to left */
+.container .category-content .category-filters .category-tags {
+  justify-content: left;
 }
 
 .category-tag {
@@ -160,7 +165,7 @@
   
   .category-tags {
     gap: 0.25rem;
-    justify-content: flex-start;
+    justify-content: left;
     overflow-x: auto;
     overflow-y: hidden;
     padding-bottom: 0.25rem;

@@ -75,7 +75,7 @@ export function SettingsPage({ onLogoClick }: SettingsPageProps) {
       // Close overlay and redirect to home
       setShowProfileTypeOverlay(false)
       navigate('/')
-    } catch (error) {
+    } catch {
       // Error changing profile type
       alert('Errore durante il cambio del tipo di profilo. Riprova.')
     } finally {

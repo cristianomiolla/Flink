@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './useAuth'
 
@@ -7,16 +7,7 @@ export function useFollowedArtists() {
   const [followedArtistIds, setFollowedArtistIds] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    if (user) {
-      fetchFollowedArtists()
-    } else {
-      setFollowedArtistIds([])
-      setLoading(false)
-    }
-  }, [user])
-
-  const fetchFollowedArtists = async () => {
+  const fetchFollowedArtists = useCallback(async () => {
     if (!user) return
 
     try {
@@ -33,12 +24,21 @@ export function useFollowedArtists() {
 
       const artistIds = data?.map(follow => follow.following_id) || []
       setFollowedArtistIds(artistIds)
-    } catch (err) {
+    } catch {
       setFollowedArtistIds([])
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
+
+  useEffect(() => {
+    if (user) {
+      fetchFollowedArtists()
+    } else {
+      setFollowedArtistIds([])
+      setLoading(false)
+    }
+  }, [user, fetchFollowedArtists])
 
   return {
     followedArtistIds,

@@ -1,0 +1,120 @@
+.management-sidebar {
+  height: 100%;
+  overflow: hidden;
+  background: var(--background);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--grey-light);
+}
+
+.sidebar-header h3 {
+  font-family: var(--font-family);
+  font-weight: 900;
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--foreground);
+  margin: 0;
+  text-align: center;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--background);
+  border: none;
+  color: var(--foreground);
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: left;
+  width: 100%;
+  position: relative;
+}
+
+.sidebar-nav-item:hover:not(.disabled) {
+  background: var(--grey-light);
+}
+
+.sidebar-nav-item.active {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.sidebar-nav-item.active:hover {
+  background: var(--accent);
+}
+
+.sidebar-nav-item.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sidebar-nav-item.disabled:hover {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.nav-icon {
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+}
+
+.nav-label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.nav-badge {
+  background: var(--accent);
+  color: var(--background);
+  padding: 0.2rem 0.5rem;
+  border-radius: 0;
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 1px 1px 0 var(--foreground);
+}
+
+/* Mobile responsive - ensure sidebar works with toggle */
+@media (max-width: 768px) {
+  .management-sidebar {
+    width: 240px;
+  }
+
+  .sidebar-header {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+  }
+}
+

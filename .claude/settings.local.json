@@ -60,7 +60,9 @@
       "mcp__supabase__list_edge_functions",
       "Bash(npx eslint:*)",
       "mcp__supabase__get_advisors",
-      "Bash(npx supabase functions deploy:*)"
+      "Bash(npx supabase functions deploy:*)",
+      "WebSearch",
+      "WebFetch(domain:developers.google.com)"
     ]
   },
   "enableAllProjectMcpServers": true,

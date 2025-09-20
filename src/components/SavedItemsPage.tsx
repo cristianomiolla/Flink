@@ -117,7 +117,7 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
 
         setSavedItems(transformedData)
         setError(null)
-      } catch (err) {
+      } catch {
         setError('Errore nel caricamento degli elementi salvati')
         // Error loading saved items
       } finally {

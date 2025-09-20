@@ -127,7 +127,7 @@ export function useAppointments(): UseAppointmentsReturn {
     } else {
       setAppointments([])
     }
-  }, [fetchAppointments])
+  }, [fetchAppointments, user, profile])
 
   const refreshAppointments = useCallback(async () => {
     await fetchAppointments()

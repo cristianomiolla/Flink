@@ -120,7 +120,7 @@ export function PersonalProfile() {
       }))
 
       setPortfolioItems(portfolioData)
-    } catch (error) {
+    } catch {
       // Error fetching portfolio items
     } finally {
       setPortfolioLoading(false)
@@ -130,35 +130,30 @@ export function PersonalProfile() {
   const uploadImage = async (file: File): Promise<string> => {
     if (!user?.id || !profile?.user_id) throw new Error('User not authenticated')
     
-    try {
-      // Genera un nome file unico
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
-      const filePath = `${user.id}/${fileName}`
+    // Genera un nome file unico
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+    const filePath = `${user.id}/${fileName}`
 
-      // Carica il file su Supabase Storage
-      const { error } = await supabase.storage
-        .from('portfolio')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        })
+    // Carica il file su Supabase Storage
+    const { error } = await supabase.storage
+      .from('portfolio')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      })
 
-      if (error) {
-        // Storage upload error
-        throw error
-      }
-
-      // Ottieni l'URL pubblico
-      const { data: urlData } = supabase.storage
-        .from('portfolio')
-        .getPublicUrl(filePath)
-
-      return urlData.publicUrl
-    } catch (error) {
-      // Error uploading image
+    if (error) {
+      // Storage upload error
       throw error
     }
+
+    // Ottieni l'URL pubblico
+    const { data: urlData } = supabase.storage
+      .from('portfolio')
+      .getPublicUrl(filePath)
+
+    return urlData.publicUrl
   }
 
   const handleUploadPortfolio = async () => {
@@ -172,7 +167,7 @@ export function PersonalProfile() {
       if (selectedFile) {
         try {
           imageUrl = await uploadImage(selectedFile)
-        } catch (uploadError) {
+        } catch {
           // Error uploading image
           alert('Errore durante il caricamento dell\'immagine. Riprova.')
           setIsSubmitting(false)
@@ -222,7 +217,7 @@ export function PersonalProfile() {
       
       await fetchPortfolioItems()
       setShowUploadOverlay(false)
-    } catch (error) {
+    } catch {
       // Error uploading portfolio item
       alert('Errore durante il caricamento del lavoro')
     } finally {
@@ -272,7 +267,7 @@ export function PersonalProfile() {
             .getPublicUrl(uploadData.path)
             
           avatarUrl = data.publicUrl
-        } catch (error) {
+        } catch {
           // Network error uploading avatar
           alert('Errore di rete. Verifica la connessione internet e riprova.')
           return
@@ -305,7 +300,7 @@ export function PersonalProfile() {
       setAvatarFile(null)
       setAvatarPreview('')
       setShowEditOverlay(false)
-    } catch (error) {
+    } catch {
       // Error updating profile
       alert('Errore durante l\'aggiornamento del profilo')
     } finally {
@@ -498,7 +493,7 @@ export function PersonalProfile() {
       // Chiudi il modal
       setShowConfirmationModal(false)
       setItemToDelete(null)
-    } catch (error) {
+    } catch {
       // Error deleting portfolio item
       alert('Errore durante l\'eliminazione dell\'elemento')
     }

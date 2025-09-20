@@ -149,7 +149,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (profileError) {
           // Profile creation failed - will be handled by user attempting to access profile features
         }
-      } catch (profileError) {
+      } catch {
         // Profile insertion failed - will be handled by user attempting to access profile features
       }
     }
@@ -164,7 +164,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         password,
       })
       return { error }
-    } catch (networkError) {
+    } catch {
       // Return null error and handle network issues in the UI
       return { error: null }
     }

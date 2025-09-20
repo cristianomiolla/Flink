@@ -66,7 +66,7 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
     e.stopPropagation()
     try {
       await toggleLike()
-    } catch (error) {
+    } catch {
       // Error toggling like
     }
   }

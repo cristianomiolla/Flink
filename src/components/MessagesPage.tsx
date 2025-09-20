@@ -180,7 +180,7 @@ export function MessagesPage() {
         .getPublicUrl(filePath)
 
       return data.publicUrl
-    } catch (error) {
+    } catch {
       // Error uploading reference image
       throw new Error('Errore durante il caricamento dell\'immagine di riferimento')
     } finally {
@@ -301,7 +301,7 @@ export function MessagesPage() {
       if (selectedReferenceFile) {
         try {
           referenceImageUrl = await uploadReferenceImage(selectedReferenceFile)
-        } catch (uploadError) {
+        } catch {
           // Error uploading reference image
           alert('Errore nel caricamento dell\'immagine di riferimento. La richiesta sarà inviata senza immagine.')
         }
@@ -376,7 +376,7 @@ export function MessagesPage() {
         setTimeout(() => refreshMessagesFn(), 500)
       }
       
-    } catch (error) {
+    } catch {
       // Error saving booking
       alert('Errore nell\'invio della richiesta. Riprova.')
     }
@@ -517,7 +517,7 @@ export function MessagesPage() {
         setSelectedChatId(conversationId)
         setNewChatArtist(artist)
       }
-    } catch (error) {
+    } catch {
       // Error fetching artist profile
     }
   }, [user])
@@ -580,7 +580,7 @@ export function MessagesPage() {
 
         // Always scroll to bottom after loading messages
         scrollToBottom({ delay: 150 })
-      } catch (error) {
+      } catch {
         // Error loading conversation messages
         setConversationMessages([])
       } finally {
@@ -718,7 +718,7 @@ export function MessagesPage() {
           
           await deleteConversation(conversation.participant.user_id)
         }
-      } catch (err) {
+      } catch {
         // Failed to delete conversation
       }
     }
@@ -772,7 +772,7 @@ export function MessagesPage() {
         // If send failed, restore the message to input
         setNewMessage(messageContent)
       }
-    } catch (error) {
+    } catch {
       // Error sending message
       // Restore message to input on error
       setNewMessage(messageContent)
@@ -872,7 +872,7 @@ export function MessagesPage() {
                   size="sm"
                   variant="default"
                 />
-                <span className="participant-name">{selectedChat.participant.name}</span>
+                <span className="conversation-participant-name">{selectedChat.participant.name}</span>
               </div>
               <button 
                 className="action-btn delete-chat-action"
@@ -1402,7 +1402,7 @@ export function MessagesPage() {
                   
                   <div className="chat-content">
                     <div className="chat-header">
-                      <h3 className="chat-participant-name">
+                      <h3 className="chat-list-participant-name">
                         {chat.participant.name}
                       </h3>
                       <div className="chat-header-actions">

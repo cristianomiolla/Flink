@@ -105,7 +105,7 @@
   margin-bottom: 0.5rem;
 }
 
-.chat-participant-name {
+.chat-list-participant-name {
   font-family: var(--font-body);
   font-size: 0.875rem;
   font-weight: 600;

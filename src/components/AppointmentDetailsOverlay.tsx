@@ -66,6 +66,7 @@ export function AppointmentDetailsOverlay({
   const [saving, setSaving] = useState(false)
   const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false)
   const [isDurationDropdownOpen, setIsDurationDropdownOpen] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({})
 
   // Fetch booking data from database
   useEffect(() => {
@@ -97,7 +98,7 @@ export function AppointmentDetailsOverlay({
             artist_notes: data.artist_notes || ''
           })
         }
-      } catch (error) {
+      } catch {
         // Error fetching booking data
       } finally {
         setLoading(false)
@@ -154,6 +155,7 @@ export function AppointmentDetailsOverlay({
       editFormData.artist_notes !== originalNotes
     )
   }
+
 
   // Check if appointment can be edited (only artists can edit, not cancelled/completed, and before appointment date)
   const canEditAppointment = () => {
@@ -228,8 +230,59 @@ export function AppointmentDetailsOverlay({
   }
 
 
+  // Check if required fields are filled
+  const areRequiredFieldsFilled = () => {
+    return editFormData.appointment_date &&
+           editFormData.appointment_time &&
+           editFormData.total_amount &&
+           editFormData.deposit_amount
+  }
+
+  // Validate form and set field errors (only for filled fields)
+  const validateForm = () => {
+    const errors: {[key: string]: string} = {}
+
+    // Only validate numeric fields if they are filled
+    if (editFormData.total_amount) {
+      const totalAmount = parseFloat(editFormData.total_amount)
+      if (totalAmount <= 0) {
+        errors.total_amount = 'Il prezzo deve essere maggiore di zero'
+      } else if (totalAmount % 10 !== 0) {
+        errors.total_amount = 'Il prezzo deve essere un multiplo di 10 (es. 50, 100, 200)'
+      }
+    }
+
+    if (editFormData.deposit_amount) {
+      const depositAmount = parseFloat(editFormData.deposit_amount)
+      if (depositAmount <= 0) {
+        errors.deposit_amount = 'L\'acconto deve essere maggiore di zero'
+      } else if (depositAmount % 10 !== 0) {
+        errors.deposit_amount = 'L\'acconto deve essere un multiplo di 10 (es. 50, 100, 200)'
+      }
+    }
+
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
+  // Clear field error when user starts typing
+  const clearFieldError = (fieldName: string) => {
+    if (fieldErrors[fieldName]) {
+      setFieldErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[fieldName]
+        return newErrors
+      })
+    }
+  }
+
   const handleSaveChanges = async () => {
     if (!bookingId || !user) return
+
+    // Check required fields and validate form
+    if (!areRequiredFieldsFilled() || !validateForm()) {
+      return
+    }
 
     setSaving(true)
 
@@ -287,10 +340,16 @@ export function AppointmentDetailsOverlay({
       // Update local state
       setBookingData(prev => prev ? { ...prev, ...updateData } : null)
 
+      // Clear any field errors on successful save
+      setFieldErrors({})
+
       // Notify parent component of booking update
       if (onBookingUpdated) {
         onBookingUpdated()
       }
+
+      // Close the overlay after successful save
+      onClose()
 
       // Reset form data to match the updated booking data
       if (updateData.appointment_date) {
@@ -302,7 +361,7 @@ export function AppointmentDetailsOverlay({
         }))
       }
 
-    } catch (error) {
+    } catch {
       // Error updating appointment
       alert('Errore durante la modifica dell\'appuntamento. Riprova.')
     } finally {
@@ -317,10 +376,12 @@ export function AppointmentDetailsOverlay({
   const handleTimeSelect = (time: string) => {
     setEditFormData(prev => ({ ...prev, appointment_time: time }))
     setIsTimeDropdownOpen(false)
+    clearFieldError('appointment_time')
   }
 
   const toggleTimeDropdown = () => {
     setIsTimeDropdownOpen(prev => !prev)
+    setIsDurationDropdownOpen(false)
   }
 
   const handleDurationSelect = (duration: string) => {
@@ -330,6 +391,7 @@ export function AppointmentDetailsOverlay({
 
   const toggleDurationDropdown = () => {
     setIsDurationDropdownOpen(prev => !prev)
+    setIsTimeDropdownOpen(false)
   }
 
   const formatDurationForDisplay = (minutes: string) => {
@@ -379,7 +441,7 @@ export function AppointmentDetailsOverlay({
       setShowCancelConfirmation(false)
       onClose()
 
-    } catch (error) {
+    } catch {
       // Error cancelling appointment
       alert('Errore durante la cancellazione dell\'appuntamento. Riprova.')
     } finally {
@@ -563,14 +625,23 @@ export function AppointmentDetailsOverlay({
                     <div className="detail-item">
                       {isAppointmentCreator && canEditAppointment() ? (
                         <div className="form-group">
-                          <label className="form-label">DATA APPUNTAMENTO</label>
+                          <label className="form-label">DATA APPUNTAMENTO <span className="required-indicator">*</span></label>
                           <input
                             type="date"
                             className="form-input"
                             value={editFormData.appointment_date}
-                            onChange={(e) => setEditFormData(prev => ({ ...prev, appointment_date: e.target.value }))}
+                            onChange={(e) => {
+                              setEditFormData(prev => ({ ...prev, appointment_date: e.target.value }))
+                              clearFieldError('appointment_date')
+                            }}
                             min={new Date().toISOString().slice(0, 10)}
+                            required
                           />
+                          {fieldErrors.appointment_date && (
+                            <div className="form-error">
+                              {fieldErrors.appointment_date}
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <>
@@ -585,8 +656,8 @@ export function AppointmentDetailsOverlay({
                     {isAppointmentCreator && canEditAppointment() && (
                       <div className="detail-item">
                         <div className="form-group">
-                          <label className="form-label">ORARIO APPUNTAMENTO</label>
-                          <div className={`custom-dropdown ${isTimeDropdownOpen ? 'open' : ''}`}>
+                          <label className="form-label">ORARIO APPUNTAMENTO <span className="required-indicator">*</span></label>
+                          <div className="custom-dropdown ">
                             <button type="button" className="dropdown-trigger" onClick={toggleTimeDropdown}>
                               <span className="dropdown-text">
                                 {editFormData.appointment_time || 'Seleziona orario'}
@@ -607,6 +678,11 @@ export function AppointmentDetailsOverlay({
                               </div>
                             )}
                           </div>
+                          {fieldErrors.appointment_time && (
+                            <div className="form-error">
+                              {fieldErrors.appointment_time}
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
@@ -618,7 +694,7 @@ export function AppointmentDetailsOverlay({
                     {isAppointmentCreator && canEditAppointment() ? (
                       <div className="form-group">
                         <label className="form-label">DURATA APPUNTAMENTO</label>
-                        <div className={`custom-dropdown ${isDurationDropdownOpen ? 'open' : ''}`}>
+                        <div className="custom-dropdown ">
                           <button type="button" className="dropdown-trigger" onClick={toggleDurationDropdown}>
                             <span className="dropdown-text">
                               {formatDurationForDisplay(editFormData.appointment_duration)}
@@ -654,16 +730,25 @@ export function AppointmentDetailsOverlay({
                   <div className="detail-item">
                     {isAppointmentCreator && canEditAppointment() ? (
                       <div className="form-group">
-                        <label className="form-label">PREZZO TOTALE TATUAGGIO (€)</label>
+                        <label className="form-label">PREZZO TOTALE TATUAGGIO (€) <span className="required-indicator">*</span></label>
                         <input
                           type="number"
                           className="form-input"
                           placeholder="Es. 200"
                           value={editFormData.total_amount}
-                          onChange={(e) => setEditFormData(prev => ({ ...prev, total_amount: e.target.value }))}
-                          min="0"
+                          onChange={(e) => {
+                            setEditFormData(prev => ({ ...prev, total_amount: e.target.value }))
+                            clearFieldError('total_amount')
+                          }}
+                          min="10"
                           step="10"
+                          required
                         />
+                        {fieldErrors.total_amount && (
+                          <div className="form-error">
+                            {fieldErrors.total_amount}
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <>
@@ -680,16 +765,25 @@ export function AppointmentDetailsOverlay({
                   <div className="detail-item">
                     {isAppointmentCreator && canEditAppointment() ? (
                       <div className="form-group">
-                        <label className="form-label">ACCONTO RICHIESTO (€)</label>
+                        <label className="form-label">ACCONTO RICHIESTO (€) <span className="required-indicator">*</span></label>
                         <input
                           type="number"
                           className="form-input"
                           placeholder="Es. 50"
                           value={editFormData.deposit_amount}
-                          onChange={(e) => setEditFormData(prev => ({ ...prev, deposit_amount: e.target.value }))}
-                          min="0"
+                          onChange={(e) => {
+                            setEditFormData(prev => ({ ...prev, deposit_amount: e.target.value }))
+                            clearFieldError('deposit_amount')
+                          }}
+                          min="10"
                           step="10"
+                          required
                         />
+                        {fieldErrors.deposit_amount && (
+                          <div className="form-error">
+                            {fieldErrors.deposit_amount}
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <>
@@ -751,7 +845,7 @@ export function AppointmentDetailsOverlay({
                     type="button"
                     className="action-btn"
                     onClick={handleSaveChanges}
-                    disabled={saving}
+                    disabled={saving || !areRequiredFieldsFilled()}
                   >
                     <svg className="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                       <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>

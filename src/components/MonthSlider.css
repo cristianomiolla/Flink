@@ -1,0 +1,110 @@
+@import '../styles/tokens.css';
+
+.month-slider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  position: relative;
+}
+
+.month-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  color: var(--muted-foreground);
+  border: none;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  box-shadow: none;
+}
+
+.month-nav-btn:hover {
+  color: var(--foreground);
+}
+
+.month-nav-btn:active {
+  color: var(--accent);
+}
+
+.month-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: auto;
+  position: relative;
+}
+
+.month-name {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.year-name {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+}
+
+.current-month-btn {
+  background: transparent;
+  color: var(--accent);
+  border: none;
+  padding: 0;
+  margin-left: 0.5rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  box-shadow: none;
+}
+
+.current-month-btn:hover {
+  color: var(--foreground);
+}
+
+.current-month-btn:active {
+  color: var(--primary);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .month-slider {
+    gap: 0.375rem;
+  }
+
+  .month-nav-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+
+  .month-name,
+  .year-name {
+    font-size: 0.875rem;
+  }
+
+  .current-month-btn {
+    font-size: 0.625rem;
+    margin-left: 0.375rem;
+  }
+}
