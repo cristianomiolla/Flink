@@ -9,6 +9,7 @@ import { usePortfolioSearch } from '../hooks/usePortfolioSearch'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
 import { useFollowers } from '../hooks/useFollowers'
+import EmptyState from './EmptyState'
 
 // Lazy load AuthOverlay component
 const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
@@ -97,22 +98,20 @@ export function FeaturedArtistsPage({ onLogoClick }: FeaturedArtistsPageProps) {
       <div className="container">
         {/* Empty state */}
         {!error && featuredArtists.length === 0 && (
-          <div className="empty-state">
-            <div className="empty-content">
-              <div className="empty-icon">👨‍🎨</div>
-              <h2 className="empty-title">Nessun artista in evidenza</h2>
-              <p className="empty-description">
-                Non ci sono ancora artisti da mostrare. Torna più tardi per scoprire gli artisti più seguiti dalla community.
-              </p>
-              <button 
-                className="action-btn" 
+          <EmptyState
+            icon="👨‍🎨"
+            title="Nessun artista in evidenza"
+            description="Non ci sono ancora artisti da mostrare. Torna più tardi per scoprire gli artisti più seguiti dalla community."
+            action={
+              <button
+                className="action-btn"
                 onClick={onLogoClick}
                 style={{ marginTop: '1.5rem' }}
               >
                 Torna alla Home
               </button>
-            </div>
-          </div>
+            }
+          />
         )}
 
         {/* Content area */}

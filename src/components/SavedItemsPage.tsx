@@ -9,6 +9,7 @@ import { useSavedTattoos } from '../hooks/useSavedTattoos'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '../lib/supabase'
 import type { PortfolioItem } from '../types/portfolio'
+import EmptyState from './EmptyState'
 
 // Lazy load AuthOverlay component
 const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
@@ -147,27 +148,23 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
       <div className="container">
         {/* Empty state - outside page-content */}
         {!error && savedItems.length === 0 && (
-          <div className="empty-state">
-            <div className="empty-content">
-              <div className="empty-icon">💾</div>
-              <h2 className="empty-title">
-                {!user ? 'Accedi per visualizzare i tatuaggi salvati' : 'Nessun tatuaggio salvato'}
-              </h2>
-              <p className="empty-description">
-                {!user 
-                  ? 'Effettua il login per vedere i tatuaggi che hai salvato e gestire la tua collezione personale.'
-                  : 'Inizia a esplorare i portfolio degli artisti e salva i tatuaggi che ti piacciono.'
-                }
-              </p>
-              <button 
-                className="action-btn" 
+          <EmptyState
+            icon="💾"
+            title={!user ? 'Accedi per visualizzare i tatuaggi salvati' : 'Nessun tatuaggio salvato'}
+            description={!user
+              ? 'Effettua il login per vedere i tatuaggi che hai salvato e gestire la tua collezione personale.'
+              : 'Inizia a esplorare i portfolio degli artisti e salva i tatuaggi che ti piacciono.'
+            }
+            action={
+              <button
+                className="action-btn"
                 onClick={!user ? handleAuthRequired : onLogoClick}
                 style={{ marginTop: '1.5rem' }}
               >
                 {!user ? 'Accedi' : 'Esplora Portfolio'}
               </button>
-            </div>
-          </div>
+            }
+          />
         )}
 
         {/* Content area only when there are items or errors */}

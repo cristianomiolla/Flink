@@ -8,6 +8,7 @@ import { PortfolioCard } from './PortfolioCard'
 import { usePortfolioSearch } from '../hooks/usePortfolioSearch'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
+import EmptyState from './EmptyState'
 
 // Lazy load AuthOverlay component
 const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
@@ -97,22 +98,20 @@ export function RecentWorksPage({ onLogoClick }: RecentWorksPageProps) {
       <div className="container">
         {/* Empty state */}
         {!error && recentItems.length === 0 && (
-          <div className="empty-state">
-            <div className="empty-content">
-              <div className="empty-icon">🆕</div>
-              <h2 className="empty-title">Nessuna opera recente</h2>
-              <p className="empty-description">
-                Non ci sono ancora opere da mostrare. Torna più tardi per scoprire le ultime opere pubblicate dalla community.
-              </p>
-              <button 
-                className="action-btn" 
+          <EmptyState
+            icon="🆕"
+            title="Nessuna opera recente"
+            description="Non ci sono ancora opere da mostrare. Torna più tardi per scoprire le ultime opere pubblicate dalla community."
+            action={
+              <button
+                className="action-btn"
                 onClick={onLogoClick}
                 style={{ marginTop: '1.5rem' }}
               >
                 Torna alla Home
               </button>
-            </div>
-          </div>
+            }
+          />
         )}
 
         {/* Content area */}

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { Avatar } from './Avatar'
 import './MobileProfilePage.css'
+import EmptyState from './EmptyState'
 
 // Lazy load AuthOverlay component
 const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
@@ -61,16 +62,20 @@ export function MobileProfilePage() {
     return (
       <div className="mobile-profile-page">
         <div className="container">
-          <div className="empty-state">
-            <div className="empty-content">
-              <div className="empty-icon">👤</div>
-              <h2 className="empty-title">Accedi per visualizzare il profilo</h2>
-              <p className="empty-description">Effettua il login per accedere alle impostazioni del tuo profilo e gestire il tuo account.</p>
-              <button className="action-btn" style={{ marginTop: '1.5rem' }} onClick={handleAuthRequired}>
+          <EmptyState
+            icon="👤"
+            title="Accedi per visualizzare il profilo"
+            description="Effettua il login per accedere alle impostazioni del tuo profilo e gestire il tuo account."
+            action={
+              <button
+                className="action-btn"
+                style={{ marginTop: '1.5rem' }}
+                onClick={handleAuthRequired}
+              >
                 Accedi
               </button>
-            </div>
-          </div>
+            }
+          />
         </div>
         
         {/* Auth Overlay */}

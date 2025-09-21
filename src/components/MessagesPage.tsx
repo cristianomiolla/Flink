@@ -20,6 +20,7 @@ import { useBookingStatus } from '../hooks/useBookingStatus'
 import { ArtistAppointmentForm } from './ArtistAppointmentForm'
 import { createScrollToBottom } from '../utils/scrollUtils'
 import { useIsMobile } from '../hooks/useIsMobile'
+import EmptyState from './EmptyState'
 
 // Lazy load AuthOverlay component
 const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
@@ -793,20 +794,20 @@ export function MessagesPage() {
       <div className="messages-page">
         <SearchBar onLogoClick={handleLogoClick} hideOnMobile={true} />
         <div className="container">
-          <div className="empty-state">
-              <div className="empty-content">
-                <div className="empty-icon">💬</div>
-                <h2 className="empty-title">Accedi per visualizzare i messaggi</h2>
-                <p className="empty-description">Effettua il login per vedere le tue conversazioni e iniziare a chattare con gli artisti.</p>
-                <button 
-                  className="action-btn" 
-                  onClick={handleAuthRequired}
-                  style={{ marginTop: '1.5rem' }}
-                >
-                  Accedi
-                </button>
-              </div>
-            </div>
+          <EmptyState
+            icon="💬"
+            title="Accedi per visualizzare i messaggi"
+            description="Effettua il login per vedere le tue conversazioni e iniziare a chattare con gli artisti."
+            action={
+              <button
+                className="action-btn"
+                onClick={handleAuthRequired}
+                style={{ marginTop: '1.5rem' }}
+              >
+                Accedi
+              </button>
+            }
+          />
         </div>
         
         {/* Auth Overlay - must be included in unauthenticated state */}
@@ -1376,13 +1377,11 @@ export function MessagesPage() {
           {/* Scrollable Chat List */}
           <div className="chat-list-items">
             {chats.length === 0 ? (
-              <div className="empty-state">
-                <div className="empty-content">
-                  <div className="empty-icon">💬</div>
-                  <h3 className="empty-title">Nessun messaggio</h3>
-                  <p className="empty-description">Non hai ancora conversazioni attive.</p>
-                </div>
-              </div>
+              <EmptyState
+                icon="💬"
+                title="Nessun messaggio"
+                description="Non hai ancora conversazioni attive."
+              />
             ) : (
               chats.map(chat => (
                 <div

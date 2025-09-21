@@ -9,6 +9,7 @@ import { usePortfolioSearch } from '../hooks/usePortfolioSearch'
 import { useFollowedArtists } from '../hooks/useFollowedArtists'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
+import EmptyState from './EmptyState'
 
 // Lazy load AuthOverlay component
 const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
@@ -96,42 +97,38 @@ export function FollowedArtistsWorksPage({ onLogoClick }: FollowedArtistsWorksPa
       <div className="container">
         {/* Empty state - not authenticated */}
         {!user && (
-          <div className="empty-state">
-            <div className="empty-content">
-              <div className="empty-icon">👥</div>
-              <h2 className="empty-title">Accedi per vedere le opere degli artisti che segui</h2>
-              <p className="empty-description">
-                Effettua il login per vedere le opere più recenti degli artisti che hai deciso di seguire.
-              </p>
-              <button 
-                className="action-btn" 
+          <EmptyState
+            icon="👥"
+            title="Accedi per vedere le opere degli artisti che segui"
+            description="Effettua il login per vedere le opere più recenti degli artisti che hai deciso di seguire."
+            action={
+              <button
+                className="action-btn"
                 onClick={handleAuthRequired}
                 style={{ marginTop: '1.5rem' }}
               >
                 Accedi
               </button>
-            </div>
-          </div>
+            }
+          />
         )}
 
         {/* Empty state - authenticated but no followed artists */}
         {user && !error && followedArtistsItems.length === 0 && (
-          <div className="empty-state">
-            <div className="empty-content">
-              <div className="empty-icon">👥</div>
-              <h2 className="empty-title">Non segui ancora nessun artista</h2>
-              <p className="empty-description">
-                Inizia a seguire degli artisti per vedere le loro opere più recenti qui. Esplora i portfolio e trova i tuoi artisti preferiti.
-              </p>
-              <button 
-                className="action-btn" 
+          <EmptyState
+            icon="👥"
+            title="Non segui ancora nessun artista"
+            description="Inizia a seguire degli artisti per vedere le loro opere più recenti qui. Esplora i portfolio e trova i tuoi artisti preferiti."
+            action={
+              <button
+                className="action-btn"
                 onClick={onLogoClick}
                 style={{ marginTop: '1.5rem' }}
               >
                 Esplora Artisti
               </button>
-            </div>
-          </div>
+            }
+          />
         )}
 
         {/* Content area */}

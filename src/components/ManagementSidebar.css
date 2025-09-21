@@ -56,16 +56,18 @@
 }
 
 .sidebar-nav-item:hover:not(.disabled) {
-  background: var(--grey-light);
+  background: var(--accent);
+  color: #ffffff;
 }
 
 .sidebar-nav-item.active {
-  background: var(--accent);
-  color: var(--accent-foreground);
+  background: var(--primary);
+  color: #ffffff;
 }
 
 .sidebar-nav-item.active:hover {
-  background: var(--accent);
+  background: var(--primary);
+  color: #ffffff;
 }
 
 .sidebar-nav-item.disabled {

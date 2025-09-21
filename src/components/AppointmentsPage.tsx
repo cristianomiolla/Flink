@@ -8,6 +8,7 @@ import { CompactAppointmentCard } from './CompactAppointmentCard'
 import { ManagementSidebar } from './ManagementSidebar'
 import { MonthSlider } from './MonthSlider'
 import { AppointmentChart } from './AppointmentChart'
+import EmptyState from './EmptyState'
 import './CompactAppointmentCard.css'
 import './AppointmentsPage.css'
 import './Header.css'
@@ -67,31 +68,91 @@ export function AppointmentsPage() {
   }
 
   const getMonthlyStats = () => {
+    const currentDate = new Date()
+    currentDate.setHours(0, 0, 0, 0) // Reset to start of day for accurate comparison
+
     const monthlyAppointments = appointments.filter(appointment => {
       const appointmentDate = appointment.appointment_date ? new Date(appointment.appointment_date) : new Date(appointment.created_at)
       return appointmentDate.getFullYear() === selectedYear && appointmentDate.getMonth() === selectedMonth
     })
 
-    const completedAppointments = monthlyAppointments.filter(a => a.status === 'completed')
-    const scheduledAppointments = monthlyAppointments.filter(a => a.status === 'scheduled' || a.status === 'rescheduled')
+    // Split appointments by date relative to today
+    const pastAppointments = monthlyAppointments.filter(appointment => {
+      if (!appointment.appointment_date) return false
+      const appointmentDate = new Date(appointment.appointment_date)
+      appointmentDate.setHours(0, 0, 0, 0)
+      return appointmentDate < currentDate
+    })
 
-    const completedEarnings = completedAppointments.reduce((total, appointment) => {
+    const futureAppointments = monthlyAppointments.filter(appointment => {
+      if (!appointment.appointment_date) return false
+      const appointmentDate = new Date(appointment.appointment_date)
+      appointmentDate.setHours(0, 0, 0, 0)
+      return appointmentDate >= currentDate
+    })
+
+    const completedEarnings = pastAppointments.reduce((total, appointment) => {
       return total + (appointment.total_amount || 0)
     }, 0)
 
-    const scheduledEarnings = scheduledAppointments.reduce((total, appointment) => {
+    const scheduledEarnings = futureAppointments.reduce((total, appointment) => {
       return total + (appointment.total_amount || 0)
     }, 0)
 
     return {
-      total: completedAppointments.length,
-      scheduled: scheduledAppointments.length,
+      total: pastAppointments.length + futureAppointments.length,
+      scheduled: futureAppointments.length,
       completedEarnings,
       scheduledEarnings
     }
   }
 
+  const get12MonthAverage = () => {
+    const currentDate = new Date()
+    const monthlyData: Array<{appointments: number, earnings: number}> = []
+
+    // Calculate stats for each of the last 12 months
+    for (let i = 0; i < 12; i++) {
+      const targetDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1)
+      const targetYear = targetDate.getFullYear()
+      const targetMonth = targetDate.getMonth()
+
+      const monthAppointments = appointments.filter(appointment => {
+        const appointmentDate = appointment.appointment_date ? new Date(appointment.appointment_date) : new Date(appointment.created_at)
+        return appointmentDate.getFullYear() === targetYear && appointmentDate.getMonth() === targetMonth
+      })
+
+      const monthEarnings = monthAppointments.reduce((total, appointment) => {
+        return total + (appointment.total_amount || 0)
+      }, 0)
+
+      // Only include months that have data
+      if (monthAppointments.length > 0 || monthEarnings > 0) {
+        monthlyData.push({
+          appointments: monthAppointments.length,
+          earnings: monthEarnings
+        })
+      }
+    }
+
+    // Calculate average only from months with data
+    const monthsWithData = monthlyData.length
+    const avgAppointments = monthsWithData > 0 ? monthlyData.reduce((sum, month) => sum + month.appointments, 0) / monthsWithData : 0
+    const avgEarnings = monthsWithData > 0 ? monthlyData.reduce((sum, month) => sum + month.earnings, 0) / monthsWithData : 0
+
+    return { avgAppointments, avgEarnings, monthsWithData }
+  }
+
+  const calculateComparison = (current: number, average: number) => {
+    if (average === 0) return { percentage: 0, isPositive: true }
+    const percentage = ((current - average) / average) * 100
+    return { percentage: Math.round(percentage), isPositive: percentage >= 0 }
+  }
+
   const monthlyStats = getMonthlyStats()
+  const averageStats = get12MonthAverage()
+  const appointmentsComparison = calculateComparison(monthlyStats.total, averageStats.avgAppointments)
+  const earningsComparison = calculateComparison(monthlyStats.completedEarnings + monthlyStats.scheduledEarnings, averageStats.avgEarnings)
 
 
   if (loading) {
@@ -157,22 +218,19 @@ export function AppointmentsPage() {
                 <>
                   {/* Empty state */}
                   {appointments.length === 0 && (
-                    <div className="empty-state">
-                      <div className="empty-content">
-                        <div className="empty-icon">📅</div>
-                        <h2 className="empty-title">Nessun appuntamento</h2>
-                        <p className="empty-description">
-                          Non hai ancora ricevuto richieste di appuntamento. Completa il tuo profilo per attirare nuovi clienti.
-                        </p>
+                    <EmptyState
+                      icon="📅"
+                      title="Nessun appuntamento"
+                      description="Non hai ancora ricevuto richieste di appuntamento. Completa il tuo profilo per attirare nuovi clienti."
+                      action={
                         <button
                           className="action-btn"
-                          style={{ marginTop: '1.5rem' }}
                           onClick={() => navigate('/profile')}
                         >
                           Completa Profilo
                         </button>
-                      </div>
-                    </div>
+                      }
+                    />
                   )}
 
                   {/* Appointments content */}
@@ -210,15 +268,11 @@ export function AppointmentsPage() {
                       <div className="appointments-content">
                         <div className="appointments-list">
                           {filteredAppointments.length === 0 ? (
-                            <div className="empty-state">
-                              <div className="empty-content">
-                                <div className="empty-icon">📅</div>
-                                <h3 className="empty-title">Nessun appuntamento {selectedFilter}</h3>
-                                <p className="empty-description">
-                                  Non hai appuntamenti {selectedFilter === 'programmati' ? 'programmati' : selectedFilter} al momento.
-                                </p>
-                              </div>
-                            </div>
+                            <EmptyState
+                              icon="📅"
+                              title={`Nessun appuntamento ${selectedFilter}`}
+                              description={`Non hai appuntamenti ${selectedFilter === 'programmati' ? 'programmati' : selectedFilter} al momento.`}
+                            />
                           ) : (
                             filteredAppointments.map((appointment) => (
                             <CompactAppointmentCard
@@ -260,9 +314,16 @@ export function AppointmentsPage() {
                         <span className="stats-label">N. APPUNTAMENTI</span>
                         <span className="stats-value">
                           {monthlyStats.total}
-                          <br />
-                          ({monthlyStats.scheduled} programmati)
+                          {monthlyStats.scheduled > 0 && (
+                            <>
+                              <br />
+                              ({monthlyStats.scheduled} programmati)
+                            </>
+                          )}
                         </span>
+                        <div className={`comparison-chip ${appointmentsComparison.isPositive ? 'positive' : 'negative'}`}>
+                          {appointmentsComparison.isPositive ? '↗' : '↘'} {Math.abs(appointmentsComparison.percentage)}%
+                        </div>
                       </div>
                     </div>
 
@@ -270,10 +331,17 @@ export function AppointmentsPage() {
                       <div className="stats-item">
                         <span className="stats-label">GUADAGNO TOTALE</span>
                         <span className="stats-value">
-                          €{monthlyStats.completedEarnings.toFixed(2)}
-                          <br />
-                          (€{monthlyStats.scheduledEarnings.toFixed(2)} programmati)
+                          €{(monthlyStats.completedEarnings + monthlyStats.scheduledEarnings).toFixed(2)}
+                          {monthlyStats.scheduledEarnings > 0 && (
+                            <>
+                              <br />
+                              (€{monthlyStats.scheduledEarnings.toFixed(2)} programmati)
+                            </>
+                          )}
                         </span>
+                        <div className={`comparison-chip ${earningsComparison.isPositive ? 'positive' : 'negative'}`}>
+                          {earningsComparison.isPositive ? '↗' : '↘'} {Math.abs(earningsComparison.percentage)}%
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -308,22 +376,19 @@ export function AppointmentsPage() {
           <div className="appointments-container">
             {/* Empty state */}
             {appointments.length === 0 && (
-              <div className="empty-state">
-                <div className="empty-content">
-                  <div className="empty-icon">📅</div>
-                  <h2 className="empty-title">Nessun appuntamento</h2>
-                  <p className="empty-description">
-                    Non hai ancora prenotato nessun appuntamento. Esplora i portfolio degli artisti e prenota il tuo primo tatuaggio.
-                  </p>
+              <EmptyState
+                icon="📅"
+                title="Nessun appuntamento"
+                description="Non hai ancora prenotato nessun appuntamento. Esplora i portfolio degli artisti e prenota il tuo primo tatuaggio."
+                action={
                   <button
                     className="action-btn"
-                    style={{ marginTop: '1.5rem' }}
                     onClick={() => navigate('/')}
                   >
                     Esplora Portfolio
                   </button>
-                </div>
-              </div>
+                }
+              />
             )}
 
             {/* Client appointments content */}
@@ -361,15 +426,11 @@ export function AppointmentsPage() {
                 <div className="appointments-content">
                   <div className="appointments-list">
                     {filteredAppointments.length === 0 ? (
-                      <div className="empty-state">
-                        <div className="empty-content">
-                          <div className="empty-icon">📅</div>
-                          <h3 className="empty-title">Nessun appuntamento {selectedFilter}</h3>
-                          <p className="empty-description">
-                            Non hai appuntamenti {selectedFilter === 'programmati' ? 'programmati' : selectedFilter} al momento.
-                          </p>
-                        </div>
-                      </div>
+                      <EmptyState
+                        icon="📅"
+                        title={`Nessun appuntamento ${selectedFilter}`}
+                        description={`Non hai appuntamenti ${selectedFilter === 'programmati' ? 'programmati' : selectedFilter} al momento.`}
+                      />
                     ) : (
                       filteredAppointments.map((appointment) => (
                       <CompactAppointmentCard

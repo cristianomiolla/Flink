@@ -8,6 +8,7 @@ import { ArtistCard } from './ArtistCard'
 import { usePortfolioSearch } from '../hooks/usePortfolioSearch'
 import { useAuth } from '../hooks/useAuth'
 import { useNavigate } from 'react-router-dom'
+import EmptyState from './EmptyState'
 
 // Lazy load AuthOverlay component
 const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
@@ -79,22 +80,20 @@ export function RecentArtistsPage({ onLogoClick }: RecentArtistsPageProps) {
       <div className="container">
         {/* Empty state */}
         {!error && recentArtists.length === 0 && (
-          <div className="empty-state">
-            <div className="empty-content">
-              <div className="empty-icon">🆕</div>
-              <h2 className="empty-title">Nessun artista recente</h2>
-              <p className="empty-description">
-                Non ci sono artisti che si sono iscritti negli ultimi 30 giorni. Torna più tardi per scoprire i nuovi talenti.
-              </p>
-              <button 
-                className="action-btn" 
+          <EmptyState
+            icon="🆕"
+            title="Nessun artista recente"
+            description="Non ci sono artisti che si sono iscritti negli ultimi 30 giorni. Torna più tardi per scoprire i nuovi talenti."
+            action={
+              <button
+                className="action-btn"
                 onClick={onLogoClick}
                 style={{ marginTop: '1.5rem' }}
               >
                 Torna alla Home
               </button>
-            </div>
-          </div>
+            }
+          />
         )}
 
         {/* Content area */}
