@@ -35,11 +35,16 @@
   display: flex;
   justify-content: center;
   overflow-x: auto;
+  padding: 0;
+  margin: 0;
 }
 
 .chart-svg {
   max-width: 100%;
   height: auto;
+  display: block;
+  margin: 0;
+  padding: 0;
 }
 
 .chart-axis-label {
@@ -71,10 +76,16 @@
   .chart-container {
     overflow-x: scroll;
     -webkit-overflow-scrolling: touch;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    width: 100%;
   }
 
   .chart-svg {
-    min-width: 350px;
+    width: 100%;
+    margin: 0 auto;
+    display: block;
   }
 
   .chart-axis-label {
