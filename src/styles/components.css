@@ -144,6 +144,7 @@
 .modal-content.auth-modal {
   max-width: 480px;
   max-height: 95vh;
+  max-height: 95dvh; /* Dynamic viewport height for mobile browsers */
 }
 
 .modal-content.confirmation-modal {
