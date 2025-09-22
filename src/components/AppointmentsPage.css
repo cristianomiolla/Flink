@@ -5,12 +5,12 @@
   color: var(--foreground);
 }
 
-.page-content {
+.appointments-page-content {
   height: 100%;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  padding: 0 2rem;
+  padding: 2rem 2rem 0;
 }
 
 
@@ -74,7 +74,6 @@
 /* Page Header */
 .page-header {
   flex-shrink: 0;
-  padding: 2rem 0 0;
 }
 
 /* Category Tags - imported from CategoryBar.css */
@@ -139,11 +138,9 @@
 
 /* Mobile responsive */
 @media (max-width: 768px) {
-  /* Universal mobile padding for page-content */
-  .page-content {
-    padding: 0 1rem !important;
-    height: 100%;
-    overflow-y: auto;
+  /* Appointments page mobile padding */
+  .appointments-page-content {
+    padding: 1rem 1rem 0 !important;
   }
 
   .appointments-container.management-layout {
@@ -166,7 +163,7 @@
     overflow: hidden;
   }
 
-  .appointments-container:not(.management-layout) .page-content {
+  .appointments-container:not(.management-layout) .appointments-page-content {
     height: 100%;
     overflow-y: auto;
   }

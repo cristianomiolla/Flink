@@ -172,7 +172,7 @@ export function SavedItemsPage({ onLogoClick, onArtistClick }: SavedItemsPagePro
           <div className="page-content">
           {/* Header - solo se ci sono elementi salvati */}
           {savedItems.length > 0 && (
-            <PageHeader 
+            <PageHeader
               title="ELEMENTI SALVATI"
               subtitle={savedItems.length === 1 ? (
                 '1 elemento salvato'

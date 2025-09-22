@@ -255,7 +255,7 @@ export function AppointmentsPage() {
 
                   {/* Appointments content */}
                   {appointments.length > 0 && (
-                    <div className="page-content">
+                    <div className="appointments-page-content">
                       <div className="page-header">
                         <div className="header-card">
                           <h2>I MIEI APPUNTAMENTI</h2>
@@ -313,7 +313,7 @@ export function AppointmentsPage() {
 
               {/* Dashboard Section */}
               {activeSection === 'dashboard' && (
-                <div className="page-content">
+                <div className="appointments-page-content">
                   <div className="page-header">
                     <div className="header-card">
                       <h2>DASHBOARD</h2>
@@ -379,7 +379,7 @@ export function AppointmentsPage() {
 
               {/* Calendar Section */}
               {activeSection === 'calendar' && (
-                <div className="page-content">
+                <div className="appointments-page-content">
                   <div className="page-header">
                     <div className="header-card">
                       <h2>CALENDARIO</h2>
@@ -413,7 +413,7 @@ export function AppointmentsPage() {
 
             {/* Client appointments content */}
             {appointments.length > 0 && (
-              <div className="page-content">
+              <div className="appointments-page-content">
                 <div className="page-header">
                   <div className="header-card">
                     <h2>I MIEI APPUNTAMENTI</h2>
