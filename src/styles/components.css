@@ -242,6 +242,8 @@
   .modal-content.auth-modal {
     width: calc(100vw - 2rem);
     max-width: none;
+    max-height: 95vh;
+    max-height: 95dvh; /* Dynamic viewport height for mobile browsers */
   }
 
   .modal-content.confirmation-modal {
