@@ -63,7 +63,8 @@
       "Bash(npx supabase functions deploy:*)",
       "WebSearch",
       "WebFetch(domain:developers.google.com)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(findstr:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

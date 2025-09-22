@@ -139,8 +139,8 @@ body {
 
 /* Mobile adjustments for state classes */
 @media (max-width: 767px) {
-  /* Specific pages mobile empty states */
-  .page-container .empty-state,
+  /* Specific pages mobile empty states - excluding appointments page */
+  .page-container:not(.appointments-page) .empty-state,
   .messages-page .empty-state,
   .mobile-profile-page .empty-state {
     min-height: auto;

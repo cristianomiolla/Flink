@@ -208,7 +208,7 @@ export function AppointmentsPage() {
   }
 
   return (
-    <div className="page-container">
+    <div className="page-container appointments-page">
       <SearchBar onLogoClick={handleLogoClick} hideOnMobile={true} />
 
       {/* Artists get full management layout */}

@@ -1,4 +1,4 @@
-@import '../styles/tokens.css';
+/* tokens.css is imported globally in index.css */
 
 .month-slider {
   display: flex;

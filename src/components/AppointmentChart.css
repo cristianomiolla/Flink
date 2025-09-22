@@ -1,4 +1,4 @@
-@import '../styles/tokens.css';
+/* tokens.css is imported globally in index.css */
 
 .appointment-chart {
   margin: 2rem 0;
