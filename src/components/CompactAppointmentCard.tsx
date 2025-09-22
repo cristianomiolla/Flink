@@ -216,70 +216,54 @@ export function CompactAppointmentCard({
           </div>
 
           {/* Secondary details - smaller, less prominent */}
-          <div className="appointment-details">
-            <div className="appointment-details-row">
-              {isArtistAppointment ? (
-                <div className="appointment-meta">
-                  {(fullBookingData?.total_amount || fullBookingData?.deposit_amount) && (
-                    <div className="pricing-summary">
-                      {fullBookingData?.deposit_amount && (
-                        <div className="pricing-row">
-                          <span className="pricing-label">Acconto</span>
-                          <span className="pricing-value">€{fullBookingData.deposit_amount}</span>
-                        </div>
-                      )}
-                      {fullBookingData?.total_amount && (
-                        <div className="pricing-row total">
-                          <span className="pricing-label total">Totale</span>
-                          <span className="pricing-value total">€{fullBookingData.total_amount}</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="appointment-meta">
-                  {fullBookingData?.body_area && (
-                    <span className="detail-item">📍 {fullBookingData.body_area}</span>
-                  )}
-                  {fullBookingData?.size_category && (
-                    <span className="detail-item">📏 {fullBookingData.size_category}</span>
-                  )}
-                </div>
-              )}
+          {((!isArtistAppointment && (fullBookingData?.body_area || fullBookingData?.size_category)) ||
+            (fullBookingData?.status === 'completed')) && (
+            <div className="appointment-details">
+              <div className="appointment-details-row">
+                {!isArtistAppointment && (
+                  <div className="appointment-meta">
+                    {fullBookingData?.body_area && (
+                      <span className="detail-item">📍 {fullBookingData.body_area}</span>
+                    )}
+                    {fullBookingData?.size_category && (
+                      <span className="detail-item">📏 {fullBookingData.size_category}</span>
+                    )}
+                  </div>
+                )}
 
-              {/* Review Section - shown only for completed appointments */}
-              {fullBookingData?.status === 'completed' && (
-                <div className="appointment-review">
-                  {reviewData ? (
-                    <div className="review-content">
-                      <div className="review-rating">
-                        <span className="stars">{renderStars(reviewData.rating)}</span>
-                        <span className="compact-rating-number">({reviewData.rating}/5)</span>
+                {/* Review Section - shown only for completed appointments */}
+                {fullBookingData?.status === 'completed' && (
+                  <div className="appointment-review">
+                    {reviewData ? (
+                      <div className="review-content">
+                        <div className="review-rating">
+                          <span className="stars">{renderStars(reviewData.rating)}</span>
+                          <span className="compact-rating-number">({reviewData.rating}/5)</span>
+                        </div>
+                        {reviewData.comment && (
+                          <div className="review-comment">"{reviewData.comment}"</div>
+                        )}
                       </div>
-                      {reviewData.comment && (
-                        <div className="review-comment">"{reviewData.comment}"</div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="review-missing">
-                      {profile?.profile_type === 'client' ? (
-                        <button
-                          className="review-cta-button"
-                          onClick={handleAddReview}
-                          title="Lascia una recensione"
-                        >
-                          ⭐ Recensisci
-                        </button>
-                      ) : (
-                        <span className="review-text">Nessuna recensione</span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
+                    ) : (
+                      <div className="review-missing">
+                        {profile?.profile_type === 'client' ? (
+                          <button
+                            className="review-cta-button"
+                            onClick={handleAddReview}
+                            title="Lascia una recensione"
+                          >
+                            ⭐ Recensisci
+                          </button>
+                        ) : (
+                          <span className="review-text">Nessuna recensione</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Mobile Layout */}
@@ -313,22 +297,6 @@ export function CompactAppointmentCard({
             <div className="mobile-details">
               {isArtistAppointment ? (
                 <>
-                  {(fullBookingData?.total_amount || fullBookingData?.deposit_amount) && (
-                    <div className="mobile-pricing-summary">
-                      {fullBookingData?.deposit_amount && (
-                        <div className="mobile-pricing-row">
-                          <span className="mobile-pricing-label">Acconto</span>
-                          <span className="mobile-pricing-value">€{fullBookingData.deposit_amount}</span>
-                        </div>
-                      )}
-                      {fullBookingData?.total_amount && (
-                        <div className="mobile-pricing-row total">
-                          <span className="mobile-pricing-label total">Totale</span>
-                          <span className="mobile-pricing-value total">€{fullBookingData.total_amount}</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
                 </>
               ) : (
                 <>

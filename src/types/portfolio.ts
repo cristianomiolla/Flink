@@ -147,3 +147,31 @@ export interface DatabaseMessage {
   deleted_at: string | null
 }
 
+// Review interfaces
+export interface DatabaseReview {
+  readonly id: string
+  readonly booking_id: string
+  readonly client_id: string
+  readonly artist_id: string
+  rating: number
+  comment: string | null
+  readonly created_at: string
+}
+
+export interface ReviewWithClient extends DatabaseReview {
+  readonly client_profile: {
+    readonly full_name: string | null
+    readonly username: string | null
+    readonly avatar_url: string | null
+  } | null
+}
+
+export interface ReviewStats {
+  readonly average_rating: number
+  readonly total_reviews: number
+  readonly rating_distribution: {
+    readonly [key: number]: number
+  }
+}
+
+

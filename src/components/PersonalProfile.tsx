@@ -4,6 +4,7 @@ import { SearchBar } from './SearchBar'
 import { useAuth } from '../hooks/useAuth'
 import { useFollowers } from '../hooks/useFollowers'
 import { useArtistServices } from '../hooks/useArtistServices'
+import { useReviews } from '../hooks/useReviews'
 import LoadingSpinner from './LoadingSpinner'
 import { Avatar } from './Avatar'
 import { PortfolioCard } from './PortfolioCard'
@@ -71,13 +72,44 @@ export function PersonalProfile() {
   const [serviceToDelete, setServiceToDelete] = useState<string | null>(null)
   
   // Services hook
-  const { 
-    services, 
-    loading: servicesLoading, 
+  const {
+    services,
+    loading: servicesLoading,
     createService,
     updateService,
-    deleteService 
+    deleteService
   } = useArtistServices(profile?.user_id)
+
+  // Reviews hook
+  const { reviews, stats: reviewStats, loading: reviewsLoading, error: reviewsError } = useReviews(profile?.user_id || '')
+
+  // Utility functions for reviews
+  const formatReviewDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('it-IT', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    })
+  }
+
+  const getClientDisplayName = (clientProfile: any) => {
+    if (!clientProfile) return 'Cliente Anonimo'
+
+    const name = clientProfile.username || clientProfile.full_name
+    if (!name) return 'Cliente Anonimo'
+
+    // Show only first name and last initial for privacy
+    const nameParts = name.split(' ')
+    if (nameParts.length > 1) {
+      return `${nameParts[0]} ${nameParts[1].charAt(0)}.`
+    }
+    return `${name.charAt(0).toUpperCase()}${name.slice(1)}`
+  }
+
+  const renderStars = (rating: number) => {
+    return '★'.repeat(rating) + '☆'.repeat(5 - rating)
+  }
 
   const handleSearch = (searchTerm: string, location: string) => {
     navigate(`/?search=${encodeURIComponent(searchTerm)}&location=${encodeURIComponent(location)}`)
@@ -725,10 +757,11 @@ export function PersonalProfile() {
                         ))}
                       </div>
                     ) : (
-                      <div className="empty-portfolio">
-                        <div className="empty-state">
-                          <h4>Portfolio vuoto</h4>
-                          <p>I tuoi lavori appariranno qui una volta che inizierai a caricarli.</p>
+                      <div className="empty-state">
+                        <div className="empty-content">
+                          <div className="empty-icon">🎨</div>
+                          <h3 className="empty-title">Portfolio vuoto</h3>
+                          <p className="empty-description">I tuoi lavori appariranno qui una volta che inizierai a caricarli.</p>
                         </div>
                       </div>
                     )}
@@ -770,10 +803,11 @@ export function PersonalProfile() {
                         ))}
                       </div>
                     ) : (
-                      <div className="empty-portfolio">
-                        <div className="empty-state">
-                          <h4>Nessun servizio pubblicato</h4>
-                          <p>Aggiungi i tuoi servizi per far conoscere ai clienti cosa offri.</p>
+                      <div className="empty-state">
+                        <div className="empty-content">
+                          <div className="empty-icon">⚙️</div>
+                          <h3 className="empty-title">Nessun servizio pubblicato</h3>
+                          <p className="empty-description">Aggiungi i tuoi servizi per far conoscere ai clienti cosa offri.</p>
                         </div>
                       </div>
                     )}
@@ -820,10 +854,11 @@ export function PersonalProfile() {
                         ))}
                       </div>
                     ) : (
-                      <div className="empty-portfolio">
-                        <div className="empty-state">
-                          <h4>Nessun flash disponibile</h4>
-                          <p>I tuoi disegni flash appariranno qui una volta che inizierai a caricarli.</p>
+                      <div className="empty-state">
+                        <div className="empty-content">
+                          <div className="empty-icon">⚡</div>
+                          <h3 className="empty-title">Nessun flash disponibile</h3>
+                          <p className="empty-description">I tuoi disegni flash appariranno qui una volta che inizierai a caricarli.</p>
                         </div>
                       </div>
                     )}
@@ -832,13 +867,58 @@ export function PersonalProfile() {
 
                 {activeTab === 'recensioni' && (
                   <div className="tab-panel recensioni-panel">
-                    <h3>LE MIE RECENSIONI</h3>
-                    <div className="empty-portfolio">
-                      <div className="empty-state">
-                        <h4>Nessuna recensione</h4>
-                        <p>Le recensioni dei tuoi clienti appariranno qui.</p>
+                    <h3>LE MIE RECENSIONI {reviewStats && reviewStats.total_reviews > 0 && `(${reviewStats.total_reviews})`}</h3>
+
+
+                    {reviewsLoading ? (
+                      <div className="portfolio-loading">
+                        <LoadingSpinner size="large" />
+                        <p>Caricamento recensioni...</p>
                       </div>
-                    </div>
+                    ) : reviewsError ? (
+                      <div className="error-state">
+                        <p>Errore nel caricamento delle recensioni</p>
+                      </div>
+                    ) : reviews.length > 0 ? (
+                      <>
+                        <div className="reviews-list">
+                          {reviews.map((review) => (
+                            <div key={review.id} className="review-item">
+                              <div className="review-header">
+                                <div className="reviewer-info">
+                                  <strong>{getClientDisplayName(review.client_profile)}</strong>
+                                  <div className="review-stars">{renderStars(review.rating)}</div>
+                                </div>
+                                <span className="review-date">{formatReviewDate(review.created_at)}</span>
+                              </div>
+                              {review.comment && (
+                                <p className="review-text">"{review.comment}"</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+
+                        {reviewStats && (
+                          <div className="reviews-summary">
+                            <div className="rating-average">
+                              <span className="artist-rating-number">{reviewStats.average_rating}</span>
+                              <div className="rating-stars">{renderStars(Math.round(reviewStats.average_rating))}</div>
+                              <span className="rating-count">
+                                {reviewStats.total_reviews} {reviewStats.total_reviews === 1 ? 'recensione' : 'recensioni'}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="empty-state">
+                        <div className="empty-content">
+                          <div className="empty-icon">⭐</div>
+                          <h3 className="empty-title">Nessuna recensione</h3>
+                          <p className="empty-description">Le recensioni dei tuoi clienti appariranno qui una volta che avrai completato i primi lavori.</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

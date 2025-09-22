@@ -62,7 +62,8 @@
       "mcp__supabase__get_advisors",
       "Bash(npx supabase functions deploy:*)",
       "WebSearch",
-      "WebFetch(domain:developers.google.com)"
+      "WebFetch(domain:developers.google.com)",
+      "Bash(npx tsc:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

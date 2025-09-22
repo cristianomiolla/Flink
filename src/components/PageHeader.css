@@ -152,8 +152,7 @@
 /* State Styles - using global classes from tokens.css */
 
 .loading-card,
-.error-card,
-.empty-card {
+.error-card {
   background: var(--background);
   border: none;
   border-radius: var(--radius);
@@ -247,8 +246,7 @@
   }
   
   .loading-card,
-  .error-card,
-  .empty-card {
+  .error-card {
     padding: 1.5rem;
     border: none;
   }

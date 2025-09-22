@@ -5,9 +5,10 @@ type ManagementSection = 'appointments' | 'dashboard' | 'calendar'
 interface ManagementSidebarProps {
   activeSection: ManagementSection
   onSectionChange: (section: ManagementSection) => void
+  onSidebarClose?: () => void
 }
 
-export function ManagementSidebar({ activeSection, onSectionChange }: ManagementSidebarProps) {
+export function ManagementSidebar({ activeSection, onSectionChange, onSidebarClose }: ManagementSidebarProps) {
   const menuItems = [
     {
       id: 'appointments' as ManagementSection,
@@ -40,7 +41,10 @@ export function ManagementSidebar({ activeSection, onSectionChange }: Management
           <button
             key={item.id}
             className={`sidebar-nav-item ${activeSection === item.id ? 'active' : ''}`}
-            onClick={() => onSectionChange(item.id)}
+            onClick={() => {
+              onSectionChange(item.id)
+              onSidebarClose?.()
+            }}
           >
             <span className="nav-icon">{item.icon}</span>
             <span className="nav-label">{item.label}</span>

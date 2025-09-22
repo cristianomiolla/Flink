@@ -200,6 +200,7 @@ export function AppointmentsPage() {
               <ManagementSidebar
                 activeSection={activeSection}
                 onSectionChange={setActiveSection}
+                onSidebarClose={() => setSidebarVisible(false)}
               />
             )}
 
@@ -329,7 +330,7 @@ export function AppointmentsPage() {
 
                     <div className="stats-box">
                       <div className="stats-item">
-                        <span className="stats-label">GUADAGNO TOTALE</span>
+                        <span className="stats-label">RICAVO TOTALE</span>
                         <span className="stats-value">
                           €{(monthlyStats.completedEarnings + monthlyStats.scheduledEarnings).toFixed(2)}
                           {monthlyStats.scheduledEarnings > 0 && (

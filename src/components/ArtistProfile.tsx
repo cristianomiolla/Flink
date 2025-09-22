@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { SearchBar } from './SearchBar'
 import { useArtistProfile } from '../hooks/useArtistProfile'
 import { useFollowers } from '../hooks/useFollowers'
+import { useReviews } from '../hooks/useReviews'
 import { useAuth } from '../hooks/useAuth'
 import LoadingSpinner from './LoadingSpinner'
 import { PortfolioCard } from './PortfolioCard'
@@ -19,7 +20,9 @@ export function ArtistProfile() {
   const { profile: currentUserProfile } = useAuth()
   const { profile, portfolioItems, services, loading, error } = useArtistProfile(artistId || '')
   const { fetchFollowerStats, getFollowerStats, toggleFollow } = useFollowers()
+  const { reviews, stats: reviewStats, loading: reviewsLoading, error: reviewsError } = useReviews(artistId || '')
   const [activeTab, setActiveTab] = useState<TabType>('portfolio')
+
   
   // Get follower stats for this artist
   const followerStats = profile ? getFollowerStats(profile.user_id) : null
@@ -74,6 +77,34 @@ export function ArtistProfile() {
     if (profile?.user_id) {
       await toggleFollow(profile.user_id)
     }
+  }
+
+  // Utility functions for reviews
+  const formatReviewDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('it-IT', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    })
+  }
+
+  const getClientDisplayName = (clientProfile: any) => {
+    if (!clientProfile) return 'Cliente Anonimo'
+
+    const name = clientProfile.username || clientProfile.full_name
+    if (!name) return 'Cliente Anonimo'
+
+    // Show only first name and last initial for privacy
+    const nameParts = name.split(' ')
+    if (nameParts.length > 1) {
+      return `${nameParts[0]} ${nameParts[1].charAt(0)}.`
+    }
+    return `${name.charAt(0).toUpperCase()}${name.slice(1)}`
+  }
+
+  const renderStars = (rating: number) => {
+    return '★'.repeat(rating) + '☆'.repeat(5 - rating)
   }
 
   return (
@@ -245,10 +276,11 @@ export function ArtistProfile() {
                           ))}
                         </div>
                       ) : (
-                        <div className="empty-portfolio">
-                          <div className="empty-state">
-                            <h4>Nessun lavoro pubblicato</h4>
-                            <p>Questo artista non ha ancora caricato lavori personalizzati nel suo portfolio.</p>
+                        <div className="empty-state">
+                          <div className="empty-content">
+                            <div className="empty-icon">🎨</div>
+                            <h3 className="empty-title">Nessun lavoro pubblicato</h3>
+                            <p className="empty-description">Questo artista non ha ancora caricato lavori personalizzati nel suo portfolio.</p>
                           </div>
                         </div>
                       )}
@@ -327,10 +359,11 @@ export function ArtistProfile() {
                           ))}
                         </div>
                       ) : (
-                        <div className="empty-portfolio">
-                          <div className="empty-state">
-                            <h4>Nessun servizio disponibile</h4>
-                            <p>Questo artista non ha ancora pubblicato i suoi servizi.</p>
+                        <div className="empty-state">
+                          <div className="empty-content">
+                            <div className="empty-icon">🛠️</div>
+                            <h3 className="empty-title">Nessun servizio disponibile</h3>
+                            <p className="empty-description">Questo artista non ha ancora pubblicato i suoi servizi.</p>
                           </div>
                         </div>
                       )}
@@ -372,10 +405,11 @@ export function ArtistProfile() {
                           ))}
                         </div>
                       ) : (
-                        <div className="empty-portfolio">
-                          <div className="empty-state">
-                            <h4>Nessun flash disponibile</h4>
-                            <p>Questo artista non ha ancora caricato disegni flash disponibili.</p>
+                        <div className="empty-state">
+                          <div className="empty-content">
+                            <div className="empty-icon">⚡</div>
+                            <h3 className="empty-title">Nessun flash disponibile</h3>
+                            <p className="empty-description">Questo artista non ha ancora caricato disegni flash disponibili.</p>
                           </div>
                         </div>
                       )}
@@ -384,55 +418,58 @@ export function ArtistProfile() {
 
                   {activeTab === 'recensioni' && (
                     <div className="tab-panel recensioni-panel">
-                      <h3>RECENSIONI CLIENTI</h3>
-                      <div className="reviews-list">
-                        <div className="review-item">
-                          <div className="review-header">
-                            <div className="reviewer-info">
-                              <strong>Marco R.</strong>
-                              <div className="review-stars">★★★★★</div>
-                            </div>
-                            <span className="review-date">15 Gen 2024</span>
+                      <h3>RECENSIONI CLIENTI {reviewStats && reviewStats.total_reviews > 0 && `(${reviewStats.total_reviews})`}</h3>
+
+
+                      {reviewsLoading ? (
+                        <div className="portfolio-loading">
+                          <LoadingSpinner size="large" />
+                          <p>Caricamento recensioni...</p>
+                        </div>
+                      ) : reviewsError ? (
+                        <div className="error-state">
+                          <p>Errore nel caricamento delle recensioni</p>
+                        </div>
+                      ) : reviews.length > 0 ? (
+                        <>
+                          <div className="reviews-list">
+                            {reviews.map((review) => (
+                              <div key={review.id} className="review-item">
+                                <div className="review-header">
+                                  <div className="reviewer-info">
+                                    <strong>{getClientDisplayName(review.client_profile)}</strong>
+                                    <div className="review-stars">{renderStars(review.rating)}</div>
+                                  </div>
+                                  <span className="review-date">{formatReviewDate(review.created_at)}</span>
+                                </div>
+                                {review.comment && (
+                                  <p className="review-text">"{review.comment}"</p>
+                                )}
+                              </div>
+                            ))}
                           </div>
-                          <p className="review-text">
-                            "Esperienza fantastica! Professionalità al top e risultato perfetto. 
-                            Il tatuaggio è venuto esattamente come volevo. Consigliatissimo!"
-                          </p>
-                        </div>
-                        <div className="review-item">
-                          <div className="review-header">
-                            <div className="reviewer-info">
-                              <strong>Giulia M.</strong>
-                              <div className="review-stars">★★★★★</div>
+
+                          {reviewStats && (
+                            <div className="reviews-summary">
+                              <div className="rating-average">
+                                <span className="artist-rating-number">{reviewStats.average_rating}</span>
+                                <div className="rating-stars">{renderStars(Math.round(reviewStats.average_rating))}</div>
+                                <span className="rating-count">
+                                  {reviewStats.total_reviews} {reviewStats.total_reviews === 1 ? 'recensione' : 'recensioni'}
+                                </span>
+                              </div>
                             </div>
-                            <span className="review-date">8 Gen 2024</span>
+                          )}
+                        </>
+                      ) : (
+                        <div className="empty-state">
+                          <div className="empty-content">
+                            <div className="empty-icon">⭐</div>
+                            <h3 className="empty-title">Nessuna recensione</h3>
+                            <p className="empty-description">Questo artista non ha ancora ricevuto recensioni dai clienti.</p>
                           </div>
-                          <p className="review-text">
-                            "Artista incredibile! Studio pulito e igienizzato, grande attenzione 
-                            ai dettagli. Il mio primo tatuaggio non poteva andare meglio."
-                          </p>
                         </div>
-                        <div className="review-item">
-                          <div className="review-header">
-                            <div className="reviewer-info">
-                              <strong>Alessio T.</strong>
-                              <div className="review-stars">★★★★★</div>
-                            </div>
-                            <span className="review-date">2 Gen 2024</span>
-                          </div>
-                          <p className="review-text">
-                            "Cover up riuscitissimo! Ha trasformato un vecchio tatuaggio in 
-                            un'opera d'arte. Tempi rispettati e prezzo onesto."
-                          </p>
-                        </div>
-                      </div>
-                      <div className="reviews-summary">
-                        <div className="rating-average">
-                          <span className="artist-rating-number">4.9</span>
-                          <div className="rating-stars">★★★★★</div>
-                          <span className="rating-count">127 recensioni</span>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   )}
                 </div>

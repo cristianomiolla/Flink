@@ -1,5 +1,6 @@
 import { memo, type ReactNode } from 'react'
 import LoadingSpinner from './LoadingSpinner'
+import './EmptyState.css'
 import '../styles/components.css'
 
 interface DataStateHandlerProps {
@@ -62,9 +63,9 @@ const DataStateHandler = memo(function DataStateHandler({
       <section className="grid-container">
         <div className="container">
           <div className="empty-state">
-            <div className="empty-card">
+            <div className="empty-content">
               <h3 className="empty-title">{emptyTitle}</h3>
-              <p className="empty-message">
+              <p className="empty-description">
                 {hasSearchTerms ? searchEmptyMessage : fallbackEmptyMessage}
               </p>
             </div>

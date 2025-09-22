@@ -109,7 +109,6 @@
   background: var(--grey-light);
   padding: 1rem;
   border: 1px solid var(--border);
-  margin-top: 0.5rem;
 }
 
 .suggestions-title {

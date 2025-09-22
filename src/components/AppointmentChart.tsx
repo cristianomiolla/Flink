@@ -19,7 +19,7 @@ interface ChartDataPoint {
 type ChartType = 'appointments' | 'earnings'
 
 export function AppointmentChart({ appointments, selectedYear, selectedMonth }: AppointmentChartProps) {
-  const [chartType, setChartType] = useState<ChartType>('appointments')
+  const [chartType, setChartType] = useState<ChartType>('earnings')
   const [containerWidth, setContainerWidth] = useState(600)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -96,22 +96,22 @@ export function AppointmentChart({ appointments, selectedYear, selectedMonth }: 
   return (
     <div className="appointment-chart" ref={containerRef}>
       <h3 className="chart-title">
-        TREND {chartType === 'appointments' ? 'APPUNTAMENTI' : 'GUADAGNI'} (12 MESI)
+        TREND {chartType === 'appointments' ? 'APPUNTAMENTI' : 'RICAVI'} (12 MESI)
       </h3>
 
       <div className="toggle-container">
         <div className="view-toggle">
           <button
+            className={`toggle-btn ${chartType === 'earnings' ? 'active' : ''}`}
+            onClick={() => setChartType('earnings')}
+          >
+            Ricavi
+          </button>
+          <button
             className={`toggle-btn ${chartType === 'appointments' ? 'active' : ''}`}
             onClick={() => setChartType('appointments')}
           >
             Appuntamenti
-          </button>
-          <button
-            className={`toggle-btn ${chartType === 'earnings' ? 'active' : ''}`}
-            onClick={() => setChartType('earnings')}
-          >
-            Guadagni
           </button>
         </div>
       </div>

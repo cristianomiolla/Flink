@@ -11,6 +11,7 @@ import './FormOverlay.css'
 const EmailChangeOverlay = lazy(() => import('./EmailChangeOverlay').then(module => ({ default: module.EmailChangeOverlay })))
 const FullNameChangeOverlay = lazy(() => import('./FullNameChangeOverlay').then(module => ({ default: module.FullNameChangeOverlay })))
 const PasswordChangeOverlay = lazy(() => import('./PasswordChangeOverlay').then(module => ({ default: module.PasswordChangeOverlay })))
+const AccountDeletionOverlay = lazy(() => import('./AccountDeletionOverlay').then(module => ({ default: module.AccountDeletionOverlay })))
 
 interface SettingsPageProps {
   onLogoClick?: () => void
@@ -23,6 +24,7 @@ export function SettingsPage({ onLogoClick }: SettingsPageProps) {
   const [showFullNameOverlay, setShowFullNameOverlay] = useState(false)
   const [showPasswordOverlay, setShowPasswordOverlay] = useState(false)
   const [showProfileTypeOverlay, setShowProfileTypeOverlay] = useState(false)
+  const [showAccountDeletionOverlay, setShowAccountDeletionOverlay] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Scroll to top when component mounts
@@ -84,7 +86,7 @@ export function SettingsPage({ onLogoClick }: SettingsPageProps) {
   }
 
   const handleAccountDeletionClick = () => {
-    // TODO: Open account deletion overlay
+    setShowAccountDeletionOverlay(true)
   }
 
 
@@ -237,10 +239,10 @@ export function SettingsPage({ onLogoClick }: SettingsPageProps) {
                 ×
               </button>
             </div>
-            
+
             <div className="auth-modal-header">
             </div>
-            
+
             <div className="auth-content">
               <div className="header-card">
                 <h2>CAMBIA A CLIENTE</h2>
@@ -258,18 +260,18 @@ export function SettingsPage({ onLogoClick }: SettingsPageProps) {
                   <div className="current-email-display">Cliente</div>
                 </div>
 
-                <div className="warning-message" style={{ 
-                  background: '#FEF3C7', 
-                  color: '#92400E', 
-                  padding: '1rem', 
-                  borderRadius: '4px', 
+                <div className="warning-message" style={{
+                  background: '#FEF3C7',
+                  color: '#92400E',
+                  padding: '1rem',
+                  borderRadius: '4px',
                   fontSize: '0.875rem'
                 }}>
                   <strong>Attenzione:</strong> Cambiando a Cliente perderai l'accesso alle funzionalità da artista come il portfolio personale e la gestione dei lavori. Potrai sempre tornare artista in futuro.
                 </div>
 
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="action-btn"
                   disabled={isSubmitting}
                 >
@@ -279,6 +281,16 @@ export function SettingsPage({ onLogoClick }: SettingsPageProps) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Account Deletion Overlay */}
+      {showAccountDeletionOverlay && (
+        <Suspense fallback={<div />}>
+          <AccountDeletionOverlay
+            isOpen={showAccountDeletionOverlay}
+            onClose={() => setShowAccountDeletionOverlay(false)}
+          />
+        </Suspense>
       )}
     </div>
   )

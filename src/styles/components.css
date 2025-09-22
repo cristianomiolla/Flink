@@ -61,10 +61,6 @@
   composes: state-container;
 }
 
-.empty-card {
-  composes: state-card;
-  border-color: var(--border);
-}
 
 .empty-title {
   color: var(--foreground);
