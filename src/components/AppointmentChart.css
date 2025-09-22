@@ -62,7 +62,7 @@
 }
 
 /* Mobile responsiveness */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .appointment-chart {
     margin: 1.5rem 0;
     padding: 1rem;

@@ -10,7 +10,7 @@
 }
 
 /* Mobile specific adjustments */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .messages-page.mobile.conversation .booking-progress-tracker {
     position: fixed;
     top: 70px; /* Right after the 70px conversation-header */

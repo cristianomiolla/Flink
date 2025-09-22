@@ -15,7 +15,7 @@
 }
 
 /* Fade effect on desktop only */
-@media (min-width: 769px) {
+@media (min-width: 768px) {
   .horizontal-scroll-container::before,
   .horizontal-scroll-container::after {
     content: '';
@@ -117,7 +117,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .horizontal-section {
     margin-bottom: 2rem;
     padding: 0; /* Remove padding on mobile */

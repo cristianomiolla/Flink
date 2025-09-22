@@ -107,7 +107,7 @@
 }
 
 /* Mobile responsive - ensure sidebar works with toggle */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .management-sidebar {
     width: 240px;
   }

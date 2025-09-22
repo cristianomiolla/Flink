@@ -169,7 +169,7 @@
 }
 
 /* Mobile responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .appointment-card {
     width: 250px;
   }
@@ -255,7 +255,7 @@
 }
 
 /* Mobile responsive adjustments for reference images */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .reference-image-preview {
     width: 60px;
     height: 60px;

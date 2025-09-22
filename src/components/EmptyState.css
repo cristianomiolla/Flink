@@ -44,7 +44,7 @@
 }
 
 /* Mobile responsive adjustments */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .empty-state {
     padding: 2rem 1rem;
   }

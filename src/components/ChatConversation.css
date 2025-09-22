@@ -148,7 +148,7 @@
 }
 
 /* Mobile optimization */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .conversation-participant-name {
     font-size: 14px;
     font-weight: 700;
@@ -187,7 +187,7 @@
 }
 
 /* Mobile responsive - handled in MessagesPage.css */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .messages-page.mobile.conversation .messages-list {
     margin-top: 137px; /* Account for fixed header (70px) + pinned button (77px) - 10px */
     padding: 16px;

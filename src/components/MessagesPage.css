@@ -48,7 +48,7 @@
 /* Messages Page Empty State uses global rules from tokens.css */
 
 /* Mobile Messages Layout */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .messages-page.mobile {
     background: var(--background);
   }
@@ -407,7 +407,7 @@
 }
 
 /* Desktop booking form styles */
-@media (min-width: 769px) {
+@media (min-width: 768px) {
   .form-row {
     display: flex;
     flex-direction: row;
