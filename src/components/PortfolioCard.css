@@ -234,10 +234,22 @@
   border-right: none;
 }
 
+.portfolio-actions .action-btn:first-child {
+  border-left: none;
+}
+
 /* Artist card overrides when using portfolio-actions */
 .artist-card .portfolio-actions .action-btn {
   border-top: 1px solid var(--border);
   border-right: none;
+}
+
+.artist-card .portfolio-actions .action-btn:first-child {
+  border-left: 1px solid var(--border);
+}
+
+.artist-card .portfolio-actions .action-btn:last-child {
+  border-right: 1px solid var(--border);
 }
 
 /* Mobile: font-size 11px for artist-card in search results */
