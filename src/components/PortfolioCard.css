@@ -231,11 +231,13 @@
 .portfolio-actions .action-btn {
   font-size: 11px;
   border-top: none;
+  border-right: none;
 }
 
 /* Artist card overrides when using portfolio-actions */
 .artist-card .portfolio-actions .action-btn {
   border-top: 1px solid var(--border);
+  border-right: none;
 }
 
 /* Mobile: font-size 11px for artist-card in search results */

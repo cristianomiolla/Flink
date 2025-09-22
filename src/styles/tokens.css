@@ -88,11 +88,6 @@ body {
   margin: 0 auto;
 }
 
-@media (min-width: 768px) {
-  .container {
-    padding: 0 2rem;
-  }
-}
 
 /* === BUTTONS === */
 /* Button styles moved to ActionButton.css */
