@@ -181,9 +181,42 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
-    // Clear any stale local storage
-    localStorage.removeItem('supabase.auth.token')
+    try {
+      // Try global logout first
+      await supabase.auth.signOut({ scope: 'global' })
+    } catch (error) {
+      console.warn('Global logout failed, attempting local logout:', error)
+      // Fallback to local logout if global fails
+      try {
+        await supabase.auth.signOut({ scope: 'local' })
+      } catch (localError) {
+        console.warn('Local logout also failed:', localError)
+      }
+    }
+
+    // Force clear all Supabase related items from localStorage
+    const keysToRemove = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key && key.startsWith('supabase')) {
+        keysToRemove.push(key)
+      }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key))
+
+    // Also clear session storage
+    const sessionKeysToRemove = []
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i)
+      if (key && key.startsWith('supabase')) {
+        sessionKeysToRemove.push(key)
+      }
+    }
+    sessionKeysToRemove.forEach(key => sessionStorage.removeItem(key))
+
+    // Force update local state
+    setUser(null)
+    setProfile(null)
   }
 
   const refreshProfile = async () => {
