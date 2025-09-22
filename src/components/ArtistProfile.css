@@ -308,17 +308,16 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  margin-bottom: 2rem;
 }
 
 .review-item {
   padding: 1.5rem;
   background: var(--background);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-red);
 }
 
 .review-item:hover {
-  border-color: var(--border-red);
+  box-shadow: var(--shadow-lg);
 }
 
 .review-header {
@@ -359,8 +358,9 @@
 .reviews-summary {
   padding: 2rem;
   background: var(--background);
-  border: 1px solid var(--border-red);
+  border: 1px solid var(--border);
   text-align: center;
+  margin-bottom: 2rem;
 }
 
 .rating-average {

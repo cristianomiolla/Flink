@@ -881,6 +881,18 @@ export function PersonalProfile() {
                       </div>
                     ) : reviews.length > 0 ? (
                       <>
+                        {reviewStats && (
+                          <div className="reviews-summary">
+                            <div className="rating-average">
+                              <span className="artist-rating-number">{reviewStats.average_rating}</span>
+                              <div className="rating-stars">{renderStars(Math.round(reviewStats.average_rating))}</div>
+                              <span className="rating-count">
+                                {reviewStats.total_reviews} {reviewStats.total_reviews === 1 ? 'recensione' : 'recensioni'}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
                         <div className="reviews-list">
                           {reviews.map((review) => (
                             <div key={review.id} className="review-item">
@@ -897,18 +909,6 @@ export function PersonalProfile() {
                             </div>
                           ))}
                         </div>
-
-                        {reviewStats && (
-                          <div className="reviews-summary">
-                            <div className="rating-average">
-                              <span className="artist-rating-number">{reviewStats.average_rating}</span>
-                              <div className="rating-stars">{renderStars(Math.round(reviewStats.average_rating))}</div>
-                              <span className="rating-count">
-                                {reviewStats.total_reviews} {reviewStats.total_reviews === 1 ? 'recensione' : 'recensioni'}
-                              </span>
-                            </div>
-                          </div>
-                        )}
                       </>
                     ) : (
                       <div className="empty-state">

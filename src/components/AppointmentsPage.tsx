@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppointments } from '../hooks/useAppointments'
 import { useAuth } from '../hooks/useAuth'
@@ -24,13 +24,32 @@ export function AppointmentsPage() {
   const { appointments, loading, error, refreshAppointments } = useAppointments()
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('programmati')
   const [activeSection, setActiveSection] = useState<ManagementSection>('appointments')
-  const [sidebarVisible, setSidebarVisible] = useState(true)
+  const [sidebarVisible, setSidebarVisible] = useState(false)
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth())
 
   const handleLogoClick = () => {
     navigate('/')
   }
+
+  // Set initial sidebar visibility based on screen size
+  useEffect(() => {
+    const checkScreenSize = () => {
+      if (window.innerWidth > 768) {
+        setSidebarVisible(true)
+      } else {
+        setSidebarVisible(false)
+      }
+    }
+
+    // Set initial state
+    checkScreenSize()
+
+    // Listen for window resize
+    window.addEventListener('resize', checkScreenSize)
+
+    return () => window.removeEventListener('resize', checkScreenSize)
+  }, [])
 
   // Filter appointments based on selected chip
   const filteredAppointments = appointments.filter(appointment => {

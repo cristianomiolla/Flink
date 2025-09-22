@@ -85,6 +85,9 @@
   left: 0;
   right: 0;
   bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for mobile browsers */
   background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -94,6 +97,7 @@
   z-index: 1000;
   padding: 1rem;
   animation: modalFadeIn 0.3s ease-out;
+  overscroll-behavior: contain; /* Prevent scroll chaining on mobile */
 }
 
 @keyframes modalFadeIn {
@@ -224,10 +228,13 @@
   .modal-overlay {
     padding: 1rem;
     z-index: 1050;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
   }
-  
+
   .modal-content {
     max-height: calc(100vh - 2rem);
+    max-height: calc(100dvh - 2rem); /* Dynamic viewport height for mobile browsers */
     border-radius: 0;
   }
   
