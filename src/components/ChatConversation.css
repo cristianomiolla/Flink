@@ -312,6 +312,34 @@
   z-index: 10;
 }
 
+/* Mobile fix for viewport changes */
+@media (max-width: 767px) {
+  .message-input-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 1rem;
+    /* Use safe area insets to account for mobile browser UI */
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    /* Use stable viewport units - fallback to 0 if not supported */
+    bottom: env(safe-area-inset-bottom, 0);
+    /* Force GPU acceleration to prevent janky movement */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* Add bottom padding to messages list to prevent overlap */
+  .messages-page.mobile.conversation .messages-list {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0)); /* Input height + safe area */
+    /* Use small viewport height for better mobile behavior */
+    height: calc(100svh - 137px - 76px - env(safe-area-inset-bottom, 0));
+    min-height: calc(100svh - 137px - 76px - env(safe-area-inset-bottom, 0));
+  }
+}
+
 .message-input-wrapper {
   display: flex;
   align-items: flex-end;
