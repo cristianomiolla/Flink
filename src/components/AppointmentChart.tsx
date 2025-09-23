@@ -32,9 +32,24 @@ export function AppointmentChart({ appointments, selectedYear, selectedMonth }: 
         setContainerWidth(Math.max(320, width - padding))
       }
     }
+
     updateWidth()
     window.addEventListener('resize', updateWidth)
-    return () => window.removeEventListener('resize', updateWidth)
+
+    // Use ResizeObserver to detect layout changes
+    const resizeObserver = new ResizeObserver(() => {
+      // Small delay to ensure CSS transitions are complete
+      setTimeout(updateWidth, 100)
+    })
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current)
+    }
+
+    return () => {
+      window.removeEventListener('resize', updateWidth)
+      resizeObserver.disconnect()
+    }
   }, [])
 
   const chartData = useMemo(() => {
