@@ -4,6 +4,7 @@ import './PageHeader.css'
 import { useAuth } from '../hooks/useAuth'
 import { HeaderIcons } from './HeaderIcons'
 import { ProfileDropdown } from './ProfileDropdown'
+import PWAInstallButton from './PWAInstallButton'
 
 interface HeaderProps {
   onLogoClick?: () => void
@@ -32,6 +33,7 @@ export function Header({ onLogoClick, children, onAuthRequired }: HeaderProps) {
           )}
           
           <div className="user-section">
+            <PWAInstallButton />
             {loading ? (
               <div className="auth-loading">...</div>
             ) : user ? (
