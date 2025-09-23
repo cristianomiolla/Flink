@@ -1,11 +1,18 @@
 /* tokens.css is imported globally in index.css */
 
 .appointment-chart {
-  margin: 2rem 0;
+  margin: 0;
   padding: 1.5rem;
   background: var(--background);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
+}
+
+/* Desktop specific styling */
+@media (min-width: 768px) {
+  .appointment-chart {
+    margin: 0;
+  }
 }
 
 .chart-title {
@@ -64,7 +71,6 @@
 /* Mobile responsiveness */
 @media (max-width: 767px) {
   .appointment-chart {
-    margin: 1.5rem 0;
     padding: 1rem;
   }
 

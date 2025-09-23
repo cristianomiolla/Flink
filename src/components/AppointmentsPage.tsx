@@ -327,51 +327,54 @@ export function AppointmentsPage() {
                     />
                   </div>
 
-                  {/* Monthly Stats Boxes */}
-                  <div className="dashboard-stats">
-                    <div className="stats-box">
-                      <div className="stats-item">
-                        <span className="stats-label">N. APPUNTAMENTI</span>
-                        <span className="stats-value">
-                          {monthlyStats.total}
-                          {monthlyStats.scheduled > 0 && (
-                            <>
-                              <br />
-                              ({monthlyStats.scheduled} programmati)
-                            </>
-                          )}
-                        </span>
-                        <div className={`comparison-chip ${appointmentsComparison.isPositive ? 'positive' : 'negative'}`}>
-                          {appointmentsComparison.isPositive ? '↗' : '↘'} {Math.abs(appointmentsComparison.percentage)}%
+                  {/* Dashboard Layout */}
+                  <div className="dashboard-layout">
+                    {/* Appointment Trend Chart */}
+                    <AppointmentChart
+                      appointments={appointments}
+                      selectedYear={selectedYear}
+                      selectedMonth={selectedMonth}
+                    />
+
+                    {/* Monthly Stats Boxes */}
+                    <div className="dashboard-stats">
+                      <div className="stats-box">
+                        <div className="stats-item">
+                          <span className="stats-label">N. APPUNTAMENTI</span>
+                          <span className="stats-value">
+                            {monthlyStats.total}
+                            {monthlyStats.scheduled > 0 && (
+                              <>
+                                <br />
+                                ({monthlyStats.scheduled} programmati)
+                              </>
+                            )}
+                          </span>
+                          <div className={`comparison-chip ${appointmentsComparison.isPositive ? 'positive' : 'negative'}`}>
+                            {appointmentsComparison.isPositive ? '↗' : '↘'} {Math.abs(appointmentsComparison.percentage)}%
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="stats-box">
-                      <div className="stats-item">
-                        <span className="stats-label">RICAVO TOTALE</span>
-                        <span className="stats-value">
-                          €{(monthlyStats.completedEarnings + monthlyStats.scheduledEarnings).toFixed(2)}
-                          {monthlyStats.scheduledEarnings > 0 && (
-                            <>
-                              <br />
-                              (€{monthlyStats.scheduledEarnings.toFixed(2)} programmati)
-                            </>
-                          )}
-                        </span>
-                        <div className={`comparison-chip ${earningsComparison.isPositive ? 'positive' : 'negative'}`}>
-                          {earningsComparison.isPositive ? '↗' : '↘'} {Math.abs(earningsComparison.percentage)}%
+                      <div className="stats-box">
+                        <div className="stats-item">
+                          <span className="stats-label">RICAVO TOTALE</span>
+                          <span className="stats-value">
+                            €{(monthlyStats.completedEarnings + monthlyStats.scheduledEarnings).toFixed(2)}
+                            {monthlyStats.scheduledEarnings > 0 && (
+                              <>
+                                <br />
+                                (€{monthlyStats.scheduledEarnings.toFixed(2)} programmati)
+                              </>
+                            )}
+                          </span>
+                          <div className={`comparison-chip ${earningsComparison.isPositive ? 'positive' : 'negative'}`}>
+                            {earningsComparison.isPositive ? '↗' : '↘'} {Math.abs(earningsComparison.percentage)}%
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-
-                  {/* Appointment Trend Chart */}
-                  <AppointmentChart
-                    appointments={appointments}
-                    selectedYear={selectedYear}
-                    selectedMonth={selectedMonth}
-                  />
 
                   {/* Dashboard content will be added here */}
                 </div>

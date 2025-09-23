@@ -218,6 +218,28 @@
   gap: 1rem;
 }
 
+/* Dashboard Layout */
+.dashboard-layout {
+  margin-bottom: 2rem;
+}
+
+/* Dashboard Layout - desktop arrangement */
+@media (min-width: 768px) {
+  .dashboard-layout {
+    display: grid;
+    grid-template-columns: 1fr 150px;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .dashboard-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 150px;
+  }
+}
+
 .stats-box {
   background: var(--background);
   border: 1px solid var(--border);
@@ -287,9 +309,16 @@
 
 /* Dashboard Stats Mobile */
 @media (max-width: 767px) {
+  .dashboard-layout {
+    display: flex;
+    flex-direction: column;
+  }
+
   .dashboard-stats {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
+    order: -1;
+    margin-bottom: 1rem;
   }
 
   .stats-box {
