@@ -5,7 +5,7 @@ import './components/ActionButton.css'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
-  <BrowserRouter basename="/Skunk">
+  <BrowserRouter basename="/Flink">
     <App />
   </BrowserRouter>,
 )

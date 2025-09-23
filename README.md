@@ -1,4 +1,4 @@
-# Skunk
+# Flink
 
 A React-based tattoo artist marketplace application with a distinctive brutalist design.
 
@@ -30,4 +30,4 @@ npm run dev
 
 This app is configured for GitHub Pages deployment. Push to main branch to deploy automatically.
 
-Live site: https://cristianomiolla.github.io/Skunk/
+Live site: https://cristianomiolla.github.io/Flink/

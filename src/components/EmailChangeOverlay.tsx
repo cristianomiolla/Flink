@@ -60,7 +60,7 @@ export function EmailChangeOverlay({ isOpen, onClose }: EmailChangeOverlayProps)
       const { error } = await supabase.auth.updateUser(
         { email: formData.newEmail },
         {
-          emailRedirectTo: 'https://cristianomiolla.github.io/Skunk/'
+          emailRedirectTo: 'https://cristianomiolla.github.io/Flink/'
         }
       )
 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Skunk** is a React-based tattoo artist marketplace application. The application uses a distinctive "brutalist" design with bold typography, high contrast colors (primarily red, black, and white), and angled/rotated elements.
+**Flink** is a React-based tattoo artist marketplace application. The application uses a distinctive "brutalist" design with bold typography, high contrast colors (primarily red, black, and white), and angled/rotated elements.
 
 ## Key Technologies & Architecture
 
@@ -390,7 +390,7 @@ The app uses TypeScript interfaces defined in `src/types/portfolio.ts`:
 ## Deployment
 
 The application is configured for GitHub Pages deployment:
-- **Live URL**: https://cristianomiolla.github.io/Skunk/
+- **Live URL**: https://cristianomiolla.github.io/Flink/
 - **Deployment**: Automatic via `npm run deploy` which builds and pushes to gh-pages branch
 - **Build Tool**: Vite with base path configured for GitHub Pages subdirectory
 - **Static Assets**: Uses `.nojekyll` file to prevent Jekyll processing

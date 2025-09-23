@@ -166,7 +166,7 @@ export function MainPage() {
       {/* Mobile layout: Logo + Search */}
       <div className="mobile-header">
         <div className="mobile-logo" onClick={handleLogoClick}>
-          <span className="mobile-logo-text">SKUNK</span>
+          <span className="mobile-logo-text">FLINK</span>
         </div>
       </div>
 

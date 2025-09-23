@@ -23,7 +23,7 @@ export function Header({ onLogoClick, children, onAuthRequired }: HeaderProps) {
     <header className="header">
       <div className="container">
         <div className="header-content">
-          <span className="logo" onClick={onLogoClick}>SKUNK</span>
+          <span className="logo" onClick={onLogoClick}>FLINK</span>
           
           {children && (
             <div className="header-card">
