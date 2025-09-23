@@ -130,12 +130,10 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
   return (
     <div className="modal-overlay" onClick={handleBackdropClick}>
       <div className={`modal-content ${openedFromPortfolioCard && !isMobile ? 'portfolio-card-modal' : ''}`}>
-        {/* Sticky Header with Close Button */}
-        <div className="modal-header">
-          <button className="modal-close-btn" onClick={onClose}>
-            ×
-          </button>
-        </div>
+        {/* Close Button positioned absolutely on modal content */}
+        <button className="modal-close-btn" onClick={onClose}>
+          ×
+        </button>
 
         {/* Image Section */}
         <div className="modal-image-section">

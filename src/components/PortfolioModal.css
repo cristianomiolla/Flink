@@ -47,10 +47,6 @@
     z-index: 10;
   }
 
-  /* Ensure the modal content allows overflow during zoom */
-  .modal-content:has(.mobile-zoomable) {
-    overflow: visible;
-  }
 
   /* Ensure the modal overlay allows overflow during zoom */
   .modal-overlay:has(.mobile-zoomable) {
@@ -334,57 +330,58 @@
   .modal-details-section {
     padding: 0 1rem 0.875rem 1rem;
   }
-  
+
   .modal-portfolio-title {
     font-size: 20px;
   }
-  
+
   .modal-artist-info {
     margin-top: 16px;
   }
-  
+
   .modal-bottom-spacer {
     height: 16px;
   }
-  
+
   .modal-artist-name {
     font-size: 15px;
   }
-  
+
   .modal-portfolio-description {
     font-size: 14px;
   }
-  
+
   .modal-portfolio-tags {
     gap: 0.5rem;
     margin: 0 0 16px 0;
   }
-  
+
   .modal-portfolio-tag {
     padding: 0.2rem 0.5rem;
     font-size: 10px;
   }
-  
+
   .modal-badge {
     top: 0.75rem;
     left: 0.75rem;
     padding: 0.4rem 0.8rem;
     font-size: 12px;
   }
-  
+
   .modal-badge.flash,
   .modal-badge.realizzato {
     padding: 0.4rem 0.8rem;
     font-size: 14px;
   }
-  
+
   .modal-price {
     bottom: 0.625rem;
     right: 0.625rem;
     padding: 0.5rem 0.75rem;
     font-size: 15px;
   }
-  
+
+
   /* Mobile layout: arrange buttons in rows */
   .modal-portfolio-actions {
     display: grid;
@@ -395,71 +392,76 @@
     margin-right: -1rem;
     padding-bottom: 0;
   }
-  
+
   .modal-portfolio-actions .action-btn.modal {
     font-size: 11px !important;
     padding: 8px 12px !important;
     padding-bottom: 8px !important;
   }
-  
+
   .modal-portfolio-actions .action-btn {
     font-size: 11px !important;
     padding: 8px 12px !important;
   }
-  
+
   /* Default layout for 3 buttons (other users' posts): Mi piace, Salva, Contatta */
   .modal-portfolio-actions .action-btn:nth-child(1) {
     grid-column: 1;
     grid-row: 1;
   }
-  
+
   .modal-portfolio-actions .action-btn:nth-child(2) {
     grid-column: 2;
     grid-row: 1;
   }
-  
+
   .modal-portfolio-actions .action-btn:nth-child(3) {
     grid-column: 1 / -1;
     grid-row: 2;
   }
-  
+
   /* Layout for 4 buttons (own posts): Mi piace, Salva (row 1), Modifica, Elimina (row 2) */
   .modal-portfolio-actions:has(.action-btn:nth-child(4)) .action-btn:nth-child(3) {
     grid-column: 1;
     grid-row: 2;
   }
-  
+
   .modal-portfolio-actions:has(.action-btn:nth-child(4)) .action-btn:nth-child(4) {
     grid-column: 2;
     grid-row: 2;
   }
-  
-  
+
+  /* Fix: Ensure modal-meta-info stays within modal-details-section */
   .modal-meta-info {
     padding: 12px;
     flex-direction: row;
     justify-content: space-between;
+    /* Ensure it stays within the parent container */
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
   }
-  
+
   .modal-meta-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.25rem;
     font-size: 11px;
+    flex: 1;
   }
-  
+
   .modal-meta-label {
     min-width: auto;
   }
-  
+
   .modal-artist-name {
     font-size: 13px;
   }
-  
+
   .modal-section-title {
     font-size: 13px;
   }
-  
+
   .modal-portfolio-description {
     font-size: 13px;
   }

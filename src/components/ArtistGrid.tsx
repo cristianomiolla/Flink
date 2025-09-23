@@ -252,7 +252,7 @@ const ArtistGrid = memo(function ArtistGrid({
               isCalculatingDistances
                 ? "Artisti vicini (calcolando...)"
                 : nearbyArtists.length > 0
-                  ? `Artisti vicini (entro 250km)`
+                  ? `Vicini a te`
                   : "Artisti vicini"
             }
             artists={nearbyArtists}

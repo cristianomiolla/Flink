@@ -172,7 +172,7 @@
   font-weight: 300;
   color: var(--foreground);
   cursor: pointer;
-  z-index: 10;
+  z-index: 20;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   box-sizing: border-box;
