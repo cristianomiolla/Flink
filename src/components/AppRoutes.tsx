@@ -10,6 +10,7 @@ const MessagesPage = lazy(() => import('./MessagesPage').then(m => ({ default: m
 const SavedItemsPage = lazy(() => import('./SavedItemsPage').then(m => ({ default: m.SavedItemsPage })))
 const FeaturedWorksPage = lazy(() => import('./FeaturedWorksPage').then(m => ({ default: m.FeaturedWorksPage })))
 const FeaturedArtistsPage = lazy(() => import('./FeaturedArtistsPage').then(m => ({ default: m.FeaturedArtistsPage })))
+const NearbyArtistsPage = lazy(() => import('./NearbyArtistsPage').then(m => ({ default: m.NearbyArtistsPage })))
 const RecentArtistsPage = lazy(() => import('./RecentArtistsPage').then(m => ({ default: m.RecentArtistsPage })))
 const RecentWorksPage = lazy(() => import('./RecentWorksPage').then(m => ({ default: m.RecentWorksPage })))
 const FollowedArtistsWorksPage = lazy(() => import('./FollowedArtistsWorksPage').then(m => ({ default: m.FollowedArtistsWorksPage })))
@@ -57,6 +58,7 @@ export function AppRoutes() {
         <Route path="/saved" element={<SavedItemsPage onLogoClick={handleLogoClick} onArtistClick={handleArtistClick} />} />
         <Route path="/featured" element={<FeaturedWorksPage onLogoClick={handleLogoClick} />} />
         <Route path="/featured-artists" element={<FeaturedArtistsPage onLogoClick={handleLogoClick} />} />
+        <Route path="/nearby-artists" element={<NearbyArtistsPage onLogoClick={handleLogoClick} />} />
         <Route path="/recent-artists" element={<RecentArtistsPage onLogoClick={handleLogoClick} />} />
         <Route path="/recent" element={<RecentWorksPage onLogoClick={handleLogoClick} />} />
         <Route path="/following" element={<FollowedArtistsWorksPage onLogoClick={handleLogoClick} />} />

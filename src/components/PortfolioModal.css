@@ -259,8 +259,8 @@
   margin-right: -3rem;
 }
 
-
 .modal-portfolio-actions .action-btn {
+  border-top: none;
   border-right: none;
 }
 

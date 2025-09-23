@@ -111,6 +111,10 @@ export function MainPage() {
     navigate('/recent-artists')
   }, [navigate])
 
+  const handleShowNearbyArtists = useCallback(() => {
+    navigate('/nearby-artists')
+  }, [navigate])
+
   const handleShowFollowedWorks = useCallback(() => {
     navigate('/following')
   }, [navigate])
@@ -239,7 +243,7 @@ export function MainPage() {
                 onDelete={handleDeletePortfolioItem}
               />
             ) : (
-              <ArtistGrid 
+              <ArtistGrid
                 profiles={artistProfiles}
                 loading={loading}
                 error={error}
@@ -251,6 +255,7 @@ export function MainPage() {
                 onAuthRequired={handleAuthRequired}
                 onContactArtist={handleContactArtist}
                 onShowMoreFeatured={handleShowFeaturedArtists}
+                onShowMoreNearby={handleShowNearbyArtists}
                 onShowMoreRecent={handleShowRecentArtists}
               />
             )}
