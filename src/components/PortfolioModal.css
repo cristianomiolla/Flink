@@ -13,6 +13,13 @@
   flex-shrink: 0;
 }
 
+/* Allow overflow during mobile zoom */
+@media (max-width: 767px) {
+  .modal-image-section:has(.mobile-zoomable) {
+    overflow: visible;
+  }
+}
+
 .modal-image-section:has(.modal-portfolio-image) {
   aspect-ratio: 1 / 1;
   background: var(--muted);
@@ -24,6 +31,31 @@
   object-fit: cover;
   display: block;
   border-bottom: 1px solid var(--border-red);
+}
+
+/* Mobile pinch-to-zoom functionality */
+@media (max-width: 767px) {
+  .modal-portfolio-image.mobile-zoomable {
+    touch-action: none;
+    transform-origin: center center;
+    transition: none;
+    will-change: transform;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Ensure the modal content allows overflow during zoom */
+  .modal-content:has(.mobile-zoomable) {
+    overflow: visible;
+  }
+
+  /* Ensure the modal overlay allows overflow during zoom */
+  .modal-overlay:has(.mobile-zoomable) {
+    overflow: visible;
+  }
 }
 
 .modal-image-placeholder {
@@ -101,11 +133,13 @@
   min-height: 0;
 }
 
+
 .modal-details-section::after {
   content: '';
   height: 0;
   flex-shrink: 0;
 }
+
 
 /* Artist Info */
 .modal-artist-info {
@@ -225,6 +259,15 @@
   margin-right: -3rem;
 }
 
+
+.modal-portfolio-actions .action-btn {
+  border-right: none;
+}
+
+.modal-portfolio-actions .action-btn:last-child {
+  border-right: 1px solid var(--border);
+}
+
 /* Desktop only: Increase padding for action buttons in modal-details-section */
 @media (min-width: 768px) {
   .modal-details-section .action-btn {
@@ -253,6 +296,38 @@
   border-color: hsl(0, 0%, 20%);
 }
 
+
+/* Portfolio Card Modal - Desktop Only Sizing Logic */
+@media (min-width: 768px) {
+  .modal-content.portfolio-card-modal {
+    height: calc(100vh - 2rem);
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    width: auto;
+    max-width: none;
+  }
+
+  .modal-content.portfolio-card-modal .modal-image-section {
+    height: calc(100vh - 2rem - 54px);
+    max-height: calc(100vh - 2rem - 54px);
+    flex-shrink: 0;
+    aspect-ratio: 1 / 1;
+    width: calc(100vh - 2rem - 54px);
+    max-width: calc(100vh - 2rem - 54px);
+    overflow: hidden;
+  }
+
+  .modal-content.portfolio-card-modal .modal-details-section {
+    flex-shrink: 0;
+  }
+
+  .modal-content.portfolio-card-modal .modal-portfolio-actions {
+    flex-shrink: 0;
+  }
+
+}
 
 /* Mobile Design - Portfolio Modal Specific */
 @media (max-width: 767px) {

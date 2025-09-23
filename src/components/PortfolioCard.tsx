@@ -264,7 +264,7 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
     </article>
 
       {/* Portfolio Modal */}
-      <PortfolioModal 
+      <PortfolioModal
         item={item}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
@@ -273,6 +273,7 @@ export function PortfolioCard({ item, onArtistClick, onAuthRequired, onContactAr
         onContactArtist={onContactArtist}
         onEdit={onEdit}
         onDelete={onDelete}
+        openedFromPortfolioCard={true}
       />
     </>
   )

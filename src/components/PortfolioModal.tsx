@@ -4,6 +4,7 @@ import { Avatar } from './Avatar'
 import { useSavedTattoos } from '../hooks/useSavedTattoos'
 import { usePortfolioLikes } from '../hooks/usePortfolioLikes'
 import { useAuth } from '../hooks/useAuth'
+import { usePinchZoom } from '../hooks/usePinchZoom'
 import { ActionButton, BookmarkIcon, HeartIcon, MessageIcon } from './ActionButton'
 import { handleImageError, getSafeImageUrl } from '../lib/imageUtils'
 import type { PortfolioItem } from '../types/portfolio'
@@ -17,9 +18,10 @@ interface PortfolioModalProps {
   onContactArtist?: (artistId: string) => void
   onEdit?: (itemId: string) => void
   onDelete?: (itemId: string) => void
+  openedFromPortfolioCard?: boolean
 }
 
-export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthRequired, onContactArtist, onEdit, onDelete }: PortfolioModalProps) {
+export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthRequired, onContactArtist, onEdit, onDelete, openedFromPortfolioCard = false }: PortfolioModalProps) {
   const { profile } = useAuth()
   const { toggleSave, isTattooSaved } = useSavedTattoos()
   const { isLiked, likeCount, toggleLike, loading, tableExists } = usePortfolioLikes(item.id)
@@ -29,30 +31,43 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
   
   // Hook to detect mobile screen size
   const [isMobile, setIsMobile] = useState(false)
-  
+
   useEffect(() => {
     const checkIsMobile = () => {
       setIsMobile(window.innerWidth <= 767)
     }
-    
+
     checkIsMobile()
     window.addEventListener('resize', checkIsMobile)
-    
+
     return () => window.removeEventListener('resize', checkIsMobile)
   }, [])
-  // Block scroll when modal is open
+
+  // Pinch-to-zoom functionality for mobile
+  const { ref: imageRef, reset: resetZoom } = usePinchZoom({
+    maxScale: 3,
+    minScale: 1,
+    onGestureEnd: () => {
+      // Optional: Add any additional logic when gesture ends
+    }
+  })
+  // Block scroll when modal is open and reset zoom when modal closes
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = 'unset'
+      // Reset zoom when modal closes
+      if (isMobile) {
+        resetZoom()
+      }
     }
 
     // Clean up on unmount
     return () => {
       document.body.style.overflow = 'unset'
     }
-  }, [isOpen])
+  }, [isOpen, isMobile, resetZoom])
 
   // Handle ESC key to close modal
   useEffect(() => {
@@ -114,7 +129,7 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
 
   return (
     <div className="modal-overlay" onClick={handleBackdropClick}>
-      <div className="modal-content">
+      <div className={`modal-content ${openedFromPortfolioCard && !isMobile ? 'portfolio-card-modal' : ''}`}>
         {/* Sticky Header with Close Button */}
         <div className="modal-header">
           <button className="modal-close-btn" onClick={onClose}>
@@ -125,14 +140,15 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
         {/* Image Section */}
         <div className="modal-image-section">
           {item.image_url && (
-            <img 
-              src={getSafeImageUrl(item.image_url)} 
-              alt={item.title || 'Portfolio Item'} 
-              className="modal-portfolio-image"
+            <img
+              ref={isMobile ? imageRef : undefined}
+              src={getSafeImageUrl(item.image_url)}
+              alt={item.title || 'Portfolio Item'}
+              className={`modal-portfolio-image ${isMobile ? 'mobile-zoomable' : ''}`}
               onError={handleImageError}
             />
           )}
-          
+
           {/* Badge and Price Overlays */}
           {badge && (
             <span className={`modal-badge ${badge.toLowerCase()}`}>
@@ -172,7 +188,7 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
               onAuthRequired={onAuthRequired}
               onClick={() => toggleSave(item.id)}
             />
-            
+
             {/* Show edit/delete buttons for own posts */}
             {isOwnPost && (
               <>
@@ -202,7 +218,7 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
                 />
               </>
             )}
-            
+
             {/* Show contact button only for other users' posts */}
             {!isOwnPost && (
               <ActionButton
@@ -215,7 +231,6 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
               />
             )}
           </div>
-
           {/* Artist Info */}
           <div className="modal-artist-info">
             <Avatar
@@ -226,7 +241,7 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
               variant="default"
               onClick={handleArtistNameClick}
             />
-            <span 
+            <span
               className="modal-artist-name"
               onClick={handleArtistNameClick}
               style={{ cursor: 'pointer' }}
@@ -278,7 +293,7 @@ export function PortfolioModal({ item, isOpen, onClose, onArtistClick, onAuthReq
               </div>
             )}
           </div>
-          
+
           {/* Spacer element for bottom spacing */}
           <div className="modal-bottom-spacer"></div>
         </div>
