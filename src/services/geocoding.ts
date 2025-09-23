@@ -38,7 +38,7 @@ class GeocodingService {
         const now = Date.now()
 
         // Filter out expired entries
-        Object.entries(parsedData).forEach(([city, data]: [string, { coordinates: CityCoordinates; timestamp: number }]) => {
+        Object.entries(parsedData as Record<string, { coordinates: CityCoordinates; timestamp: number }>).forEach(([city, data]) => {
           if (now - data.timestamp < CACHE_DURATION) {
             this.cache.set(city.toLowerCase(), data)
           }
