@@ -1,4 +1,4 @@
-const CACHE_NAME = 'flink-v1';
+const CACHE_NAME = 'flink-v2';
 const urlsToCache = [
   '/Flink/',
   '/Flink/manifest.json'
