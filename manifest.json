@@ -1,0 +1,34 @@
+{
+  "name": "Flink - Tattoo Artist Marketplace",
+  "short_name": "Flink",
+  "description": "Discover and connect with tattoo artists in your area",
+  "start_url": "/Flink/",
+  "display": "standalone",
+  "background_color": "#171717",
+  "theme_color": "#EF4343",
+  "orientation": "portrait-primary",
+  "categories": ["lifestyle", "social"],
+  "lang": "it",
+  "icons": [
+    {
+      "src": "/Flink/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/Flink/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/Flink/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
+}
