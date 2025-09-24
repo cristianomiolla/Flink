@@ -8,10 +8,27 @@ import EmptyState from './EmptyState'
 // Lazy load AuthOverlay component
 const AuthOverlay = lazy(() => import('./AuthOverlay').then(module => ({ default: module.AuthOverlay })))
 
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[];
+  readonly userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed';
+    platform: string;
+  }>;
+  prompt(): Promise<void>;
+}
+
+declare global {
+  interface WindowEventMap {
+    beforeinstallprompt: BeforeInstallPromptEvent;
+  }
+}
+
 export function MobileProfilePage() {
   const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
   const [showAuthOverlay, setShowAuthOverlay] = useState(false)
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
+  const [showInstallButton, setShowInstallButton] = useState(false)
 
   const handleAuthRequired = useCallback(() => {
     setShowAuthOverlay(true)
@@ -21,6 +38,32 @@ export function MobileProfilePage() {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstallButton(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, [])
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+      setShowInstallButton(false);
+    }
+  };
 
   const getDisplayName = (): string => {
     if (profile?.profile_type === 'client') {
@@ -170,8 +213,20 @@ export function MobileProfilePage() {
             </button>
           )}
 
-          <button 
-            className="mobile-profile-item" 
+          {showInstallButton && (
+            <button
+              className="mobile-profile-item"
+              onClick={handleInstallClick}
+            >
+              <span className="mobile-profile-item-text">Installa App</span>
+              <svg className="mobile-profile-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <polyline points="9,18 15,12 9,6"/>
+              </svg>
+            </button>
+          )}
+
+          <button
+            className="mobile-profile-item"
             onClick={() => navigate('/settings')}
           >
             <span className="mobile-profile-item-text">Impostazioni</span>
