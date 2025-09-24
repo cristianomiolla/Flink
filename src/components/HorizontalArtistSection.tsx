@@ -120,7 +120,7 @@ function HorizontalArtistSection({
           >
             {artists.slice(0, 12).map((artist) => (
               <div key={artist.id} className="horizontal-card-wrapper">
-                <ArtistCard 
+                <ArtistCard
                   profile={artist}
                   onArtistClick={onArtistClick}
                   onAuthRequired={onAuthRequired}
