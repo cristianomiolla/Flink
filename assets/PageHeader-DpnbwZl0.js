@@ -1,1 +1,0 @@
-import{j as e}from"./index-wZQoyXLs.js";function i({title:s,subtitle:r,actions:a,className:d=""}){return e.jsx("div",{className:`page-header ${d}`,children:e.jsxs("div",{className:"header-card",children:[e.jsx("h2",{children:s}),r&&e.jsx("p",{children:r}),a&&e.jsx("div",{className:"header-actions",children:a})]})})}export{i as P};

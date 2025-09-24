@@ -1,4 +1,4 @@
-import{r as n,s as _}from"./index-wZQoyXLs.js";function b(o){const[m,u]=n.useState([]),[p,l]=n.useState(null),[h,c]=n.useState(!0),[v,d]=n.useState(null);return n.useEffect(()=>{if(!o)return;(async()=>{try{c(!0),d(null);const{data:i,error:g}=await _.from("reviews").select(`
+import{r as n,s as _}from"./index-CRZ081Ij.js";function b(o){const[m,u]=n.useState([]),[p,l]=n.useState(null),[h,c]=n.useState(!0),[v,d]=n.useState(null);return n.useEffect(()=>{if(!o)return;(async()=>{try{c(!0),d(null);const{data:i,error:g}=await _.from("reviews").select(`
             id,
             booking_id,
             client_id,
