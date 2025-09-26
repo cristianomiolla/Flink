@@ -71,7 +71,7 @@ export function AppointmentChart({ appointments, selectedYear, selectedMonth }: 
           : new Date(appointment.created_at)
         return appointmentDate.getFullYear() === targetYear &&
                appointmentDate.getMonth() === targetMonth &&
-               appointment.status === 'completed'
+               (appointment.status === 'completed' || appointment.status === 'scheduled')
       })
 
       const monthlyEarnings = monthlyAppointments.reduce((total, appointment) => {
